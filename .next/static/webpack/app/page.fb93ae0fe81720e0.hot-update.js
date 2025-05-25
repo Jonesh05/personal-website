@@ -1,0 +1,21 @@
+/*
+ * ATTENTION: An "eval-source-map" devtool has been used.
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+self["webpackHotUpdate_N_E"]("app/page",{
+
+/***/ "(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CContact%5CContact.tsx&modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CProjects%5CProjectsContainer.tsx&server=false!":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CContact%5CContact.tsx&modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CProjects%5CProjectsContainer.tsx&server=false! ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+
+eval(__webpack_require__.ts("Promise.resolve(/*! import() eager */).then(__webpack_require__.bind(__webpack_require__, /*! ./src/components/Contact/Contact.tsx */ \"(app-pages-browser)/./src/components/Contact/Contact.tsx\"));\nPromise.resolve(/*! import() eager */).then(__webpack_require__.bind(__webpack_require__, /*! ./src/components/Projects/ProjectsContainer.tsx */ \"(app-pages-browser)/./src/components/Projects/ProjectsContainer.tsx\"))//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwcC1wYWdlcy1icm93c2VyKS8uL25vZGVfbW9kdWxlcy9uZXh0L2Rpc3QvYnVpbGQvd2VicGFjay9sb2FkZXJzL25leHQtZmxpZ2h0LWNsaWVudC1lbnRyeS1sb2FkZXIuanM/bW9kdWxlcz1DJTNBJTVDVXNlcnMlNUNtY19qbyU1Q0Nhc2NhZGVQcm9qZWN0cyU1Q3BlcnNvbmFsLXdlYnNpdGUlNUNzcmMlNUNjb21wb25lbnRzJTVDQ29udGFjdCU1Q0NvbnRhY3QudHN4Jm1vZHVsZXM9QyUzQSU1Q1VzZXJzJTVDbWNfam8lNUNDYXNjYWRlUHJvamVjdHMlNUNwZXJzb25hbC13ZWJzaXRlJTVDc3JjJTVDY29tcG9uZW50cyU1Q1Byb2plY3RzJTVDUHJvamVjdHNDb250YWluZXIudHN4JnNlcnZlcj1mYWxzZSEiLCJtYXBwaW5ncyI6IkFBQUEsa01BQStIO0FBQy9IIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vX05fRS8/YzBlNyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQoLyogd2VicGFja01vZGU6IFwiZWFnZXJcIiAqLyBcIkM6XFxcXFVzZXJzXFxcXG1jX2pvXFxcXENhc2NhZGVQcm9qZWN0c1xcXFxwZXJzb25hbC13ZWJzaXRlXFxcXHNyY1xcXFxjb21wb25lbnRzXFxcXENvbnRhY3RcXFxcQ29udGFjdC50c3hcIik7XG5pbXBvcnQoLyogd2VicGFja01vZGU6IFwiZWFnZXJcIiAqLyBcIkM6XFxcXFVzZXJzXFxcXG1jX2pvXFxcXENhc2NhZGVQcm9qZWN0c1xcXFxwZXJzb25hbC13ZWJzaXRlXFxcXHNyY1xcXFxjb21wb25lbnRzXFxcXFByb2plY3RzXFxcXFByb2plY3RzQ29udGFpbmVyLnRzeFwiKSJdLCJuYW1lcyI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CContact%5CContact.tsx&modules=C%3A%5CUsers%5Cmc_jo%5CCascadeProjects%5Cpersonal-website%5Csrc%5Ccomponents%5CProjects%5CProjectsContainer.tsx&server=false!\n"));
+
+/***/ })
+
+});

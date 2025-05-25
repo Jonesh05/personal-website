@@ -7,8 +7,9 @@ import gsap from 'gsap';
 interface Props {
   data: ProjectsData;
   projects: Project[];
+  featuredProjects: Project[];
   selectedCategory: string;
-  onCategoryChange: (cat: string) => void;
+  onCategoryChange: (category: string) => void;
 }
 
 export const ProjectsPresentational: FC<Props> = ({
@@ -48,7 +49,7 @@ export const ProjectsPresentational: FC<Props> = ({
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, idx) => (
+        {projects?.map((project, idx) => (
             <div
               key={project.id}
               ref={el => (cardsRef.current[idx] = el!)}

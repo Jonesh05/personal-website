@@ -1,8 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ProjectsData } from './Projects.types';
+import { useState, useEffect, useCallback } from 'react';
+import { ProjectsData, Project } from './Projects.types';
 
+// Funciones puras para filtrado
+const filterProjectsByCategory = (projects: Project[], category: string): Project[] => {
+  if (category === 'all') return projects;
+  return projects.filter(project => project.category === category);
+};
+
+const getFeaturedProjects = (projects: Project[]): Project[] => {
+  return projects.filter(project => project.featured);
+};
+
+// Simulación de fetch (puedes reemplazar con fetch real si lo deseas)
 const PROJECTS_DATA: ProjectsData = {
   title: "Proyectos Destacados",
   subtitle: "Una selección de mis trabajos en Web3, AI y desarrollo frontend",
@@ -97,19 +108,36 @@ const PROJECTS_DATA: ProjectsData = {
   ]
 };
 
-export function useProjects() {
+export const useProjects = () => {
+  const [data, setData] = useState<ProjectsData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const filteredProjects = useMemo(
-    () =>
-      selectedCategory === 'all'
-        ? PROJECTS_DATA.projects
-        : PROJECTS_DATA.projects.filter(p => p.category === selectedCategory),
-    [selectedCategory]
-  );
+
+  useEffect(() => {
+    const fetchProjectsData = async () => {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setData(PROJECTS_DATA);
+      setLoading(false);
+    };
+    fetchProjectsData();
+  }, []);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+  }, []);
+
+  const filteredProjects = data 
+    ? filterProjectsByCategory(data.projects, selectedCategory)
+    : [];
+  const featuredProjects = getFeaturedProjects(filteredProjects);
+
   return {
-    data: PROJECTS_DATA,
+    data,
+    loading,
     selectedCategory,
-    setSelectedCategory,
-    filteredProjects
+    setSelectedCategory: handleCategoryChange,
+    filteredProjects,
+    featuredProjects
   };
-}
+};
+
