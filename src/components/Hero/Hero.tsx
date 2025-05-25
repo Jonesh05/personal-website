@@ -14,6 +14,7 @@ const Hero = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -140,11 +141,13 @@ const Hero = () => {
           'radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
       }}
     >
-      {/* Partículas */}
-      <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none" />
+      <div ref={glowRef} className="absolute inset-0 bg-gradient-to-br from-purple-900 via-fuchsia-900 to-fuchsia-800"/>
 
       {/* Overlay ligero */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
+      {/* Partículas */}
+      <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none" />
+
 
       {/* Contenido */}
       <div className="container mx-auto px-4 py-20 relative z-10 text-center">
@@ -155,12 +158,12 @@ const Hero = () => {
           Jhonny Pimiento
         </h1>
         <p ref={subtitleRef} className="text-2xl md:text-3xl text-white/90 mb-8 font-light">
-          Web3 & Blockchain Developer | Colombian Entrepreneur
+          Web3 & Blockchain Developer |  AWS Cloud Architect
         </p>
         <div ref={buttonsRef} className="flex flex-col md:flex-row gap-4 justify-center">
           <Link
             href="#contact"
-            className="px-8 py-4 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="px-8 py-4 bg-white text-slate-500 hover:text-purple-400 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Get in Touch
           </Link>
