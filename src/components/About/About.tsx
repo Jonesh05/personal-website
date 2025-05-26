@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-
+const gradientText = 'bg-gradient-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
 
 const About = () => {
   return (
@@ -19,19 +19,20 @@ const About = () => {
               decentralized space. I'm constantly exploring new possibilities in Web3, from DeFi applications to 
               NFTs and beyond.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <span className="px-4 py-2 bg-primary-50 text-primary-600 rounded-full">32 Years Old</span>
-              <span className="px-4 py-2 bg-primary-50 text-primary-600 rounded-full">Colombian</span>
-              <span className="px-4 py-2 bg-primary-50 text-primary-600 rounded-full">Web3 Enthusiast</span>
+            <div className="flex flex-wrap gap-4 pb-6">
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>Full Stack Developer</span>
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>DevRel</span>
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>Web3 Enthusiast</span>
             </div>
           </div>
-          <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl">
-            <img src="/images/profile.png" alt="Image test"  />
-            <div className="w-full h-full bg-gray-200 animate-pulse" />
+          <div className="relative w-52 h-52 rounded-full scale-150 overflow-hidden shadow-2xl ml-24">
+            <img src="/images/about.png" alt="Image test"  
+            className="w-full h-full object-cover object-[50%_60%] rounded-full border-4 border-white/30 shadow-lg"
+            />
           </div>
         </div>
       </div>
-    </section>
+    </section> 
   );
 };
 
