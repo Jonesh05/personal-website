@@ -1,4 +1,4 @@
-const Skills = () => {
+/* const Skills = () => {
   const skills = [
     {
       category: "Frontend",
@@ -22,7 +22,7 @@ const Skills = () => {
     }
   ];
 
-  return (
+return (
     <section id="skills" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-12">Skills</h2>
@@ -51,4 +51,4 @@ const Skills = () => {
   );
 };
 
-export default Skills;
+export default Skills; */
