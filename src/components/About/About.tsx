@@ -25,10 +25,29 @@ const About = () => {
               <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>Web3 Enthusiast</span>
             </div>
           </div>
-          <div className="relative w-52 h-52 rounded-full scale-150 overflow-hidden shadow-2xl ml-24">
-            <img src="/images/about.png" alt="Image test"  
-            className="w-full h-full object-cover object-[50%_60%] rounded-full border-4 border-white/30 shadow-lg"
-            />
+          <div className="relative w-52 h-52 mx-auto">
+            {/* Spinner externo */}
+            <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 
+                  animate-spin-slow z-0 blur-md opacity-70"></div>
+
+            {/* Spinner medio */}
+            <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-pink-500 
+                  animate-spin-reverse-slower z-0 blur-sm opacity-60"></div>
+
+            {/* Spinner interno */}
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-400 to-purple-600 
+                  animate-spin-slowest z-0 opacity-40"></div>
+
+            {/* Avatar visible */}
+            <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">
+              <Image
+                src="/images/about.png"
+                alt="Avatar"
+                width={208}
+                height={208}
+                className="w-full h-full object-cover object-center rounded-full"
+              />
+            </div>
           </div>
         </div>
       </div>

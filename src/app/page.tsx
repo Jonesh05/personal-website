@@ -2,8 +2,10 @@ import Hero from "../components/Hero/Hero";
 import About from "../components/About/About";
 import Projects from "../components/Projects/Projects";
 //import Skills from "../components/Skills/Skills";
+import { Suspense } from 'react';
 import Timeline from "../components/Timeline/Timeline";
-import BlogList from "../components/BlogList/BlogList";
+import BlogSection from '@/components/Blog/BlogSection';
+import BlogSectionSkeleton from '@/components/Blog/BlogSectionSkeleton';
 import Contact from "../components/Contact/Contact";
 
 export default function Home() {
@@ -14,7 +16,9 @@ export default function Home() {
       <Projects />
      
       <Timeline />
-      <BlogList />
+      <Suspense fallback={<BlogSectionSkeleton />}>
+      <BlogSection />
+      </Suspense>
       <Contact />
     </main>
   );
