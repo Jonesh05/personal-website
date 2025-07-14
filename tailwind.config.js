@@ -14,16 +14,25 @@ module.exports = {
           200: '#bae6fd',
           300: '#7dd3fc',
           400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          500: '#A855F7',
+          600: '#9333EA',
+          700: '#7E22CE',
+          800: '#6B21A8',
+          900: '#581C87',
           DEFAULT: '#0ea5e9'
         },
-        'primary-500': '#0ea5e9',
-        'primary-600': '#0284c7',
-        'primary-700': '#0369a1'
+        'primary-500': '#A855F7',
+        'primary-600': '#9333EA',
+        'primary-700': '#7E22CE',
+        bluish: "#7182ff",
+        greenish: "#3cff52",
+        'bg-light': 'hsla(0, 0%, 95%, 1)', // Gris claro
+        'bg-blue': 'hsla(210, 100%, 95%, 1)', // Azul suave
+        'bg-lavender': 'hsla(240, 100%, 90%, 1)', // Lavanda claro
+        'bg-mint': 'hsla(160, 100%, 90%, 1)', // Verde menta suave
+      },
+      dropShadow: {
+        'text-glow': '0 0 4px rgba(0,0,0,0.4)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

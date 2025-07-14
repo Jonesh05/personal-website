@@ -2,11 +2,20 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["localhost"]
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
   },
 
   webpack: (config) => {
-    config.resolve.fallback = { fs: false, path: false };
+    config.module.rules.push({
+      test: /\.svg$/,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack'],
+    });
     return config;
   }
 }

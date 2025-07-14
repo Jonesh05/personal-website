@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { HeroData } from '../../hooks/useHeroData';
+import { HeroData } from '@/hooks/useHeroData';
 import { motion } from 'framer-motion';
 
 interface HeroPresentationalProps {

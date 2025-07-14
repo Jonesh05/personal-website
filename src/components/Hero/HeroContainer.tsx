@@ -1,5 +1,5 @@
 import { HeroPresentational } from './HeroPresentational';
-import { useHeroData } from '../../hooks/useHeroData';
+import { useHeroData } from '@/hooks/useHeroData';
 
 const HeroContainer = () => {
   const data = useHeroData();

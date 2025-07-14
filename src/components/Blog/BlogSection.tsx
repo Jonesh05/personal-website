@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { postsApi } from '../../lib/firebase/firestore';
+import { postsApi } from '@/lib/firebase/firestore';
 
 interface BlogPost {
   id: string;

@@ -38,7 +38,7 @@ const PROJECTS_DATA: ProjectsData = {
       id: '2',
       title: 'NFT ReFi Platform',
       description: 'Plataforma de finanzas regenerativas usando NFTs para proyectos ambientales. Smart contracts, minting y marketplace integrado.',
-      image: '/images/NFT.png',
+      image: '/images/NFT-card.webp',
       technologies: ['Solidity', 'Hardhat', 'RainbowKit', 'Next.js', 'IPFS'],
       category: 'blockchain',
       status: 'completed',

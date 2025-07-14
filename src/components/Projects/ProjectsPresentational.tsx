@@ -29,7 +29,7 @@ export const ProjectsPresentational: FC<Props> = ({
   }, [projects]);
 
   return (
-    <section className="py-24 bg-gradient-to-br from-purple-900 via-slate-900 to-slate-800">
+    <section id="Projects" className="py-24 bg-gradient-to-br from-purple-900 via-slate-900 to-slate-800">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-3 text-white">{data.title}</h2>
         <p className="text-lg text-slate-300 text-center mb-12 max-w-2xl mx-auto">{data.subtitle}</p>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import KeepScrolling from '@/assets/keep-scrolling-white.svg'
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -134,7 +135,7 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-700 via-primary-800 to-primary-900 overflow-hidden"
       style={{
         backgroundImage:
           'radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), ' +
@@ -153,11 +154,11 @@ const Hero = () => {
       <div className="container mx-auto px-4 py-20 relative z-10 text-center">
         <h1
           ref={titleRef}
-          className="text-5xl md:text-7xl font-bold text-white mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
+          className="text-5xl md:text-7xl font-bold text-white text-glow mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
         >
           Jhonny Pimiento
         </h1>
-        <p ref={subtitleRef} className="text-2xl md:text-3xl text-white/90 mb-8 font-light">
+        <p ref={subtitleRef} className="text-2xl md:text-3xl text-white/90 text-glow mb-8 font-light">
           Web3 & Blockchain Developer |  AWS Cloud Architect
         </p>
         <div ref={buttonsRef} className="flex flex-col md:flex-row gap-4 justify-center">
@@ -168,8 +169,8 @@ const Hero = () => {
             Get in Touch
           </Link>
           <Link
-            href="#projects"
-            className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+            href="#Projects"
+            className="px-8 py-4 border-2 border-white text-white text-glow font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
           >
             View My Work
           </Link>
@@ -178,7 +179,13 @@ const Hero = () => {
 
       {/* Indicador de scroll animado con Tailwind */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+        <span className="text-white/90 uppercase tracking-[6px] whitespace-nowrap text-xs text-center text-shadow-[0_0_2px_rgba(255,255,255,.5),0_0_8px_#000]">
+          Check my curriculum         
+        </span> 
+        <KeepScrolling
+          className="fixed bottom-3 text-white/90 left-0 right-0 top-4 mt-2 mx-auto drop-shadow-2xl animate-bounce"
+        />
+        <div className="w-6 h-10 left-0 mt-4 mx-auto border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce" />
         </div>
       </div>
