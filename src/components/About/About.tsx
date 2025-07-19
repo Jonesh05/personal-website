@@ -117,28 +117,11 @@ const About: React.FC = () => {
     <section id="about" className="py-20 bg-bg-blue">
       <div className="container mx-auto px-4">
         <h2 className={`text-4xl font-bold text-center mb-12 ${gradientText}`}>About Me</h2>
-        <div className="md:col-span-5 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up">
-          <div className="space-y-6">
-            <p className="text-xl text-gray-600">
-              I'm Jhonny Pimiento, a 32-year-old Colombian entrepreneur with a passion for Web3 and blockchain technology.
-              With a background in full-stack development, I specialize in creating innovative solutions that leverage
-              the power of decentralized technologies.
-            </p>
-            <p className="text-xl text-gray-600">
-              My journey in tech started with traditional web development, but I quickly found my passion in the
-              decentralized space. I'm constantly exploring new possibilities in Web3, from DeFi applications to
-              NFTs and beyond.
-            </p>
-            <div className="flex flex-wrap gap-4 pb-6">
-              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>Full Stack Developer</span>
-              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>DevRel</span>
-              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-600`}>Web3 Enthusiast</span>
-            </div>
-          </div>
+        <div className="md:col-span-5 backdrop-blur-sm border border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up"> 
           <div className="relative w-52 h-52 mb-8 mx-auto">
             {/* Spinners */}
-            <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
-            <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-sm opacity-60"></div>
+            {/* <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
+            <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-sm opacity-60"></div> */}
             <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
 
             {/* Avatar visible */}
@@ -153,7 +136,24 @@ const About: React.FC = () => {
               
             </div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full animate-ping"></div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full"></div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full"></div>
+          </div>
+          <div className="space-y-6">
+            <p className="text-xl font-semibold text-gray-600">
+              I'm Jhonny Pimiento, a 32-year-old Colombian entrepreneur with a passion for Web3 and blockchain technology.
+              With a background in full-stack development, I specialize in creating innovative solutions that leverage
+              the power of decentralized technologies.
+            </p>
+            <p className="text-xl font-semibold text-gray-600">
+              My journey in tech started with traditional web development, but I quickly found my passion in the
+              decentralized space. I'm constantly exploring new possibilities in Web3, from DeFi applications to
+              NFTs and beyond.
+            </p>
+            <div className="flex flex-wrap gap-4 pb-6">
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-400`}>Full Stack Developer</span>
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-400`}>DevRel</span>
+              <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-400`}>Web3 Enthusiast</span>
+            </div>
           </div>
         </div> 
         {/* Terminal Section */}

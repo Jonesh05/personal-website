@@ -87,7 +87,7 @@ const SocialLink: React.FC<SocialLinkProps> = ({ href, icon, name }) => (
     href={href} 
     target="_blank" 
     rel="noopener noreferrer"
-    className="group relative p-2 rounded-full transition-all duration-300 
+    className="group relative p-0 mt-4 rounded-full transition-all duration-300 
       hover:bg-white/10 hover:scale-110 active:scale-95"
     aria-label={name}
   >
@@ -143,41 +143,45 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, navLinks, socialLinks, 
     }`}
   >
     <div className="rounded-2xl border border-white/10 
-      bg-gradient-to-br from-white/20 to-white/5 
-      backdrop-blur-xl shadow-2xl p-6">
-      <nav className="flex flex-col gap-4">
-        {navLinks.map(({ name, href }, idx) => (
-          <NavLink
-            key={idx}
-            href={href}
-            onClick={onLinkClick}
-            className="text-center py-2 px-4 rounded-lg hover:bg-white/10"
-          >
-            {name}
-          </NavLink>
-        ))}
+        bg-gradient-to-br from-white/20 to-white/5 
+        backdrop-blur-xl shadow-2xl p-6">
+      <nav aria-label="Mobile Navigation">
+        <ul className="flex flex-col gap-4 justify-center items-center">
+          {navLinks.map(({ name, href }, idx) => (
+             <li key={idx}>
+              <NavLink
+                href={href}
+                onClick={onLinkClick}
+                className="text-center py-2 px-4 rounded-lg hover:bg-white/10"
+              >
+                {name}
+              </NavLink>
+             </li> 
+          ))}
+        </ul>
       </nav>
       {/* Mobile Social Links */}
-      <div className="flex justify-center gap-4 mt-8 pt-6 border-t border-white-700/20 dark:border-white-700/50">
+      <ul className="flex justify-center gap-4 mt-8 pt-6 border-t border-white-700/20 dark:border-white-700/50">
         {socialLinks.map((social, idx) => (
-          <Link 
-            key={`mobile-social-${idx}`}
-            href={social.href} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="p-3 rounded-xl bg-gray-100/50 dark:bg-white/10 hover:bg-gray-200/50 dark:hover:bg-white/20 transition-all duration-200"
-            aria-label={`Visit ${social.name} profile`}
-          >
-            <Image 
-              src={social.icon} 
-              alt={`${social.name} icon`} 
-              width={20} 
-              height={20}
-              className="filter brightness-0 opacity-70 dark:brightness-0 dark:invert dark:opacity-80"
-            />
-          </Link>
+          <li key={`mobile-social-${idx}`}>
+            <Link
+              href={social.href} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-0 mt-4 rounded-xl bg-gray-100/50 dark:bg-white/10 hover:bg-gray-200/50 dark:hover:bg-white/20 transition-all duration-200"
+              aria-label={`Visit ${social.name} profile`}
+            >
+              <Image 
+                src={social.icon} 
+                alt={`${social.name} icon`} 
+                width={20} 
+                height={20}
+                className="filter brightness-0 opacity-70 dark:brightness-0 dark:invert dark:opacity-80"
+              />
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </div>
 )
@@ -253,20 +257,24 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Navegación desktop */}
-          <div className="hidden lg:flex items-center gap-8">
+          <ul className="hidden lg:flex items-center gap-8">
             {navLinks.map(({ name, href }, idx) => (
-              <NavLink key={idx} href={href}>
-                {name}
-              </NavLink>
+              <li key={idx}>
+                <NavLink href={href}>
+                  {name}
+                </NavLink>
+              </li>
             ))}
-          </div>
+          </ul>
 
           {/* Enlaces sociales desktop */}
-          <div className="hidden lg:flex items-center gap-2">
+          <ul className="hidden lg:flex items-center gap-2">
             {socialLinks.map(({ name, href, icon }, idx) => (
-              <SocialLink key={idx} href={href} icon={icon} name={name} />
+              <li key={idx}>
+                <SocialLink href={href} icon={icon} name={name} />
+              </li>
             ))}
-          </div>
+          </ul>
 
           {/* Toggle menú móvil */}
           <MenuToggle isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />

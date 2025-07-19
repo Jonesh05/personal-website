@@ -53,7 +53,9 @@ export const ProjectsPresentational: FC<Props> = ({
         {projects?.map((project, idx) => (
             <div
               key={project.id}
-              ref={el => (cardsRef.current[idx] = el!)}
+              ref={(el) => {
+                if (el) cardsRef.current[idx] = el;
+              }}
               className="relative group bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 flex flex-col hover:scale-[1.025] transition-all duration-300 h-full"
             >
               <img
