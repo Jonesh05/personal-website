@@ -29,7 +29,7 @@ export const ProjectsPresentational: FC<Props> = ({
   }, [projects]);
 
   return (
-    <section id="Projects" className="py-24 bg-gradient-to-br from-purple-900 via-slate-900 to-slate-800">
+    <section id="Projects" className="py-24 bg-linear-to-br from-purple-900 via-slate-900 to-slate-800">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-3 text-white">{data.title}</h2>
         <p className="text-lg text-slate-300 text-center mb-12 max-w-2xl mx-auto">{data.subtitle}</p>
@@ -61,10 +61,10 @@ export const ProjectsPresentational: FC<Props> = ({
               <img
                 src={project.image}
                 alt={project.title}
-                className="rounded-xl w-full h-40 object-cover mb-4 border border-white/10 shadow"
+                className="rounded-xl w-full h-40 object-cover mb-4 border border-white/10 shadow-sm"
               />
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs px-2 py-1 rounded bg-purple-500 text-white font-bold uppercase">
+                <span className="text-xs px-2 py-1 rounded-sm bg-purple-500 text-white font-bold uppercase">
                   {project.category}
                 </span>
                 <span
@@ -81,7 +81,7 @@ export const ProjectsPresentational: FC<Props> = ({
                 <span className="ml-auto text-xs text-slate-400">{project.year}</span>
               </div>
               <h3 className="text-xl font-bold mb-2 text-white">{project.title}</h3>
-              <p className="text-slate-200 mb-6 flex-grow">{project.description}</p>
+              <p className="text-slate-200 mb-6 grow">{project.description}</p>
               <div className="flex flex-wrap gap-2 mb-6">
                 {project.technologies.map(tech => (
                   <span
@@ -98,7 +98,7 @@ export const ProjectsPresentational: FC<Props> = ({
                     href={project.links.live}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs px-3 py-1 rounded bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white hover:scale-105 transition"
+                    className="text-xs px-3 py-1 rounded-sm bg-linear-to-r from-purple-500 to-fuchsia-500 text-white hover:scale-105 transition"
                   >
                     Live
                   </a>
@@ -108,7 +108,7 @@ export const ProjectsPresentational: FC<Props> = ({
                     href={project.links.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs px-3 py-1 rounded bg-slate-700 text-white hover:bg-black transition"
+                    className="text-xs px-3 py-1 rounded-sm bg-slate-700 text-white hover:bg-black transition"
                   >
                     GitHub
                   </a>
@@ -118,14 +118,14 @@ export const ProjectsPresentational: FC<Props> = ({
                     href={project.links.demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs px-3 py-1 rounded bg-fuchsia-600 text-white hover:bg-fuchsia-800 transition"
+                    className="text-xs px-3 py-1 rounded-sm bg-fuchsia-600 text-white hover:bg-fuchsia-800 transition"
                   >
                     Demo
                   </a>
                 )}
               </div>
               {project.featured && (
-                <span className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white px-2 py-1 rounded-full text-[10px] font-bold shadow">
+                <span className="absolute top-4 right-4 bg-linear-to-r from-purple-500 to-fuchsia-500 text-white px-2 py-1 rounded-full text-[10px] font-bold shadow-sm">
                   ★ Featured
                 </span>
               )}

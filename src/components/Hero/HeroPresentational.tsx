@@ -6,10 +6,10 @@ interface HeroPresentationalProps {
   data: HeroData;
 }
 
-const gradientText = 'bg-gradient-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
+const gradientText = 'bg-linear-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
 
 export const HeroPresentational: FC<HeroPresentationalProps> = ({ data }) => (
-    <section className="relative min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-slate-900 to-slate-800">
+    <section className="relative min-h-[80vh] flex flex-col items-center justify-center bg-linear-to-br from-purple-900 via-slate-900 to-slate-800">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ export const HeroPresentational: FC<HeroPresentationalProps> = ({ data }) => (
         animate={{ y: [0, 20, 0] }}
         transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
       >
-        <div className="w-2 h-8 bg-gradient-to-b from-purple-400 to-slate-400 rounded-full opacity-70" />
+        <div className="w-2 h-8 bg-linear-to-b from-purple-400 to-slate-400 rounded-full opacity-70" />
         <span className="text-xs text-slate-300 mt-2">Scroll</span>
       </motion.div>
     </section>

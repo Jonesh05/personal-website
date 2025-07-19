@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "framer-motion": "^12.23.3",
     "gray-matter": "^4.0.3",
     "gsap": "^3.13.0",
@@ -17,19 +18,19 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "remark": "^14.0.2",
-    "tailwindcss": "^3.4.17",
     "zustand": "^4.4.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/node": "^20.11.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "autoprefixer": "^10.4.21",
     "eslint": "^9.31.0",
     "eslint-config-next": "15.3.5",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3"
   },
   "overrides": {

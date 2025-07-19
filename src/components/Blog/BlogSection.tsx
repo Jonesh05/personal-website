@@ -91,9 +91,9 @@ function BlogCard({ post, priority = false }: BlogCardProps) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block">
-      <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full flex flex-col">
+      <article className="bg-white rounded-xl shadow-xs hover:shadow-md transition-shadow duration-300 overflow-hidden h-full flex flex-col">
         {/* Featured Image */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+        <div className="relative aspect-16/10 overflow-hidden bg-gray-100">
           {post.featuredImage ? (
             <Image
               src={post.featuredImage}
@@ -104,7 +104,7 @@ function BlogCard({ post, priority = false }: BlogCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
               <svg
                 className="w-12 h-12 text-blue-300"
                 fill="none"
@@ -119,7 +119,7 @@ function BlogCard({ post, priority = false }: BlogCardProps) {
           {/* Category Badge */}
           {post.tags?.length > 0 && (
             <div className="absolute top-3 left-3">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/90 text-gray-800 backdrop-blur-sm">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/90 text-gray-800 backdrop-blur-xs">
                 {post.tags[0]}
               </span>
             </div>

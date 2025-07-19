@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Terminal } from 'lucide-react';
 
 
-const gradientText = 'bg-gradient-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
+const gradientText = 'bg-linear-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
 
 interface TerminalLine {
   text: string;
@@ -117,12 +117,12 @@ const About: React.FC = () => {
     <section id="about" className="py-20 bg-bg-blue">
       <div className="container mx-auto px-4">
         <h2 className={`text-4xl font-bold text-center mb-12 ${gradientText}`}>About Me</h2>
-        <div className="md:col-span-5 backdrop-blur-sm border border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up"> 
+        <div className="md:col-span-5 backdrop-blur-xs border border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up"> 
           <div className="relative w-52 h-52 mb-8 mx-auto">
             {/* Spinners */}
-            {/* <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
-            <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-sm opacity-60"></div> */}
-            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
+            {/* <div className="absolute -inset-6 rounded-full bg-linear-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
+            <div className="absolute -inset-4 rounded-full bg-linear-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-xs opacity-60"></div> */}
+            <div className="absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
 
             {/* Avatar visible */}
             <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">

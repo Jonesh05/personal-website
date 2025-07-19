@@ -72,7 +72,7 @@ const NavLink: React.FC<NavLinkProps> = ({ href, children, onClick, className = 
     className={`relative text-lg font-medium text-bg-lavender hover:text-white 
       transition-all duration-300 ease-out
         after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 
-      after:bg-gradient-to-r after:from-primary-400 after:to-primary-600 
+      after:bg-linear-to-r after:from-primary-400 after:to-primary-600 
       after:transition-all after:duration-300 after:ease-out
       hover:after:left-0 hover:after:w-full
       active:scale-95 ${className}`}
@@ -97,7 +97,7 @@ const SocialLink: React.FC<SocialLinkProps> = ({ href, icon, name }) => (
       width={20} 
       height={20} 
       className="transition-all duration-300 filter brightness-90 contrast-100 
-        group-hover:brightness-110 group-hover:drop-shadow-sm"
+        group-hover:brightness-110 group-hover:drop-shadow-xs"
     />
   </Link>
 )
@@ -107,7 +107,7 @@ const MenuToggle: React.FC<MenuToggleProps> = ({ isOpen, onClick }) => (
   <button
     onClick={onClick}
     className="lg:hidden relative p-2.5 rounded-full transition-all duration-300 
-      hover:bg-white/10 active:scale-95 focus:outline-none focus:ring-2 
+      hover:bg-white/10 active:scale-95 focus:outline-hidden focus:ring-2 
       focus:ring-white/20"
     aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
     aria-expanded={isOpen}
@@ -143,7 +143,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, navLinks, socialLinks, 
     }`}
   >
     <div className="rounded-2xl border border-white/10 
-        bg-gradient-to-br from-white/20 to-white/5 
+        bg-linear-to-br from-white/20 to-white/5 
         backdrop-blur-xl shadow-2xl p-6">
       <nav aria-label="Mobile Navigation">
         <ul className="flex flex-col gap-4 justify-center items-center">
@@ -247,7 +247,7 @@ const Navbar: React.FC = () => {
           hover:shadow-3xl hover:border-white/20">
           
           {/* Logo */}
-          <div className="flex-shrink-0 w-[150px] h-[50px] flex items-center">
+          <div className="shrink-0 w-[150px] h-[50px] flex items-center">
             <Link href="/" aria-label="Jonesh Logo">
               <Logo className="cursor-pointer object-contain w-full h-full 
                 drop-shadow-md transition-all duration-300 
@@ -292,7 +292,7 @@ const Navbar: React.FC = () => {
       {/* Overlay para cerrar menú móvil */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 -z-10 bg-black/20 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 -z-10 bg-black/20 backdrop-blur-xs"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />

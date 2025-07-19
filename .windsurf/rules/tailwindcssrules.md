@@ -116,15 +116,15 @@ module.exports = {
 ## Breaking Changes from v3
 
 ### Utility Renames (MUST UPDATE):
+- `shadow-xs` → `shadow-2xs`
 - `shadow-sm` → `shadow-xs`
-- `shadow` → `shadow-sm`
+- `drop-shadow-xs` → `drop-shadow-xs`
 - `drop-shadow-sm` → `drop-shadow-xs`
-- `drop-shadow` → `drop-shadow-sm`
+- `blur-xs` → `blur-xs`
 - `blur-sm` → `blur-xs`
-- `blur` → `blur-sm`
+- `rounded-xs` → `rounded-xs`
 - `rounded-sm` → `rounded-xs`
-- `rounded` → `rounded-sm`
-- `outline-none` → `outline-hidden` (for old behavior)
+- `outline-hidden` → `outline-hidden` (for old behavior)
 
 ### Opacity Syntax Changes:
 ```css
@@ -140,7 +140,7 @@ text-primary-600/75
 ### CSS Variable Access:
 ```css
 /* OLD v3 arbitrary values */
-bg-[--brand-color]
+bg-(--brand-color)
 
 /* NEW v4 arbitrary values */
 bg-(--brand-color)
@@ -179,7 +179,7 @@ bg-(--brand-color)
 
 ### Composable Variants:
 ```html
-<div class="group-has-data-active:hover:bg-primary-500">
+<div class="hover:group-has-data-active:bg-primary-500">
   Complex state combinations
 </div>
 ```
@@ -265,7 +265,7 @@ bg-(--brand-color)
 ## Default Behavior Changes
 
 - Default border color is now `currentColor` (was `gray-200`)
-- Default `ring` width is 1px (was 3px)  
+- Default `ring-3` width is 1px (was 3px)  
 - Placeholder text uses current color at 50% opacity (was `gray-400`)
 - Hover styles only apply on devices supporting hover (`@media (hover: hover)`)
 

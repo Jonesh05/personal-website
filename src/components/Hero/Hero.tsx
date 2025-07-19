@@ -135,17 +135,17 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-700 via-primary-800 to-primary-900 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center bg-linear-to-br from-primary-700 via-primary-800 to-primary-900 overflow-hidden"
       style={{
         backgroundImage:
           'radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), ' +
           'radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
       }}
     >
-      <div ref={glowRef} className="absolute inset-0 bg-gradient-to-br from-purple-900 via-fuchsia-900 to-fuchsia-800"/>
+      <div ref={glowRef} className="absolute inset-0 bg-linear-to-br from-purple-900 via-fuchsia-900 to-fuchsia-800"/>
 
       {/* Overlay ligero */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
+      <div className="absolute inset-0 bg-linear-to-r from-primary-500/20 to-transparent animate-pulse" />
       {/* Partículas */}
       <div ref={particlesRef} className="absolute inset-0 overflow-hidden pointer-events-none" />
 
@@ -154,7 +154,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 py-20 relative z-10 text-center">
         <h1
           ref={titleRef}
-          className="text-5xl md:text-7xl font-bold text-white text-glow mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
+          className="text-5xl md:text-7xl font-bold text-white text-glow mb-6 bg-clip-text text-transparent bg-linear-to-r from-white to-white/80"
         >
           Jhonny Pimiento
         </h1>
@@ -170,7 +170,7 @@ const Hero = () => {
           </Link>
           <Link
             href="#Projects"
-            className="px-8 py-4 border-2 border-white text-white text-glow font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+            className="px-8 py-4 border-2 border-white text-white text-glow font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-xs"
           >
             View My Work
           </Link>

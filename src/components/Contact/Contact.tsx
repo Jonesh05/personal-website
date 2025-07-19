@@ -35,7 +35,7 @@ const Contact = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -46,7 +46,7 @@ const Contact = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -57,7 +57,7 @@ const Contact = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={4}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <button
