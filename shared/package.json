@@ -1,0 +1,12 @@
+{
+    "name": "@personal-website/shared",
+    "version": "1.0.0",
+    "private": true,
+    "main": "index.ts",
+    "scripts": {
+      "build": "tsc"
+    },
+    "devDependencies": {
+      "typescript": "^5.8.3"
+    }
+  }
