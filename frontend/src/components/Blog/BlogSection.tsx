@@ -1,4 +1,3 @@
-
 import type { Post } from '../../../../shared/types/post.types';
 import PostCard from '@/components/Blog/PostCard';
 import ApiError from '@/components/ui/ApiError';

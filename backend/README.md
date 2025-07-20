@@ -11,7 +11,11 @@ Portafolio web actualizado con proyectos destacados, una parte de blog, entradas
 
 ### Backend
 - Node.js
-- Firebase Client SDK
+- Express
+- Firebase
+
+## Modelos
+- 
 
 ### Entidades
 - Usuario

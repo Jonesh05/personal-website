@@ -1,15 +1,76 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // Cargar variables de entorno
 dotenv.config();
 
 const app = express();
+
+// Configuración optimizada de Helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "trusted-cdn.com"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    frameguard: { action: 'deny' },
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+  })
+);
+
+// Verificar headers duplicados
+app.use((req, res, next) => {
+  const headers = res.getHeaderNames();
+  if (headers.length !== new Set(headers).size) {
+    console.error("¡Error! Headers duplicados detectados");
+  }
+  next();
+});
+
 const PORT = process.env.PORT || 8000;
 
+// Configuración de CORS con maxAge y manejo de !origin
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) { // Permite solicitudes sin origen (mobile apps, curl, etc)
+      return callback(null, true);
+    }
+    const allowedOrigins = [
+      'https://tudominio.com',
+      'http://localhost:3000'
+    ];
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Bloqueado por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['X-Custom-Header', 'Authorization'],
+  maxAge: 7200, // 2 horas en segundos
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Habilitar preflight para todas las rutas
+
+// Configuración de rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Límite por IP
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use(limiter);
+
 // Middlewares básicos
-app.use(cors());
 app.use(express.json());
 
 // Datos de ejemplo en memoria

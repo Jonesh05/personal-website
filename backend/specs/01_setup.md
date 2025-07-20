@@ -11,7 +11,8 @@ Portafolio web actualizado con proyectos destacados, una parte de blog, entradas
 
 ### Backend
 - Node.js
-- Firebase Client SDK
+- Express
+- Firebase
 
 ### Entidades
 - Usuario
@@ -60,4 +61,6 @@ Frontend (TypeScript)
      Backend (Node.js)
           │
     Database (Firebase)
+
+    
 El enfoque es mantener la simplicidad y funcionalidad core sin features adicionales complejas.
