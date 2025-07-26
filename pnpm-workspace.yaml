@@ -1,0 +1,16 @@
+packages:
+  - backend
+  - frontend
+  - functions
+  - shared
+
+ignoredBuiltDependencies:
+  - '@firebase/util'
+  - protobufjs
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - sharp
