@@ -4,6 +4,7 @@
  */
 import { initializeApp, getApps, getApp } from 'firebase/app';
 // Importa los servicios que necesites, ej: import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 // Configuración de Firebase de tu web app. 
 // Es seguro exponer estas claves en el cliente.
@@ -19,8 +20,9 @@ const firebaseConfig = {
 
 // Inicializa Firebase, evitando re-inicializaciones en el HMR de Next.js
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
 
 // Exporta la app y otros servicios que inicialices
 // const db = getFirestore(app);
 
-export { app /*, db */ };
+export { app, auth/*, db */ };

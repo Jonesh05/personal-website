@@ -4,13 +4,16 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { authenticateToken, requireAdmin } from './middlewares/auth';
+import { postsService } from './services/posts.service';
+import { Post } from 'shared/types/post.types';
 
 
 // Cargar variables de entorno
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 8000;
+//const PORT = process.env.PORT || 8000;
 
 // Middlewares básicos
 app.use(express.json({ limit: '10mb' }));
@@ -37,7 +40,7 @@ app.use(
   })
 );
 
-// Configuración de CORS
+//// Configuración de CORS
 /*const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     // Permitir requests sin origin (mobile apps, Postman, etc.)
@@ -63,8 +66,9 @@ app.use(
 };
 
 app.use(cors(corsOptions)); 
-*/
+*///
 
+// Configuración de CORS
 const allowedOrigins = process.env.FRONTEND_URLS?.split(',') || [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -110,7 +114,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Datos de ejemplo
-interface Post {
+/*interface Post {
   id: string;
   title: string;
   slug: string;
@@ -145,7 +149,7 @@ const posts: Post[] = [
     createdAt: '2024-01-20T14:30:00.000Z',
     updatedAt: '2024-01-20T14:30:00.000Z'
   }
-];
+]; */
 
 // ===== RUTAS =====
 
@@ -167,6 +171,7 @@ app.get('/test', (req: Request, res: Response) => {
   });
 });
 
+/*Change
 // Posts endpoints
 app.get('/posts', (req: Request, res: Response) => {
   try {
@@ -259,7 +264,222 @@ app.use('*', (req: Request, res: Response) => {
       'POST /posts'
     ]
   });
+});  */
+
+// Obtener posts públicos (solo publicados)
+app.get('/posts', async (req: Request, res: Response) => {
+  try {
+    const { tag, limit = '10', offset = '0' } = req.query;
+
+    const filters = {
+      published: true, // Solo posts publicados para el público
+      tag: tag as string,
+      limit: parseInt(limit as string),
+      offset: parseInt(offset as string),
+    };
+
+    const result = await postsService.getPosts(filters);
+
+    res.json({
+      posts: result.posts,
+      total: result.total,
+      pagination: {
+        limit: filters.limit,
+        offset: filters.offset,
+        hasNext: result.posts.length === filters.limit
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo posts:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
+
+// Obtener post público por slug
+app.get('/posts/slug/:slug', async (req: Request, res: Response) => {
+  try {
+    const { slug } = req.params;
+
+    const post = await postsService.getPostBySlug(slug);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post no encontrado' });
+    }
+
+    // Solo mostrar si está publicado (para rutas públicas)
+    if (!post.published) {
+      return res.status(404).json({ error: 'Post no encontrado' });
+    }
+
+    res.json({ post });
+  } catch (error) {
+    console.error('Error obteniendo post:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== RUTAS PROTEGIDAS (ADMIN) =====
+
+// Middleware de autenticación para todas las rutas admin
+app.use('/admin/*', authenticateToken);
+
+// Obtener todos los posts (incluyendo borradores) - ADMIN
+app.get('/admin/posts', async (req: Request, res: Response) => {
+  try {
+    const { published, tag, limit = '10', offset = '0' } = req.query;
+
+    const filters: any = {
+      limit: parseInt(limit as string),
+      offset: parseInt(offset as string),
+    };
+
+    if (published !== undefined) {
+      filters.published = published === 'true';
+    }
+    if (tag) {
+      filters.tag = tag as string;
+    }
+
+    const result = await postsService.getPosts(filters);
+
+    res.json({
+      posts: result.posts,
+      total: result.total,
+      pagination: {
+        limit: filters.limit,
+        offset: filters.offset,
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo posts admin:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Obtener post por ID - ADMIN
+app.get('/admin/posts/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const post = await postsService.getPostById(id);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post no encontrado' });
+    }
+
+    res.json({ post });
+  } catch (error) {
+    console.error('Error obteniendo post:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Crear nuevo post - ADMIN
+app.post('/admin/posts', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { title, content, excerpt, tags = [], published = false, featuredImage } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({
+        error: 'Título y contenido son requeridos'
+      });
+    }
+
+    // Generar slug automáticamente
+    const slug = postsService.generateSlug(title);
+
+    const postData: Omit<Post, 'id' | 'createdAt' | 'updatedAt'> = {
+      title,
+      slug,
+      content,
+      excerpt: excerpt || content.substring(0, 150) + '...',
+      published,
+      tags: Array.isArray(tags) ? tags : [],
+      authorId: req.user!.uid,
+      featuredImage: featuredImage || '',
+    };
+
+    const newPost = await postsService.createPost(postData);
+
+    res.status(201).json({ post: newPost });
+  } catch (error) {
+    console.error('Error creando post:', error);
+    if (error instanceof Error && error.message.includes('slug')) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Error creando el post' });
+  }
+});
+
+// Actualizar post - ADMIN
+app.put('/admin/posts/:id', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Si se actualiza el título, regenerar slug
+    if (updateData.title && !updateData.slug) {
+      updateData.slug = postsService.generateSlug(updateData.title);
+    }
+
+    const updatedPost = await postsService.updatePost(id, updateData);
+
+    res.json({ post: updatedPost });
+  } catch (error) {
+    console.error('Error actualizando post:', error);
+    if (error instanceof Error && error.message.includes('encontrado')) {
+      return res.status(404).json({ error: error.message });
+    }
+    if (error instanceof Error && error.message.includes('slug')) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Error actualizando el post' });
+  }
+});
+
+// Eliminar post - ADMIN
+app.delete('/admin/posts/:id', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    await postsService.deletePost(id);
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error eliminando post:', error);
+    if (error instanceof Error && error.message.includes('encontrado')) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Error eliminando el post' });
+  }
+});
+
+// Verificar autenticación admin
+app.get('/admin/verify', authenticateToken, (req: Request, res: Response) => {
+  res.json({
+    authenticated: true,
+    user: req.user
+  });
+});
+
+// ===== ERROR HANDLERS =====
+
+app.use('*', (req: Request, res: Response) => {
+  res.status(404).json({
+    error: 'Endpoint no encontrado',
+    path: req.originalUrl,
+    availableEndpoints: [
+      'GET /health',
+      'GET /posts',
+      'GET /posts/slug/:slug',
+      'GET /admin/posts (requiere auth)',
+      'POST /admin/posts (requiere auth)',
+      'PUT /admin/posts/:id (requiere auth)',
+      'DELETE /admin/posts/:id (requiere auth)',
+    ]
+  });
+});
+
 
 // Global error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

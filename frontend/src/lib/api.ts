@@ -1,19 +1,27 @@
-// frontend/src/lib/api.ts
 import type { Post } from "@personal-website/shared/types/post.types";
 
 // Detectar el entorno y configurar la URL base
 const getApiBaseUrl = (): string => {
   // En desarrollo con emulators
-  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_EMULATOR === 'true') {
+  /*if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_EMULATOR === 'true') {
     return 'http://127.0.0.1:5001/portfolio-website-668ce/us-central1/api';
   }
   
   // En producción o cuando se usa hosting emulator
   return '/api';
 };
+*/
+   if (process.env.NODE_ENV === 'development') {
+    return 'http://127.0.0.1:5001/portfolio-website-668ce/us-central1/api';
+  }
+  
+  // En producción
+  return 'https://us-central1-portfolio-website-668ce.cloudfunctions.net/api';
+};   
 
 class ApiClient {
   private baseURL: string;
+  
 
   constructor() {
     this.baseURL = getApiBaseUrl();
