@@ -73,6 +73,10 @@ web_modules/
 .env.*
 !.env.example
 
+# Ignore data sensitiveFirebase Functions
+functions/secret/
+functions/secret/service-account.json
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -98,8 +102,6 @@ dist
 .temp
 .cache
 
-# Sveltekit cache directory
-.svelte-kit/
 
 # vitepress build output
 **/.vitepress/dist
@@ -121,6 +123,11 @@ dist
 
 # Firebase cache directory
 .firebase/
+
+# Firebase service account keys (NEVER commit these)
+**/secret/
+**/service-account*.json
+*.pem
 
 # TernJS port file
 .tern-port
