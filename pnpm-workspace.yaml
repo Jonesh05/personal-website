@@ -1,8 +1,8 @@
 packages:
   - backend
   - frontend
-  - functions
   - shared
+  - functions
 
 ignoredBuiltDependencies:
   - '@firebase/util'
@@ -13,4 +13,5 @@ onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@tailwindcss/oxide'
   - esbuild
+  - re2
   - sharp

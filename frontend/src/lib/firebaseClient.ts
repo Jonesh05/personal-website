@@ -1,4 +1,7 @@
 /**
+ * @deprecated This file is deprecated and should be deleted.
+ * Use '@/lib/firebase/client' instead.
+ * 
  * Configuración del cliente de Firebase para el lado del frontend.
  * Este archivo inicializa la app de Firebase para ser usada en componentes de cliente.
  */
@@ -6,7 +9,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 // Importa los servicios que necesites, ej: import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-// Configuración de Firebase de tu web app. 
+// Configuración de Firebase de tu web app.  
 // Es seguro exponer estas claves en el cliente.
 // Para mayor seguridad, cárgalas desde variables de entorno.
 const firebaseConfig = {

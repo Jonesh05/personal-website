@@ -9,6 +9,7 @@ declare global {
         uid: string;
         email: string;
         role: string;
+        displayName?: string;
       };
     }
   }
@@ -32,8 +33,8 @@ export const authenticateToken = async (
 
     const decodedToken = await verifyAuthToken(token);
     
-    // Verificar si es admin
-    const isAdmin = await verifyAdminRole(decodedToken.uid);
+    // Verificar si es admin, passing email to allow bypass for empty emulator DB
+    const isAdmin = await verifyAdminRole(decodedToken.uid, decodedToken.email);
     
     if (!isAdmin) {
       return res.status(403).json({ 
@@ -45,7 +46,8 @@ export const authenticateToken = async (
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email || '',
-      role: 'admin'
+      role: 'admin',
+      displayName: decodedToken.name || ''
     };
 
     next();

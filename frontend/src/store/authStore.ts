@@ -1,191 +1,101 @@
-import { create } from 'zustand';
-import { auth } from '@/lib/firebaseClient';
-import { persist } from 'zustand/middleware';
-import { 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  User
-} from 'firebase/auth';
+'use client'
 
+import { create }          from 'zustand'
+import { auth }            from '@/lib/firebase/client'
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut as firebaseSignOut,
+} from 'firebase/auth'
 
 interface AuthState {
-  user: User | null;
-  isAdmin: boolean;
-  loading: boolean;
-  error: string | null;
-  token: string | null;
+  isAdmin:     boolean
+  initialized: boolean   // restored so AdminRoute works
+  loading:     boolean
+  error:       string | null
+  displayName: string | null
 }
 
 interface AuthActions {
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
-  verifyAdmin: () => Promise<boolean>;
-  clearError: () => void;
-  initialize: () => void;
+  signInWithGoogle: () => Promise<void>
+  signOut:          () => Promise<void>
+  checkSession:     () => Promise<void>
+  clearError:       () => void
 }
 
-type AuthStore = AuthState & AuthActions;
+export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
+  isAdmin:     false,
+  initialized: false,
+  loading:     false,
+  error:       null,
+  displayName: null,
 
-const initialState: AuthState = {
-  user: null,
-  isAdmin: false,
-  loading: true,
-  error: null,
-  token: null,
-};
-
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
-
-      signInWithGoogle: async () => {
-        try {
-          set({ loading: true, error: null });
-          
-          const provider = new GoogleAuthProvider();
-          provider.addScope('email');
-          provider.addScope('profile');
-
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
-          const token = await user.getIdToken();
-
-          // Verificar si es admin en el backend
-          const adminCheck = await fetch('/admin/verify', {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!adminCheck.ok) {
-            throw new Error('No tienes permisos de administrador');
-          }
-
-          set({ 
-            user, 
-            isAdmin: true, 
-            token,
-            loading: false,
-            error: null 
-          });
-
-        } catch (error) {
-          console.error('Error en login:', error);
-          set({ 
-            error: error instanceof Error ? error.message : 'Error al iniciar sesión',
-            loading: false,
-            user: null,
-            isAdmin: false,
-            token: null
-          });
-          throw error;
-        }
-      },
-
-      signOut: async () => {
-        try {
-          set({ loading: true });
-          await firebaseSignOut(auth);
-          set({
-            user: null,
-            isAdmin: false,
-            token: null,
-            loading: false,
-            error: null
-          });
-        } catch (error) {
-          console.error('Error al cerrar sesión:', error);
-          set({ 
-            error: 'Error al cerrar sesión',
-            loading: false 
-          });
-        }
-      },
-
-      verifyAdmin: async () => {
-        const { token } = get();
-        if (!token) return false;
-
-        try {
-          const response = await fetch('/api/admin/verify', {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-
-          const isValidAdmin = response.ok;
-          set({ isAdmin: isValidAdmin });
-          return isValidAdmin;
-        } catch (error) {
-          console.error('Error verificando admin:', error);
-          set({ isAdmin: false });
-          return false;
-        }
-      },
-
-      clearError: () => set({ error: null }),
-
-      initialize: () => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-          try {
-            if (user) {
-              const token = await user.getIdToken();
-              
-              // Verificar permisos admin
-              const adminCheck = await fetch('/api/admin/verify', {
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-              });
-
-              set({
-                user,
-                token,
-                isAdmin: adminCheck.ok,
-                loading: false,
-                error: null
-              });
-            } else {
-              set({
-                user: null,
-                token: null,
-                isAdmin: false,
-                loading: false,
-                error: null
-              });
-            }
-          } catch (error) {
-            console.error('Error en inicialización auth:', error);
-            set({
-              user: null,
-              token: null,
-              isAdmin: false,
-              loading: false,
-              error: 'Error de autenticación'
-            });
-          }
-        });
-
-        // Retornar función de limpieza
-        return unsubscribe;
-      },
-    }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user ? {
-          uid: state.user.uid,
-          email: state.user.email,
-          displayName: state.user.displayName,
-          photoURL: state.user.photoURL,
-        } : null,
-        token: state.token,
-        isAdmin: state.isAdmin,
-      }),
+  // Called on mount by AdminRoute — verifies httpOnly cookie server-side
+  checkSession: async () => {
+    try {
+      const res = await fetch('/api/auth/verify', { method: 'GET' })
+      if (res.ok) {
+        const data = await res.json()
+        set({ isAdmin: data.isAdmin, displayName: data.displayName, initialized: true })
+      } else {
+        set({ isAdmin: false, initialized: true })
+      }
+    } catch {
+      set({ isAdmin: false, initialized: true })
     }
-  )
-);
+  },
+
+  signInWithGoogle: async () => {
+    set({ loading: true, error: null })
+    try {
+      const provider = new GoogleAuthProvider()
+      provider.addScope('email')
+      provider.addScope('profile')
+      provider.setCustomParameters({ login_hint: 'newrevolutiion@gmail.com' })
+
+      const result  = await signInWithPopup(auth, provider)
+      const idToken = await result.user.getIdToken()
+
+      const res = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ idToken }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Login failed')
+      }
+
+      set({
+        isAdmin:     true,
+        initialized: true,
+        loading:     false,
+        displayName: result.user.displayName,
+        error:       null,
+      })
+    } catch (err) {
+      await firebaseSignOut(auth).catch(() => {})
+      set({
+        error:       err instanceof Error ? err.message : 'Login failed',
+        loading:     false,
+        isAdmin:     false,
+        initialized: true,
+      })
+      throw err
+    }
+  },
+
+  signOut: async () => {
+    set({ loading: true })
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      await firebaseSignOut(auth)
+      set({ isAdmin: false, initialized: true, loading: false, displayName: null, error: null })
+    } catch {
+      set({ error: 'Sign out failed', loading: false })
+    }
+  },
+
+  clearError: () => set({ error: null }),
+}))

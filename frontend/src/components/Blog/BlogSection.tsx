@@ -1,34 +1,7 @@
-import type { Post } from '../../../../shared/types/post.types';
+import type { Post } from '@/lib/firestore/posts';
 import PostCard from '@/components/Blog/PostCard';
 import ApiError from '@/components/ui/ApiError';
-
-// URL de la API del backend. Debería estar en una variable de entorno.
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-interface GetPostsResult {
-  success: boolean;
-  posts: Post[];
-  error?: string;
-}
-
-async function getPosts(): Promise<GetPostsResult> {
-  try {
-    const response = await fetch(`${API_URL}/posts`, {
-      next: { revalidate: 3600 },
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    return { success: true, posts: data.posts || [] };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error('Failed to fetch posts:', errorMessage, error);
-    return { success: false, posts: [], error: errorMessage };
-  }
-}
+import { getPosts } from '@/lib/firestore/posts';
 
 /**
  * Componente BlogSection
@@ -36,9 +9,16 @@ async function getPosts(): Promise<GetPostsResult> {
  * Maneja los estados de carga (con Suspense), error y vacío.
  */
 export default async function BlogSection() {
-  const { success, posts, error } = await getPosts();
+  let posts: Post[] = [];
+  let error: string | null = null;
 
-  if (!success) {
+  try {
+    posts = await getPosts({ published: true, limit: 4 });
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'Unknown error';
+  }
+
+  if (error) {
     return <ApiError message={`Failed to load blog posts. ${error}`} />;
   }
 

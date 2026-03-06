@@ -1,77 +1,12 @@
-'use client';
-
-import { useState } from 'react';
-
+import ContactForm from './ContactForm.client';
 
 const Contact = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('Sending...');
-    // TODO: Implement actual form submission
-    setTimeout(() => {
-      setStatus('Message sent successfully!');
-      setName('');
-      setEmail('');
-      setMessage('');
-    }, 1500);
-  };
-
   return (
     <section id="contact" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-12">Get in Touch</h2>
         <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
-              <textarea
-                id="message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                required
-                rows={4}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-primary-600 text-white py-3 px-6 rounded-md hover:bg-primary-700 transition-colors"
-            >
-              Send Message
-            </button>
-            {status && (
-              <p className={`mt-4 text-center ${status.includes('sent') ? 'text-green-600' : 'text-blue-600'}`}>
-                {status}
-              </p>
-            )}
-          </form>
+          <ContactForm />
           <div className="mt-12 text-center">
             <h3 className="text-xl font-semibold mb-4">Find me on social media</h3>
             <div className="flex justify-center gap-6">

@@ -1,2 +1,1 @@
-import { https } from "firebase-functions";
-export declare const helloWorld: https.HttpsFunction;
+export declare const helloWorld: import("firebase-functions/https").HttpsFunction;

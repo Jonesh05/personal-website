@@ -3,19 +3,22 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
-    "dev": "nodemon --exec ts-node ./app/index.ts",
+    "dev": "nodemon --exec ts-node ./server.ts",
     "build:watch": "tsc --watch",
     "serve": "pnpm run build && firebase emulators:start --only functions",
     "shell": "pnpm run build && firebase functions:shell",
     "start": "pnpm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "seed:emulator": "node app/scripts/seed.js",
+    "seed:prod": "echo 'Remove emulator env then run: node app/scripts/seed.js'"
   },
   "engines": {
     "node": "22"
   },
   "main": "dist/app/index.js",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^4.18.2",
@@ -26,6 +29,7 @@
     "path-to-regexp": "8.2.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.17",
     "@types/node": "24.0.15",

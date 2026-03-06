@@ -1,4 +1,7 @@
-
+/**
+ * @deprecated This file contains mock data and should be deleted.
+ * Use '@/lib/firestore/posts' for real Firestore queries instead.
+ */
 
 // Simulación de datos de posts
 const mockPosts = [

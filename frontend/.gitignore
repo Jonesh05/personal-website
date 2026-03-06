@@ -49,3 +49,7 @@ public/icons
 
 # vitepress cache directory
 **/.vitepress/cache
+
+# Ignore data sensitiveFirebase Functions
+/secret/
+/secret/service-account.json

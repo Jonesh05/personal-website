@@ -1,4 +1,3 @@
-import { db } from '../lib/firebase';
 import { Post } from 'shared/types/post.types';
 import { adminDb } from '../db/firebaseAdmin';
 
@@ -70,9 +69,15 @@ export class PostsService {
   }
 
   async getPostById(id: string): Promise<Post | null> {
-    const doc = await db.collection('posts').doc(id).get();
+    const doc = await this.collection.doc(id).get();
     if (!doc.exists) return null;
-    return { id: doc.id, ...doc.data() } as Post;
+    const data = doc.data()!;
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
+    } as Post;
   }
 
   // Obtener post por slug

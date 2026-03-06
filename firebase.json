@@ -1,7 +1,6 @@
 {
   "hosting": {
     "public": "frontend/out",
-    "source": "frontend",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -14,13 +13,13 @@
       },
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/index.html"  
       }
     ]
   },
   "functions": [
     {
-      "source": "backend",
+      "source": "functions",
       "codebase": "blog-devs",
       "runtime": "nodejs22",
       "ignore": [
@@ -36,14 +35,17 @@
     }
   ],
   "emulators": {
+    "auth": {
+      "port": 9099
+    },
     "hosting": {
-      "port": 3000
+      "port": 3002
     },
     "functions": {
-      "port": 5001
+      "port": 5002
     },
     "firestore": {
-      "port": 8080
+      "port": 8081
     },
     "ui": {
       "enabled": true,

@@ -4,5 +4,5 @@
 !.env.example
 
 # Ignore data sensitiveFirebase Functions
-secret/
+secret/*
 secret/service-account.json

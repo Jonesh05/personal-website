@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import { Terminal } from 'lucide-react';
+import { TerminalIcon } from '@/components/ui/Icons';
 
 
 const gradientText = 'bg-linear-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
@@ -167,7 +167,7 @@ const About: React.FC = () => {
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
               </div>
               <div className="flex items-center space-x-2 text-gray-400">
-                <Terminal className="w-4 h-4" />
+                <TerminalIcon className="w-4 h-4" />
                 <span className="text-sm font-mono">secure-terminal</span>
               </div>
             </div>

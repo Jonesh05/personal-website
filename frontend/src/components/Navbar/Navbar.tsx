@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import Logo from '@/assets/logotest.svg'
 import { useTranslations } from '@/i18n/utils'
 
 // Types
@@ -247,12 +246,18 @@ const Navbar: React.FC = () => {
           hover:shadow-3xl hover:border-white/20">
           
           {/* Logo */}
-          <div className="shrink-0 w-[150px] h-[50px] flex items-center">
-            <Link href="/" aria-label="Jonesh Logo">
-              <Logo className="cursor-pointer object-contain w-full h-full 
-                drop-shadow-md transition-all duration-300 
-                brightness-100 dark:brightness-150 contrast-100 
-                text-black dark:text-white hover:scale-105" />
+          <div className="shrink-0 w-[260px] h-[50px] flex items-center">
+            <Link href="/" aria-label="Jonesh Logo" className="text-gray-900 dark:text-white">
+              <Image 
+                src="/images/logo.svg"
+                alt="Jonesh Logo"
+                width={260}
+                height={50}
+                className="cursor-pointer object-contain w-full h-full 
+                  drop-shadow-md transition-all duration-300 
+                  hover:scale-105"
+                priority
+              />
             </Link>
           </div>
 

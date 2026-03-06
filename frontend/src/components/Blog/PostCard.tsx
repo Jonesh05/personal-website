@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Post } from '../../../../shared/types/post.types';
+import type { Post } from '@/lib/firestore/posts';
 
 interface PostCardProps {
   post: Post;
 }
+
 
 export default function PostCard({ post }: PostCardProps) {
   const { title, slug, excerpt, featuredImage, tags, authorId } = post;

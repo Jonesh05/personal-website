@@ -1,3 +1,5 @@
+export { LOCALE_TO_HREFLANG, LOCALES, DEFAULT_LOCALE } from './routing'
+
 export function useTranslations(locale: string) {
-  return (key: string) => key; // Returns the key as the translation
+  return (key: string) => key
 }

@@ -1,6 +1,5 @@
-import { https } from "firebase-functions";
+import { onRequest } from 'firebase-functions/v2/https';
 
-// función HTTP
-export const helloWorld = https.onRequest((req, res) => {
-  res.send("Hello from Firebase Functions!");
+export const helloWorld = onRequest((req, res) => {
+  res.send('Hello from Firebase Functions!');
 });

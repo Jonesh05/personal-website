@@ -1,18 +1,49 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Default rule: deny all access
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2025, 8, 20);
+      allow read, write: if false;
+    }
+
+    // Since we are using Firebase Admin SDK (Server Actions) for all mutations
+    // We only need to allow read access for public data on the client.
+    // Client SDK should NOT be able to write anything directly.
+
+    // Rules for /posts collection
+    match /posts/{postId} {
+      // Public can read only published posts
+      allow read: if resource.data.published == true;
+      allow write: if false; // Only Admin SDK can write
+    }
+
+    // Rules for /projects collection
+    match /projects/{projectId} {
+      // Public can read all projects
+      allow read: if true;
+      allow write: if false; // Only Admin SDK can write
+    }
+
+    // Rules for /contacts collection
+    match /contacts/{contactId} {
+      // Client cannot read other people's contacts
+      allow read: if false;
+      // Client cannot write contacts directly (must use Server Action to prevent spam)
+      allow write: if false; 
+    }
+
+    // Rules for /users collection
+    match /users/{userId} {
+      allow read, write: if false; // Only Admin SDK can read/write
+    }
+
+    // Rules for /siteConfig collection
+    match /siteConfig/{settingId} {
+      allow read: if true; // Public can read site config
+      allow write: if false; // Only Admin SDK can write
     }
   }
 }
+

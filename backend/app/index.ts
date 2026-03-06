@@ -1,12 +1,20 @@
-import { onRequest } from 'firebase-functions/v2/https';
-import express, { Express, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import { onRequest } from 'firebase-functions/v2/https'
+import express, { Express, Request, Response, NextFunction } from 'express'
+import cors from 'cors'
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { authenticateToken, requireAdmin } from './middlewares/auth';
-import { postsService } from './services/posts.service';
-import { Post } from 'shared/types/post.types';
+import { authenticateToken, requireAdmin } from './middlewares/auth'
+import { postsService } from './services/posts.service'
+import { Post } from 'shared/types/post.types'
+
+// Interface for authenticated user
+interface AuthenticatedUser {
+  uid: string;
+  email: string;
+  role: string;
+  displayName?: string;
+}
 
 
 // Cargar variables de entorno
@@ -71,13 +79,15 @@ app.use(cors(corsOptions));
 // Configuración de CORS
 const allowedOrigins = process.env.FRONTEND_URLS?.split(',') || [
   'http://localhost:3000',
+  'http://localhost:3001',
   'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
   'https://portfolio-website-668ce.firebaseapp.com',
   'https://portfolio-website-668ce.web.app'
 ];
 
 const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Permitir requests sin origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
@@ -397,6 +407,9 @@ app.post('/admin/posts', requireAdmin, async (req: Request, res: Response) => {
       tags: Array.isArray(tags) ? tags : [],
       authorId: req.user!.uid,
       featuredImage: featuredImage || '',
+      authorName: (req.user as AuthenticatedUser)?.displayName || '',
+      likes: 0,
+      views: 0,
     };
 
     const newPost = await postsService.createPost(postData);

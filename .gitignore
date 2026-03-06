@@ -40,6 +40,14 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -47,7 +55,10 @@ jspm_packages/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
-# TypeScript cache
+# vercel
+.vercel
+
+# typescript cache
 *.tsbuildinfo
 
 # Optional npm cache directory
@@ -55,6 +66,7 @@ web_modules/
 
 # Optional eslint cache
 .eslintcache
+eslint.config*
 
 # Optional stylelint cache
 .stylelintcache
@@ -72,6 +84,10 @@ web_modules/
 .env
 .env.*
 !.env.example
+functions/.env
+
+# local env files
+.env*.local
 
 # Ignore data sensitiveFirebase Functions
 functions/secret/
@@ -123,6 +139,8 @@ dist
 
 # Firebase cache directory
 .firebase/
+firebase-debug.log
+.firebaserc
 
 # Firebase service account keys (NEVER commit these)
 **/secret/
@@ -141,6 +159,7 @@ dist
 /.pnp
 .pnp.js
 pnpm-lock.yaml
+.npmrc
 
 # yarn v3
 .pnp.*
