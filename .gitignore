@@ -1,3 +1,4 @@
+
 # Created by https://gitignore.org
 # Node.gitignore
 
@@ -173,3 +174,6 @@ pnpm-lock.yaml
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+node_modules
+
