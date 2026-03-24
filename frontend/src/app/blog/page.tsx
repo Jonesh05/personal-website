@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { InfinitePostList } from '@/components/Blog/InfinitePostList'
 import  BlogSidebar  from '@/components/Blog/BlogSidebar'
 import { BlogHeader } from '@/components/Blog/BlogHeader'
+import PlantSidebar from '@/components/Blog/PlantSidebar'
 import BlogSectionSkeleton from '@/components/Blog/BlogSectionSkeleton'
 import { getPosts, getPopularTags, getFeaturedPosts } from '@/lib/firestore/posts'
 
@@ -41,8 +42,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+                    {/* Plant Sidebar - Left Column */}
+                    <div className="hidden lg:block lg:col-span-3">
+                        <div className="sticky top-24">
+                            <PlantSidebar />
+                        </div>
+                    </div>
+
                     {/* Main Content */}
-                    <div className="lg:col-span-8">
+                    <div className="lg:col-span-6">
                         {/* Breadcrumbs y filtros activos */}
                         {(selectedTag || searchQuery) && (
                             <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
@@ -86,7 +94,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     </div>
 
                     {/* Sidebar */}
-                    <div className="mt-12 lg:mt-0 lg:col-span-4">
+                    <div className="mt-12 lg:mt-0 lg:col-span-3">
                         <div className="sticky top-24 space-y-8">
                             {/* Search Widget */}
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -161,7 +169,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                             </Suspense>
 
                             {/* Newsletter Signup */}
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 
+                            <div className="bg-linear-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 
                 dark:to-indigo-900/20 rounded-lg p-6 border border-blue-100 dark:border-blue-800">
                                 <div className="text-center">
                                     <div className="w-12 h-12 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
@@ -207,8 +215,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                     Sobre el Autor
                                 </h3>
                                 <div className="flex items-start space-x-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 
-                    rounded-full flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 
+                    rounded-full flex items-center justify-center shrink-0">
                                         <span className="text-white font-bold text-lg">JP</span>
                                     </div>
                                     <div>

@@ -35,8 +35,8 @@ const BlogHeaderInner: React.FC = () => {
 
     return (
         <>
-            <div className="bg-gradient-to-br from-blue-600 via-purple-700 to-pink-600 py-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-linear-to-br from-blue-600 via-purple-700 to-pink-600 py-16">
+                <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center py-24">
                     <h1 
                         className="text-4xl md:text-6xl font-bold text-white mb-6 cursor-default"
                         onDoubleClick={() => setIsAdminModalOpen(true)}
@@ -67,7 +67,7 @@ const BlogHeaderInner: React.FC = () => {
 export const BlogHeader: React.FC = () => {
     return (
         <Suspense fallback={
-            <div className="bg-gradient-to-br from-blue-600 via-purple-700 to-pink-600 py-16">
+            <div className="bg-linear-to-br from-blue-600 via-purple-700 to-pink-600 py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 cursor-default">
                         Blog

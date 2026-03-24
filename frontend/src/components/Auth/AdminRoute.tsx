@@ -54,7 +54,7 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({
                         No tienes permisos para acceder a esta página.
                     </p>
                     <button
-                        onClick={() => router.push('/blog/admin/login')}
+                        onClick={() => router.push('/blog?login=required')}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         Ir al Login

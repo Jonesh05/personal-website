@@ -1,79 +1,261 @@
 @import 'tailwindcss';
 
+/* ============================================================
+   PLASMA THEME — Purple × Green × Dark
+   Stack: Tailwind v4 · Next.js 16 · React 19
+   ============================================================ */
+
 @theme {
-  --color-primary-50: #f0f9ff;
+  /* ── Legacy primary scale (kept for existing utilities) ── */
+  --color-primary-50:  #f0f9ff;
   --color-primary-100: #e0f2fe;
   --color-primary-200: #bae6fd;
   --color-primary-300: #7dd3fc;
   --color-primary-400: #38bdf8;
+  --color-primary:     #0ea5e9;
   --color-primary-500: #a855f7;
   --color-primary-600: #9333ea;
   --color-primary-700: #7e22ce;
   --color-primary-800: #6b21a8;
   --color-primary-900: #581c87;
-  --color-primary: #0ea5e9;
 
-  --color-primary-500: #a855f7;
-  --color-primary-600: #9333ea;
-  --color-primary-700: #7e22ce;
-  --color-bluish: #7182ff;
-  --color-greenish: #3cff52;
-  --color-bg-light: hsla(0, 0%, 95%, 1);
-  --color-bg-blue: hsla(210, 100%, 95%, 1);
-  --color-bg-lavender: hsla(240, 100%, 90%, 1);
-  --color-bg-mint: hsla(160, 100%, 90%, 1);
+  --color-bluish:        #7182ff;
+  --color-greenish:      #3cff52;
+  --color-bg-light:      hsla(0, 0%, 95%, 1);
+  --color-bg-blue:       hsla(210, 100%, 95%, 1);
+  --color-bg-lavender:   hsla(240, 100%, 90%, 1);
+  --color-bg-mint:       hsla(160, 100%, 90%, 1);
 
   --drop-shadow-text-glow: 0 0 4px rgba(0, 0, 0, 0.4);
 
-  --font-sans: Inter, system-ui, sans-serif;
+  /* ── Core palette ── */
+  --color-void:        #04080F;
+  --color-surface:     #080E18;
+  --color-surface-2:   #0D1524;
+  --color-surface-3:   #121D30;
+  --color-border:      #1A2640;
+  --color-border-glow: #2D3F5E;
+
+  /* ── Plasma purple ── */
+  --color-purple-dim:    #3B1A6E;
+  --color-purple:        #7C3AED;
+  --color-purple-bright: #9B3FFB;
+  --color-purple-neon:   #BF5EFF;
+  --color-purple-glow:   rgba(124, 58, 237, 0.35);
+
+  /* ── Plasma green ── */
+  --color-green-dim:    #053D2A;
+  --color-green:        #059669;
+  --color-green-bright: #10B981;
+  --color-green-neon:   #00FFB2;
+  --color-green-glow:   rgba(16, 185, 129, 0.35);
+
+  /* ── Text ── */
+  --color-text:        #E8F0FE;
+  --color-text-muted:  #7A8FAD;
+  --color-text-faint:  #3D4F6E;
+
+  /* ── Gradients ── */
+  --gradient-plasma:      linear-gradient(135deg, var(--color-purple-bright) 0%, var(--color-green-bright) 100%);
+  --gradient-plasma-text: linear-gradient(90deg, #BF5EFF 0%, #00FFB2 100%);
+  --gradient-surface:     linear-gradient(180deg, var(--color-surface) 0%, var(--color-void) 100%);
+
+  /* ── Typography ── */
+  --font-sans:    Inter, system-ui, sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* ── Spacing ── */
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  /* ── Shadows ── */
+  --shadow-purple: 0 0 40px rgba(124, 58, 237, 0.25), 0 0 80px rgba(124, 58, 237, 0.10);
+  --shadow-green:  0 0 40px rgba(16, 185, 129, 0.25), 0 0 80px rgba(16, 185, 129, 0.10);
+  --shadow-card:   0 4px 32px rgba(4, 8, 15, 0.6), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* ── Tailwind v4 border-color compatibility ── */
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    box-sizing: border-box;
+    border-color: var(--color-border, currentcolor);
   }
 }
 
+/* ── Base styles ── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* ── Plasma text gradient ── */
+.text-plasma {
+  background: var(--gradient-plasma-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Plasma border ── */
+.border-plasma {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+.border-plasma::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--gradient-plasma);
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* ── Noise texture overlay ── */
+.noise::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── Plasma blob animations ── */
+@keyframes plasma-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(40px, -60px) scale(1.08); }
+  66%       { transform: translate(-30px, 40px) scale(0.95); }
+}
+@keyframes plasma-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-50px, 30px) scale(1.05); }
+  66%       { transform: translate(40px, -50px) scale(1.1); }
+}
+@keyframes plasma-float-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(30px, 50px) scale(1.07); }
+}
+
+.plasma-blob-a { animation: plasma-float-a 18s ease-in-out infinite; }
+.plasma-blob-b { animation: plasma-float-b 22s ease-in-out infinite; }
+.plasma-blob-c { animation: plasma-float-c 15s ease-in-out infinite; }
+
+/* ── Cursor blink ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink { animation: blink 1s step-start infinite; }
+
+/* ── Reveal animations ── */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes reveal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.reveal-up { animation: reveal-up 0.7s ease forwards; }
+.reveal-in { animation: reveal-in 0.5s ease forwards; }
+
+/* ── Card hover glow ── */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-purple);
+}
+.card-hover.green-accent:hover {
+  box-shadow: var(--shadow-green);
+}
+
+/* ── Grid overlay ── */
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ── Tag pill styles ── */
+.tag-purple {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--color-purple-neon);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+.tag-green {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-green-neon);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.tag-default {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-void); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-purple) 0%, var(--color-green) 100%);
+  border-radius: 3px;
+}
+
+/* ── Grid overlay ── */
+/*
+   Líneas visibles sobre fondo oscuro plasma.
+   Purple vertical + green horizontal — mezcla cromática sutil.
+   0.04 era invisible; 0.12-0.14 es el rango legible sin competir
+   con partículas ni blobs.
+*/
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(191, 94, 255, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 178, 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+/* ── Utilities ── */
 @utility container {
-  @apply px-4 mx-auto max-w-7xl;
+  padding-inline: 1rem;
+  margin-inline: auto;
+  max-width: 80rem;
 }
 
 @utility btn {
-  @apply px-6 py-3 font-medium rounded-lg transition-colors;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: colors 0.2s;
 }
 
 @utility btn-primary {
-  @apply bg-primary-600 text-white hover:bg-primary-700;
+  background-color: var(--color-primary-600);
+  color: white;
 }
 
 @utility btn-outline {
-  @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-50;
-}
-
-@layer utilities {
-  :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-rgb: 255, 255, 255;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-rgb));
-  }
+  border: 2px solid var(--color-primary-600);
+  color: var(--color-primary-600);
 }

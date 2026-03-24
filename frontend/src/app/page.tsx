@@ -10,11 +10,11 @@ import Contact from "@/components/Contact/Contact";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-900">
       <Hero />
       <About />
       <Projects />
-     
+    
       <Timeline />
       <Suspense fallback={<BlogSectionSkeleton />}>
       <BlogSection />

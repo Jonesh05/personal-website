@@ -1,36 +1,39 @@
 'use client'
 
-import { create }          from 'zustand'
-import { auth }            from '@/lib/firebase/client'
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut as firebaseSignOut,
-} from 'firebase/auth'
+import { create } from 'zustand'
+import { auth } from '@/lib/firebase/client'
+import { User, signInWithPopup, GoogleAuthProvider, signOut as firebaseSignOut } from 'firebase/auth'
 
+// 1. Definimos el estado (Variables)
 interface AuthState {
-  isAdmin:     boolean
-  initialized: boolean   // restored so AdminRoute works
-  loading:     boolean
-  error:       string | null
+  isAdmin: boolean
+  initialized: boolean
+  loading: boolean
+  error: string | null
   displayName: string | null
+  user: User | null      // <-- Agregado para resolver el error del Modal
+  token: string | null    // <-- Agregado para resolver el error del Modal
 }
 
+// 2. Definimos las acciones (Funciones)
+// ¡Asegúrate de que este nombre sea EXACTAMENTE 'AuthActions'!
 interface AuthActions {
   signInWithGoogle: () => Promise<void>
-  signOut:          () => Promise<void>
-  checkSession:     () => Promise<void>
-  clearError:       () => void
+  signOut: () => Promise<void>
+  checkSession: () => Promise<void>
+  clearError: () => void
 }
 
+// 3. Creamos el Store uniendo ambas interfaces
 export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
-  isAdmin:     false,
+  isAdmin: false,
   initialized: false,
-  loading:     false,
-  error:       null,
+  loading: false,
+  error: null,
   displayName: null,
+  user: null,
+  token: null,
 
-  // Called on mount by AdminRoute — verifies httpOnly cookie server-side
   checkSession: async () => {
     try {
       const res = await fetch('/api/auth/verify', { method: 'GET' })
@@ -53,13 +56,13 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
       provider.addScope('profile')
       provider.setCustomParameters({ login_hint: 'newrevolutiion@gmail.com' })
 
-      const result  = await signInWithPopup(auth, provider)
+      const result = await signInWithPopup(auth, provider)
       const idToken = await result.user.getIdToken()
 
       const res = await fetch('/api/auth/login', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken }),
       })
 
       if (!res.ok) {
@@ -68,19 +71,23 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
       }
 
       set({
-        isAdmin:     true,
+        isAdmin: true,
         initialized: true,
-        loading:     false,
+        loading: false,
         displayName: result.user.displayName,
-        error:       null,
+        user: result.user, // <-- Guardamos el usuario
+        token: idToken,    // <-- Guardamos el token
+        error: null,
       })
     } catch (err) {
       await firebaseSignOut(auth).catch(() => {})
       set({
-        error:       err instanceof Error ? err.message : 'Login failed',
-        loading:     false,
-        isAdmin:     false,
+        error: err instanceof Error ? err.message : 'Login failed',
+        loading: false,
+        isAdmin: false,
         initialized: true,
+        user: null,
+        token: null,
       })
       throw err
     }
@@ -91,7 +98,15 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
       await firebaseSignOut(auth)
-      set({ isAdmin: false, initialized: true, loading: false, displayName: null, error: null })
+      set({ 
+        isAdmin: false, 
+        initialized: true, 
+        loading: false, 
+        displayName: null, 
+        user: null, 
+        token: null, 
+        error: null 
+      })
     } catch {
       set({ error: 'Sign out failed', loading: false })
     }

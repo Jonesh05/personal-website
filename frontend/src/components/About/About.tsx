@@ -1,11 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { TerminalIcon } from '@/components/ui/Icons';
 
 
-const gradientText = 'bg-linear-to-r from-purple-500 via-fuchsia-500 to-slate-500 bg-clip-text text-transparent';
+const gradientText = 'bg-linear-to-r from-purple-100 via-fuchsia-400 to-gray-500 bg-clip-text text-transparent';
 
 interface TerminalLine {
   text: string;
@@ -80,29 +79,6 @@ const About: React.FC = () => {
     return () => clearInterval(resetInterval);
   }, []);
 
-  const FloatingParticles = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(60)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-60"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `twinkle ${2 + Math.random() * 3}s infinite ease-in-out`,
-            animationDelay: `${Math.random() * 3}s`
-          }}
-        />
-      ))}
-      <style jsx>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.5); }
-        }
-      `}</style>
-    </div>
-  );
-
   const getLineColor = (type: string) => {
     switch (type) {
       case 'command': return 'text-blue-400';
@@ -114,38 +90,20 @@ const About: React.FC = () => {
   };
 
   return (
-    <section id="about" className="py-20 bg-bg-blue">
+    <section id="about" className="py-20">
       <div className="container mx-auto px-4">
-        <h2 className={`text-4xl font-bold text-center mb-12 ${gradientText}`}>About Me</h2>
-        <div className="md:col-span-5 backdrop-blur-xs border border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up"> 
-          <div className="relative w-52 h-52 mb-8 mx-auto">
-            {/* Spinners */}
-            {/* <div className="absolute -inset-6 rounded-full bg-linear-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
-            <div className="absolute -inset-4 rounded-full bg-linear-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-xs opacity-60"></div> */}
-            <div className="absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
-
-            {/* Avatar visible */}
-            <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">
-              <Image
-                src="/images/about.webp"
-                alt="Avatar"
-                width={208}
-                height={208}
-                className="w-full h-full object-cover object-center rounded-full"
-              />
-              
-            </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full animate-ping"></div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full"></div>
-          </div>
+        <div className="md:col-span-5 backdrop-blur-xs border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up bg-gray-900"> 
           <div className="space-y-6">
-            <p className="text-xl font-semibold text-gray-600">
-              I'm Jhonny Pimiento, a 32-year-old Colombian entrepreneur with a passion for Web3 and blockchain technology.
+            <div className="flex flex-wrap pb-6">
+              <h2 className={`px-4 py-2 rounded-full bg-primary-50 font-bold text-4xl transition text-center mb-6 shadow-lg ${gradientText} hover:text-cyan-400`}>ABOUT</h2>
+            </div>
+            <p className="text-xl font-semibold text-zinc-50">
+              Hi, I'm Jhonny👋, a Colombian entrepreneur with a passion for Web3 and blockchain technology.
               With a background in full-stack development, I specialize in creating innovative solutions that leverage
               the power of decentralized technologies.
             </p>
-            <p className="text-xl font-semibold text-gray-600">
-              My journey in tech started with traditional web development, but I quickly found my passion in the
+            <p className="text-xl font-semibold text-zinc-50">
+              I'm a student of Cybersecurity Engineer. My journey in tech started with traditional web development, but I quickly found my passion in the
               decentralized space. I'm constantly exploring new possibilities in Web3, from DeFi applications to
               NFTs and beyond.
             </p>
@@ -155,46 +113,46 @@ const About: React.FC = () => {
               <span className={`px-4 py-2 rounded-full bg-primary-50 font-semibold transition text-center mb-4 shadow-lg ${gradientText} hover:text-cyan-400`}>Web3 Enthusiast</span>
             </div>
           </div>
-        </div> 
-        {/* Terminal Section */}
-        <div className="max-w-7xl  mt-8 mb-16">
-          <div className="bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl shadow-blue-900/30 border border-gray-700/50 overflow-hidden">
-            {/* Terminal Header */}
-            <div className="bg-gray-800/50 px-6 py-4 flex items-center justify-between border-b border-gray-700/50">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          {/* Terminal Section */}
+          <div className="max-w-7xl  mt-8 mb-16">
+            <div className="bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl shadow-blue-900/30 border border-gray-700/50 overflow-hidden">
+              {/* Terminal Header */}
+              <div className="bg-gray-800/50 px-6 py-4 flex items-center justify-between border-b border-gray-700/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-400">
+                  <TerminalIcon className="w-4 h-4" />
+                  <span className="text-sm font-mono">terminal</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-2 text-gray-400">
-                <TerminalIcon className="w-4 h-4" />
-                <span className="text-sm font-mono">secure-terminal</span>
+
+              {/* Terminal Body */}
+              <div className="p-6 font-mono text-sm leading-relaxed min-h-80">
+                {displayedLines.map((line, index) => (
+                  <div key={index} className={`mb-2 ${getLineColor(line.type)}`}>
+                    {line.text}
+                  </div>
+                ))}
+
+                {isTyping && currentText && (
+                  <div className={`mb-2 ${getLineColor(terminalSequence[currentLineIndex]?.type || 'command')}`}>
+                    {currentText}
+                    {showCursor && <span className="bg-blue-400 text-black ml-1 animate-pulse">|</span>}
+                  </div>
+                )}
+
+                {!isTyping && (
+                  <div className="text-blue-400 animate-pulse">
+                    &gt; <span className={showCursor ? 'opacity-100' : 'opacity-0'}>_</span>
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Terminal Body */}
-            <div className="p-6 font-mono text-sm leading-relaxed min-h-80">
-              {displayedLines.map((line, index) => (
-                <div key={index} className={`mb-2 ${getLineColor(line.type)}`}>
-                  {line.text}
-                </div>
-              ))}
-
-              {isTyping && currentText && (
-                <div className={`mb-2 ${getLineColor(terminalSequence[currentLineIndex]?.type || 'command')}`}>
-                  {currentText}
-                  {showCursor && <span className="bg-blue-400 text-black ml-1 animate-pulse">|</span>}
-                </div>
-              )}
-
-              {!isTyping && (
-                <div className="text-blue-400 animate-pulse">
-                  &gt; <span className={showCursor ? 'opacity-100' : 'opacity-0'}>_</span>
-                </div>
-              )}
             </div>
           </div>
-        </div>
+        </div> 
       </div>
 
     </section>

@@ -4,13 +4,14 @@ export interface Project {
   description: string;
   image: string;
   technologies: string[];
-  category: 'web' | 'blockchain' | 'ai' | 'mobile';
+  category: 'web' | 'blockchain' | 'AI/ML' | 'mobile';
   status: 'completed' | 'in-progress' | 'planning';
-  links: {
-    live?: string;
-    github?: string;
-    demo?: string;
-  };
+  tags:       string[]
+  liveUrl?:    string
+  githubUrl?:  string
+  demoUrl?:    string
+  coverImage?: string
+  accentColor: 'purple' | 'green'
   featured: boolean;
   year: number;
 }

@@ -12,7 +12,7 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Link href={`/blog/${slug}`} className="block group">
-      <article className="w-full max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden transform transition-transform duration-300 ease-in-out group-hover:-translate-y-1 group-hover:shadow-xl">
+      <article className="w-full max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-transform duration-300 ease-in-out group-hover:-translate-y-1 group-hover:shadow-xl">
         {/* Image Container */}
         {featuredImage && (
           <div className="relative h-48 w-full">
@@ -40,7 +40,7 @@ export default function PostCard({ post }: PostCardProps) {
           )}
 
           {/* Title */}
-          <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-primary-600">
+          <h3 className="text-xl font-bold text-blue-900 mb-2 leading-tight group-hover:text-primary-600">
             {title}
           </h3>
 

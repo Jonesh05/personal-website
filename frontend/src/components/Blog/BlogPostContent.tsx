@@ -21,7 +21,7 @@ function formatDate(raw: Post['createdAt']): string {
 
 export function BlogPostContent({ post }: Props) {
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-gray-950 pt-[106px] text-gray-100">
       <div className="max-w-3xl mx-auto px-6 pt-12 pb-24">
 
         {/* Breadcrumb */}
