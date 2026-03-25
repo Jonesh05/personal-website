@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 import { toast } from "@/lib/toast"
 import { validatePost } from "@/utils/validation"
@@ -19,6 +20,7 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
 	onSaveAction,
 	onCancelAction,
 }) => {
+	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
 	const [formData, setFormData] = useState({
 		title: "",
@@ -147,7 +149,7 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
 				<div className="flex items-center justify-between">
 					<div className="flex items-center space-x-4">
 						<button
-							onClick={onCancelAction}
+							onClick={onCancelAction ?? (() => router.push('/blog/admin'))}
 							className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
 								text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 
 								hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
