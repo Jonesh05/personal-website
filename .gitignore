@@ -89,6 +89,8 @@ functions/.env
 
 # local env files
 .env*.local
+.env.*.local
+.env.local
 
 # Ignore data sensitiveFirebase Functions
 functions/secret/

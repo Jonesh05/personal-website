@@ -5,7 +5,7 @@ import  BlogSidebar  from '@/components/Blog/BlogSidebar'
 import { BlogHeader } from '@/components/Blog/BlogHeader'
 import PlantSidebar from '@/components/Blog/PlantSidebar'
 import BlogSectionSkeleton from '@/components/Blog/BlogSectionSkeleton'
-import { getPosts, getPopularTags, getFeaturedPosts } from '@/lib/firestore/posts'
+import { getServerTranslations } from '@/i18n/server'
 
 // Metadata para SEO
 export const metadata: Metadata = {
@@ -34,6 +34,7 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
     const { tag: selectedTag, search: searchQuery } = await searchParams
+    const { t } = await getServerTranslations('Blog')
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -56,7 +57,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                             <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                        <span>Mostrando resultados para:</span>
+                                        <span>{t('showingResultsFor')}</span>
                                         {selectedTag && (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs 
                         font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -78,7 +79,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                        Limpiar filtros
+                                        {t('clearFilters')}
                                     </a>
                                 </div>
                             </div>
@@ -99,11 +100,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                             {/* Search Widget */}
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                                    Buscar Artículos
+                                    {t('searchArticles')}
                                 </h3>
                                 <form action="/blog" method="get" className="space-y-3">
                                     <div>
-                                        <label htmlFor="search" className="sr-only">Buscar</label>
+                                        <label htmlFor="search" className="sr-only">{t('searchButton')}</label>
                                         <div className="relative">
                                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +120,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                                     rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
                                                     placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
                                                     focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                                placeholder="Buscar en el blog..."
+                                                placeholder={t('searchPlaceholder')}
                                             />
                                         </div>
                                     </div>
@@ -129,7 +130,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                             shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
                                             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                     >
-                                        Buscar
+                                        {t('searchButton')}
                                     </button>
                                 </form>
                             </div>
@@ -179,15 +180,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                         </svg>
                                     </div>
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                        Stay Updated
+                                        {t('newsletterTitle')}
                                     </h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                        Recibe las últimas actualizaciones sobre Web3, blockchain y desarrollo.
+                                        {t('newsletterBody')}
                                     </p>
                                     <div className="space-y-3">
                                         <input
                                             type="email"
-                                            placeholder="tu@email.com"
+                                            placeholder={t('newsletterEmailPlaceholder')}
                                             className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
                         rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
                         placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
@@ -200,11 +201,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                         hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
                         focus:ring-blue-500 transition-colors"
                                         >
-                                            Suscribirse
+                                            {t('newsletterSubscribe')}
                                         </button>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                        Sin spam. Solo contenido de calidad.
+                                        {t('newsletterNoSpam')}
                                     </p>
                                 </div>
                             </div>
@@ -212,7 +213,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                             {/* About Widget */}
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                                    Sobre el Autor
+                                    {t('authorCardTitle')}
                                 </h3>
                                 <div className="flex items-start space-x-3">
                                     <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 
@@ -224,9 +225,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                             Jhonny Pimiento
                                         </h4>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            Desarrollador Full Stack especializado en Web3, Blockchain y
-                                            Arquitectura en la Nube. Apasionado por las tecnologías emergentes
-                                            y la construcción de soluciones escalables.
+                                            {t('authorBio')}
                                         </p>
                                         <div className="flex space-x-2 mt-3">
                                             <a

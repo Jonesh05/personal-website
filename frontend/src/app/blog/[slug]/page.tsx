@@ -1,5 +1,5 @@
 import { notFound }      from 'next/navigation'
-import { getPostBySlug, incrementPostViews } from '@/lib/firestore/posts'
+import { getPostBySlug } from '@/lib/firestore/posts'
 import { BlogPostContent } from '@/components/Blog/BlogPostContent'
 import type { Post }     from '@/lib/firestore/posts'
 
@@ -13,8 +13,8 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post || !post.published) notFound()
 
-  incrementPostViews(post.id).catch(() => {})
-
+  // Views are tracked client-side via useViewTracker so we can dedup per
+  // visitor/day and avoid inflating counts on refresh, prefetch, or SSR revalidation.
   return <BlogPostContent post={post} />
 }
 

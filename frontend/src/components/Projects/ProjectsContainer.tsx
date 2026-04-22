@@ -2,8 +2,10 @@
 
 import { useProjects } from './useProjects';
 import { ProjectsPresentational } from './ProjectsPresentational';
+import { useTranslations } from '@/i18n';
 
 const ProjectsContainer = () => {
+  const t = useTranslations('Projects');
   const {
     data,
     loading,
@@ -13,20 +15,18 @@ const ProjectsContainer = () => {
     featuredProjects,
   } = useProjects();
 
-  // 1. Estado de carga
   if (loading) {
     return (
       <section className="py-20 text-center">
-        <p className="text-white">Cargando proyectos…</p>
+        <p className="text-white">{t('loading')}</p>
       </section>
     );
   }
 
-  // 2. Fallback por si data sigue siendo null (muy improbable tras loading)
   if (!data) {
     return (
       <section className="py-20 text-center">
-        <p className="text-red-400">Error al cargar proyectos.</p>
+        <p className="text-red-400">{t('error')}</p>
       </section>
     );
   }

@@ -3,6 +3,29 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { Project, ProjectsData } from './Projects.types';
 import gsap from 'gsap';
+import { useTranslations, useLocale } from '@/i18n';
+import type { Locale } from '@/i18n/constants';
+
+/**
+ * Translate a category *label* for display. The identifier stays in the
+ * underlying data ("blockchain", "AI/ML", …) — we only convert it to
+ * human-readable copy here.
+ *
+ * Frozen categories (Blockchain, AI/ML) are rendered as-is per product
+ * rules; "all" and "web" pick up localized strings from the Projects
+ * namespace so they switch with the rest of the UI.
+ */
+function displayCategory(
+  cat: string,
+  tAll: string,
+  tWeb: string,
+): string {
+  if (cat === 'all') return tAll;
+  if (cat === 'web') return tWeb;
+  if (cat === 'blockchain') return 'Blockchain';
+  if (cat === 'AI/ML') return 'AI / ML';
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
+}
 
 interface Props {
   data: ProjectsData;
@@ -27,12 +50,20 @@ const ACCENT = {
 } as const;
 
 // Card individual con hover gestionado por state local
-const ProjectCard: FC<{ project: Project; idx: number; cardRef: (el: HTMLDivElement | null) => void }> = ({
-  project,
-  cardRef,
-}) => {
+const ProjectCard: FC<{
+  project: Project;
+  idx: number;
+  cardRef: (el: HTMLDivElement | null) => void;
+  locale: Locale;
+  labels: {
+    statusDone: string;
+    statusWip: string;
+    featured: string;
+  };
+}> = ({ project, cardRef, locale, labels }) => {
   const [hovered, setHovered] = useState(false);
   const accent = ACCENT[project.accentColor ?? 'purple'];
+  const description = project.description[locale] ?? project.description.en;
 
   return (
     <div
@@ -87,8 +118,10 @@ const ProjectCard: FC<{ project: Project; idx: number; cardRef: (el: HTMLDivElem
             }`}
             style={{ fontFamily: 'var(--font-mono)' }}
           >
-            {project.status === 'completed' ? '● Completed'
-              : project.status === 'in-progress' ? '◌ In Progress'
+            {project.status === 'completed'
+              ? labels.statusDone
+              : project.status === 'in-progress'
+              ? labels.statusWip
               : project.status}
           </span>
           <span
@@ -114,9 +147,9 @@ const ProjectCard: FC<{ project: Project; idx: number; cardRef: (el: HTMLDivElem
           {project.title}
         </h3>
 
-        {/* Description */}
+        {/* Description — per-locale text picked up from `project.description` */}
         <p className="text-sm leading-relaxed flex-1 mb-4" style={{ color: 'var(--color-text-muted)' }}>
-          {project.description}
+          {description}
         </p>
 
         {/* Tech tags */}
@@ -208,7 +241,7 @@ const ProjectCard: FC<{ project: Project; idx: number; cardRef: (el: HTMLDivElem
             boxShadow:  '0 0 12px rgba(124,58,237,0.4)',
           }}
         >
-          ★ Featured
+          {labels.featured}
         </span>
       )}
     </div>
@@ -217,12 +250,25 @@ const ProjectCard: FC<{ project: Project; idx: number; cardRef: (el: HTMLDivElem
 
 // ── Componente principal ──────────────────────────────────────────────────────
 export const ProjectsPresentational: FC<Props> = ({
-  data,
   projects,
   selectedCategory,
   onCategoryChange,
+  data,
 }) => {
+  const t = useTranslations('Projects');
+  const { locale } = useLocale();
   const cardsRef = useRef<HTMLDivElement[]>([]);
+
+  // Short-lived labels computed once per render; passed into each card to
+  // avoid calling the translator from leaf components that re-render on hover.
+  const cardLabels = {
+    statusDone: t('status_done'),
+    statusWip:  t('status_wip'),
+    featured:   t('featured_badge'),
+  };
+
+  const filterAll = t('filter_all');
+  const filterWeb = t('filter_web');
 
   useEffect(() => {
     if (cardsRef.current.length === 0) return;
@@ -236,16 +282,16 @@ export const ProjectsPresentational: FC<Props> = ({
   return (
     <section id="projects" className="py-24" aria-labelledby="projects-heading">
       <div className="container mx-auto px-4">
-        {/* Header */}
+        {/* Header — title/subtitle come from the i18n dictionary */}
         <h2
           id="projects-heading"
           className="text-4xl font-bold text-center mb-3"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
         >
-          {data.title}
+          {t('heading_line1')} <span className="text-plasma">{t('heading_line2')}</span>
         </h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--color-text-muted)' }}>
-          {data.subtitle}
+          {t('subtitle')}
         </p>
 
         {/* Filter tabs */}
@@ -275,7 +321,7 @@ export const ProjectsPresentational: FC<Props> = ({
                   border:     'none',
                 }}
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {displayCategory(cat, filterAll, filterWeb)}
               </button>
             );
           })}
@@ -289,6 +335,8 @@ export const ProjectsPresentational: FC<Props> = ({
               project={project}
               idx={idx}
               cardRef={el => { if (el) cardsRef.current[idx] = el; }}
+              locale={locale}
+              labels={cardLabels}
             />
           ))}
         </div>

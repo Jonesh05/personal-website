@@ -2,10 +2,12 @@ import { getSessionUser } from '@/lib/auth/session'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { SignOutButton } from '@/components/Auth/SignOutButton.client'
+import { getServerTranslations } from '@/i18n/server'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getSessionUser()
   if (!user?.isAdmin) redirect('/blog?login=required')
+  const { t } = await getServerTranslations('AdminNav')
 
   return (
     <div className="min-h-screen bg-gray-950 pt-106px text-gray-100">
@@ -14,16 +16,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="flex h-11 items-center justify-between">
             <div className="flex items-center gap-5 text-sm">
               <span className="text-xs font-semibold uppercase tracking-wider text-orange-500">
-                Admin
+                {t('admin')}
               </span>
               <Link href="/blog/admin" className="text-gray-400 transition-colors hover:text-white">
-                Dashboard
+                {t('dashboard')}
               </Link>
               <Link href="/blog/admin/posts" className="text-gray-400 transition-colors hover:text-white">
-                Posts
+                {t('posts')}
               </Link>
               <Link href="/blog/admin/posts/new" className="text-gray-400 transition-colors hover:text-white">
-                + New
+                {t('new')}
               </Link>
             </div>
             <div className="flex items-center gap-3">

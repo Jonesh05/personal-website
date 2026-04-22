@@ -172,19 +172,10 @@ export async function getRelatedPosts(tags: string[], excludeId: string, limit =
     })
 }
 
-export async function incrementPostViews(id: string): Promise<void> {
-  const { FieldValue } = await import('firebase-admin/firestore')
-  await adminDb.collection(COLLECTION).doc(id).update({
-    views: FieldValue.increment(1),
-  })
-}
-
-export async function incrementPostLikes(id: string): Promise<void> {
-  const { FieldValue } = await import('firebase-admin/firestore')
-  await adminDb.collection(COLLECTION).doc(id).update({
-    likes: FieldValue.increment(1),
-  })
-}
+// Views and likes counters are mutated exclusively by the transactional
+// helpers in `lib/firestore/interactions.ts` (per-visitor dedup + atomic
+// counters). Do not add "blind" increment helpers here — they would bypass
+// the per-user rules and re-inflate the counters.
 
 export function generateSlug(title: string): string {
   return title

@@ -32,6 +32,7 @@ import type { Namespace } from './locales/en';
 import en from './locales/en';
 import es from './locales/es';
 
+import { LOCALES } from './constants';
 // Re-export pure constants
 export { LOCALES, DEFAULT_LOCALE, LOCALE_KEY, LOCALE_TO_HREFLANG, type Locale }
   from './constants';
@@ -44,11 +45,20 @@ const dictionaries = { en, es } as const;
 type DictLocale = keyof typeof dictionaries;
 
 // ── Static keys — always return English value regardless of locale ─────────
-// Add any word that should NOT translate across the site.
-// Typically: brand names, proper nouns, tech terms, globally-recognized labels.
+// These are the "do not translate" terms enforced across the site. They fall
+// into two buckets:
+//   1. Tech / brand nouns — already English in every language (Blockchain,
+//      Web3, GitHub, TypeScript, etc.). We freeze them so a translator cannot
+//      accidentally localise them.
+//   2. Navigation anchors the product copy explicitly requires to stay
+//      English ("Home", "About"): per product rules these labels never
+//      translate even when the rest of the UI is in Spanish.
 const STATIC_KEYS = new Set([
   'Web3',
   'Blockchain',
+  'AI',
+  'ML',
+  'ReFi',
   'GitHub',
   'LinkedIn',
   'TypeScript',
@@ -58,7 +68,9 @@ const STATIC_KEYS = new Set([
   'Solidity',
   'IPFS',
   'DevRel',
-  'Blog',        // "Blog" is internationally recognized — stays as-is
+  'Blog',
+  'Home',
+  'About',
 ]);
 
 // ── Pure resolver (shared by hook and getTranslations) ────────────────────
@@ -72,7 +84,7 @@ function resolve(
     return (en[namespace] as Record<string, string>)[key] ?? key;
   }
 
-  const dict    = dictionaries[locale] ?? dictionaries.es;
+  const dict    = dictionaries[locale] ?? dictionaries.en;
   const section = dict[namespace] as Record<string, string>;
   return section[key] ?? (en[namespace] as Record<string, string>)[key] ?? key;
 }
@@ -115,7 +127,7 @@ export function useTranslations<N extends Namespace>(namespace: N) {
  *   t('heading')  // → "Hola, soy Jhonny 👋"
  */
 export function getTranslations(locale: string, namespace: Namespace) {
-  const safe = (LOCALES.includes(locale as DictLocale) ? locale : 'es') as DictLocale;
+  const safe = (LOCALES.includes(locale as DictLocale) ? locale : 'en') as DictLocale;
   return (key: string): string => resolve(safe, namespace, key);
 }
 

@@ -3,11 +3,13 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AdminAuthModal } from '@/components/Auth/AdminAuthModal'
+import { useTranslations } from '@/i18n'
 
 const BlogHeaderInner: React.FC = () => {
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
+    const t = useTranslations('Blog')
 
     useEffect(() => {
         // Automatically open the login modal if redirected from an admin route
@@ -40,13 +42,12 @@ const BlogHeaderInner: React.FC = () => {
                     <h1 
                         className="text-4xl md:text-6xl font-bold text-white mb-6 cursor-default"
                         onDoubleClick={() => setIsAdminModalOpen(true)}
-                        title="Doble clic para acceso admin"
+                        title={t('adminAccessHint')}
                     >
-                        Blog
+                        {t('title')}
                     </h1>
                     <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                        Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube
-                        y las últimas tendencias en tecnología.
+                        {t('subtitle')}
                     </p>
                 </div>
             </div>
@@ -73,8 +74,7 @@ export const BlogHeader: React.FC = () => {
                         Blog
                     </h1>
                     <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                        Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube
-                        y las últimas tendencias en tecnología.
+                        Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube y las últimas tendencias en tecnología.
                     </p>
                 </div>
             </div>

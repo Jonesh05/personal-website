@@ -9,8 +9,8 @@ import {
   createPost as createPostDb,
   updatePost as updatePostDb,
   deletePost as deletePostDb,
+  getPostById,
   generateSlug,
-  incrementPostLikes,
 } from '@/lib/firestore/posts'
 
 export interface ActionResult {
@@ -51,7 +51,8 @@ export async function createPostAction(formData: FormData): Promise<ActionResult
 
     revalidatePath('/')
     revalidatePath('/blog')
-    revalidatePath('/admin/posts')
+    revalidatePath('/blog/admin/posts')
+    revalidatePath(`/blog/${post.slug}`)
     return { success: true, data: post }
   } catch (error) {
     console.error('Create post error:', error)
@@ -86,6 +87,8 @@ export async function updatePostAction(id: string, formData: FormData): Promise<
   }
 
   try {
+    const existingPost = await getPostById(id)
+
     // If title changed, regenerate slug
     const updateData = parsed.data.title
       ? { ...parsed.data, slug: generateSlug(parsed.data.title) }
@@ -95,8 +98,13 @@ export async function updatePostAction(id: string, formData: FormData): Promise<
 
     revalidatePath('/')
     revalidatePath('/blog')
-    revalidatePath('/admin/posts')
-    revalidatePath(`/blog/${id}`)
+    revalidatePath('/blog/admin/posts')
+    if (existingPost?.slug) {
+      revalidatePath(`/blog/${existingPost.slug}`)
+    }
+    if (updateData.slug) {
+      revalidatePath(`/blog/${updateData.slug}`)
+    }
     return { success: true }
   } catch (error) {
     console.error('Update post error:', error)
@@ -111,11 +119,15 @@ export async function deletePostAction(id: string): Promise<ActionResult> {
   }
 
   try {
+    const existingPost = await getPostById(id)
     await deletePostDb(id)
 
     revalidatePath('/')
     revalidatePath('/blog')
-    revalidatePath('/admin/posts')
+    revalidatePath('/blog/admin/posts')
+    if (existingPost?.slug) {
+      revalidatePath(`/blog/${existingPost.slug}`)
+    }
     return { success: true }
   } catch (error) {
     console.error('Delete post error:', error)
@@ -123,13 +135,6 @@ export async function deletePostAction(id: string): Promise<ActionResult> {
   }
 }
 
-export async function likePostAction(id: string): Promise<ActionResult> {
-  try {
-    await incrementPostLikes(id)
-    revalidatePath(`/blog/${id}`)
-    return { success: true }
-  } catch (error) {
-    console.error('Like post error:', error)
-    return { success: false, error: 'Failed to like post' }
-  }
-}
+// Likes are handled exclusively through `/api/posts/[id]/like`, which enforces
+// per-visitor dedup via Firestore subcollections + atomic transactions. There
+// is intentionally no server action that increments likes "blindly".

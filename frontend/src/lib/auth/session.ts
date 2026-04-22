@@ -1,30 +1,52 @@
 // frontend/src/lib/auth/session.ts
-// Server-side session cookie utilities
-// Replaces localStorage token storage with httpOnly cookies
+// Server-side admin session utilities built on Firebase Admin SDK.
+//
+// Identity rules (production-safe):
+//   • Admin allow-list comes from the server-only `ADMIN_EMAILS` env var.
+//   • NO hardcoded fallback. NO `NEXT_PUBLIC_*` source — admin emails must
+//     never ship in the client bundle.
+//   • If `ADMIN_EMAILS` is empty, ALL admin checks fail closed; login is
+//     impossible. We log a clear error once at module load so the misconfig
+//     is loud in server logs (Vercel / container).
 
+import 'server-only'
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebase/admin'
 
 export const SESSION_COOKIE_NAME = '__session'
 export const SESSION_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
-// Use the admin email configured in environment variables, or allow newrevolutiion@gmail.com as a fallback
-const ADMIN_EMAILS = [
-  process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-  'newrevolutiion@gmail.com',
-  'jhonny.pimiento@gmail.com' // Commonly seen in user projects, adding as safety
-].filter(Boolean);
+const ADMIN_EMAILS: ReadonlyArray<string> = (() => {
+  const raw = process.env.ADMIN_EMAILS ?? ''
+  const list = raw
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+
+  if (list.length === 0) {
+    console.error(
+      '[auth/session] ADMIN_EMAILS is empty — admin login is disabled. ' +
+        'Set ADMIN_EMAILS (comma-separated) in the server environment.',
+    )
+  }
+  return Object.freeze(list)
+})()
+
+function isAdminEmail(email: string | undefined | null): boolean {
+  if (!email) return false
+  if (ADMIN_EMAILS.length === 0) return false
+  return ADMIN_EMAILS.includes(email.toLowerCase())
+}
 
 export async function createSessionCookie(idToken: string): Promise<string> {
-  // Verify the idToken first
   const decoded = await adminAuth.verifyIdToken(idToken)
 
-  // Check if user is admin
-  if (!decoded.email || !ADMIN_EMAILS.includes(decoded.email)) {
-    throw new Error(`Unauthorized: not an admin (${decoded.email})`)
+  if (!isAdminEmail(decoded.email)) {
+    // Log without echoing the attempted email back to the client.
+    console.warn('[auth/session] rejected non-admin login attempt')
+    throw new Error('Unauthorized')
   }
 
-  // Create session cookie
   const sessionCookie = await adminAuth.createSessionCookie(idToken, {
     expiresIn: SESSION_EXPIRY_MS,
   })
@@ -40,7 +62,7 @@ export async function verifySessionCookie() {
 
   try {
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true)
-    if (!decoded.email || !ADMIN_EMAILS.includes(decoded.email)) return null
+    if (!isAdminEmail(decoded.email)) return null
     return decoded
   } catch {
     return null
@@ -56,7 +78,7 @@ export async function getSessionUser() {
     email: decoded.email,
     name: decoded.name || decoded.email?.split('@')[0] || 'Admin',
     picture: decoded.picture || null,
-    isAdmin: decoded.email ? ADMIN_EMAILS.includes(decoded.email) : false,
+    isAdmin: isAdminEmail(decoded.email),
   }
 }
 

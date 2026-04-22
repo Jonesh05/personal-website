@@ -2,6 +2,7 @@ import { getSessionUser } from '@/lib/auth/session'
 import { redirect, notFound } from 'next/navigation'
 import { getPostById }    from '@/lib/firestore/posts'
 import { AdminPostEditor } from '@/components/Blog/AdminPostEditor'
+import { getServerTranslations } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -10,6 +11,7 @@ interface Props {
 export default async function EditPostPage({ params }: Props) {
   const user = await getSessionUser()
   if (!user?.isAdmin) redirect('/blog/login')
+  const { t } = await getServerTranslations('AdminEditor')
 
   const { id } = await params
   const post = await getPostById(id)
@@ -18,7 +20,7 @@ export default async function EditPostPage({ params }: Props) {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Edit Post</h1>
+        <h1 className="text-2xl font-bold text-white">{t('editPost')}</h1>
         <p className="text-gray-500 text-sm mt-1 truncate">{post.title}</p>
       </div>
       <AdminPostEditor post={post} />

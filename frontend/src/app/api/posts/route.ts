@@ -5,11 +5,16 @@ import { getPosts } from '@/lib/firestore/posts'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const limit  = parseInt(searchParams.get('limit')  ?? '10')
+    const limitParam = parseInt(searchParams.get('limit') ?? '10', 10)
+    const offsetParam = parseInt(searchParams.get('offset') ?? '0', 10)
+    const limit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 50) : 10
+    const offset = Number.isFinite(offsetParam) ? Math.max(offsetParam, 0) : 0
     const tag    = searchParams.get('tag')    ?? undefined
     const search = searchParams.get('search') ?? undefined
 
-    const posts = await getPosts({ published: true, limit, tag })
+    // Fetch the filtered collection, then apply offset pagination in-memory.
+    // This keeps a stable API contract while preserving current search behavior.
+    const posts = await getPosts({ published: true, tag })
 
     const filtered = search
       ? posts.filter(p =>
@@ -18,13 +23,17 @@ export async function GET(req: NextRequest) {
         )
       : posts
 
+    const paginatedPosts = filtered.slice(offset, offset + limit)
+    const total = filtered.length
+    const hasNext = offset + paginatedPosts.length < total
+
     return NextResponse.json({
-      posts: filtered,
-      total: filtered.length,
+      posts: paginatedPosts,
+      total,
       pagination: {
         limit,
-        offset: parseInt(searchParams.get('offset') ?? '0'),
-        hasNext: false, // Simple implementation — all returned in one page for now
+        offset,
+        hasNext,
       },
     })
   } catch (err) {

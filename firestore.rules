@@ -1,49 +1,58 @@
 rules_version = '2';
 
+// All writes go through the Firebase Admin SDK on the server (Next.js route
+// handlers / server actions). The client SDK is only used for authentication
+// (popup login) and is never allowed to write directly to Firestore.
+//
+// Reads are restricted to public content only. Everything else is Admin-only.
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Default rule: deny all access
+
+    // Default deny — every rule below must explicitly allow access.
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Since we are using Firebase Admin SDK (Server Actions) for all mutations
-    // We only need to allow read access for public data on the client.
-    // Client SDK should NOT be able to write anything directly.
-
-    // Rules for /posts collection
+    // Posts — public can read only published posts.
     match /posts/{postId} {
-      // Public can read only published posts
       allow read: if resource.data.published == true;
-      allow write: if false; // Only Admin SDK can write
+      allow write: if false; // Admin SDK only
+
+      // Per-user interactions (likes / views). The client never reads or
+      // writes these directly; the Next.js API routes operate on them
+      // through the Admin SDK, which bypasses these rules.
+      match /likes/{visitorId} {
+        allow read, write: if false;
+      }
+
+      match /views/{viewId} {
+        allow read, write: if false;
+      }
     }
 
-    // Rules for /projects collection
     match /projects/{projectId} {
-      // Public can read all projects
       allow read: if true;
-      allow write: if false; // Only Admin SDK can write
+      allow write: if false;
     }
 
-    // Rules for /contacts collection
     match /contacts/{contactId} {
-      // Client cannot read other people's contacts
-      allow read: if false;
-      // Client cannot write contacts directly (must use Server Action to prevent spam)
-      allow write: if false; 
+      allow read, write: if false;
     }
 
-    // Rules for /users collection
     match /users/{userId} {
-      allow read, write: if false; // Only Admin SDK can read/write
+      allow read, write: if false;
     }
 
-    // Rules for /siteConfig collection
+    // Per-visitor aggregates for liked/saved posts. Admin SDK only — the
+    // client hydrates via /api/me which reads these server-side.
+    match /visitors/{visitorId}/{document=**} {
+      allow read, write: if false;
+    }
+
     match /siteConfig/{settingId} {
-      allow read: if true; // Public can read site config
-      allow write: if false; // Only Admin SDK can write
+      allow read: if true;
+      allow write: if false;
     }
   }
 }
-

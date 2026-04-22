@@ -1,7 +1,18 @@
+import type { Locale } from '@/i18n/constants'
+
+/**
+ * Localized string — used for project descriptions which the product rules
+ * explicitly require to translate with the rest of the site. Project titles
+ * are intentionally NOT localized (they must stay English everywhere).
+ */
+export type LocalizedText = Record<Locale, string>
+
 export interface Project {
   id: string;
+  /** Always English — titles never translate (product rule). */
   title: string;
-  description: string;
+  /** Per-locale description. Rendered via `description[locale]` at runtime. */
+  description: LocalizedText;
   image: string;
   technologies: string[];
   category: 'web' | 'blockchain' | 'AI/ML' | 'mobile';
@@ -16,9 +27,11 @@ export interface Project {
   year: number;
 }
 
+/**
+ * Section-level chrome. Titles/subtitles come from the i18n dictionary at
+ * render time so we keep a single source of truth per namespace.
+ */
 export interface ProjectsData {
-  title: string;
-  subtitle: string;
   categories: string[];
   projects: Project[];
 }

@@ -78,7 +78,7 @@ export default function NavbarMobile({ navLinks, socialLinks, children }: Navbar
             className="lg:hidden relative p-2.5 rounded-full transition-all duration-300 
               hover:bg-white/10 active:scale-95 focus:outline-none focus:ring-2 
               focus:ring-white/20"
-            aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-label={isOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={isOpen}
           >
             <div className="w-6 h-6 flex flex-col justify-center items-center">

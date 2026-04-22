@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useMemo } from 'react';
-import Link from 'next/link';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
 import { HeroClient } from './HeroClient'
+import { useTranslations } from '@/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Hero = () => {
+  const t = useTranslations('Hero');
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -227,7 +228,7 @@ const Hero = () => {
                 boxShadow: '0 0 32px rgba(124, 58, 237, 0.4)',
               }}
             >
-              View My Work
+              {t('cta_work')}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -242,7 +243,7 @@ const Hero = () => {
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              Get in Touch
+              {t('cta_contact')}
             </a>
           </div>
 

@@ -12,16 +12,27 @@ const getFeaturedProjects = (projects: Project[]): Project[] => {
   return projects.filter(project => project.featured);
 };
 
+/**
+ * PROJECTS_DATA — the single source of truth for the Projects section.
+ *
+ * Rules enforced by the shape:
+ *   • `title` is a plain string → authored in English; never translated.
+ *   • `description` is a `{ en, es }` record → both languages live side-by-side
+ *     so the component can pick the right variant based on the active locale.
+ *   • Category names (`web`, `blockchain`, `AI/ML`) are identifiers, not
+ *     copy. They travel through the i18n layer only for display labels (see
+ *     `ProjectsPresentational`).
+ */
 const PROJECTS_DATA: ProjectsData = {
-  title: 'Proyectos Destacados',
-  subtitle: 'Una selección de mis trabajos en Web3, AI y desarrollo frontend',
   categories: ['all', 'web', 'blockchain', 'AI/ML'],
   projects: [
     {
       id: '1',
       title: 'Utilscore E-commerce',
-      description:
-        'Plataforma de comercio electrónico completa construida con Vite + React + TypeScript. Incluye carrito, checkout, gestión de productos y panel administrativo.',
+      description: {
+        en: 'A full e-commerce platform built with Vite + React + TypeScript. Ships with cart, checkout, product management and an admin dashboard.',
+        es: 'Plataforma de comercio electrónico completa construida con Vite + React + TypeScript. Incluye carrito, checkout, gestión de productos y panel administrativo.',
+      },
       image: 'https://picsum.photos/400/250?grayscale',
       technologies: ['React', 'TypeScript', 'Vite', 'Tailwind', 'Zustand'],
       tags:        ['React', 'TypeScript', 'Vite', 'Tailwind', 'Zustand'],
@@ -36,8 +47,10 @@ const PROJECTS_DATA: ProjectsData = {
     {
       id: '2',
       title: 'NFT ReFi Platform',
-      description:
-        'Plataforma de finanzas regenerativas usando NFTs para proyectos ambientales. Smart contracts, minting y marketplace integrado.',
+      description: {
+        en: 'Regenerative-finance platform that uses NFTs to fund environmental projects. Smart contracts, minting and an integrated marketplace.',
+        es: 'Plataforma de finanzas regenerativas que usa NFTs para proyectos ambientales. Smart contracts, minteo y marketplace integrado.',
+      },
       image: '/images/NFT-card.webp',
       technologies: ['Solidity', 'Hardhat', 'RainbowKit', 'Next.js', 'IPFS'],
       tags:         ['Solidity', 'Hardhat', 'RainbowKit', 'Next.js', 'IPFS'],
@@ -52,8 +65,10 @@ const PROJECTS_DATA: ProjectsData = {
     {
       id: '3',
       title: 'Quantum Computing Research',
-      description:
-        'Investigación y desarrollo con Qiskit para algoritmos cuánticos aplicados a optimización de portfolios y machine learning.',
+      description: {
+        en: 'Research and prototypes in Qiskit for quantum algorithms applied to portfolio optimization and ML workloads.',
+        es: 'Investigación y prototipos con Qiskit para algoritmos cuánticos aplicados a optimización de portafolios y cargas de ML.',
+      },
       image: 'https://picsum.photos/400/250?grayscale',
       technologies: ['Qiskit', 'Python', 'Jupyter', 'NumPy', 'Matplotlib'],
       tags:         ['Qiskit', 'Python', 'Jupyter', 'NumPy', 'Matplotlib'],
@@ -67,8 +82,10 @@ const PROJECTS_DATA: ProjectsData = {
     {
       id: '4',
       title: 'Hackathon Clerk',
-      description:
-        'Solución ganadora en hackathon blockchain para trazabilidad de cadena de suministro usando smart contracts y oráculos.',
+      description: {
+        en: 'Winning hackathon entry: a supply-chain traceability system built on smart contracts and decentralized oracles.',
+        es: 'Proyecto ganador de hackathon: un sistema de trazabilidad de cadena de suministro basado en smart contracts y oráculos descentralizados.',
+      },
       image: 'https://picsum.photos/400/250?grayscale',
       technologies: ['Solidity', 'Chainlink', 'React', 'Web3.js', 'Node.js'],
       tags:         ['Solidity', 'Chainlink', 'React', 'Web3.js', 'Node.js'],
@@ -82,8 +99,10 @@ const PROJECTS_DATA: ProjectsData = {
     {
       id: '5',
       title: 'Design System & UI Kit',
-      description:
-        'Sistema de diseño completo con componentes reutilizables, tokens de diseño y documentación interactiva para equipos de desarrollo.',
+      description: {
+        en: 'A complete design system with reusable components, design tokens and interactive documentation tailored for product teams.',
+        es: 'Sistema de diseño completo con componentes reutilizables, tokens de diseño y documentación interactiva orientada a equipos de producto.',
+      },
       image: 'https://picsum.photos/400/250?grayscale',
       technologies: ['React', 'Storybook', 'Figma', 'Styled Components'],
       tags:         ['React', 'Storybook', 'Figma', 'Styled Components'],
@@ -97,8 +116,10 @@ const PROJECTS_DATA: ProjectsData = {
     {
       id: '6',
       title: 'AI Trading Bot',
-      description:
-        'Bot de trading automatizado usando machine learning para análisis técnico y ejecución de estrategias en mercados crypto.',
+      description: {
+        en: 'Automated trading bot that combines ML-driven technical analysis with strategy execution across crypto exchanges.',
+        es: 'Bot de trading automatizado que combina análisis técnico dirigido por ML con ejecución de estrategias en exchanges cripto.',
+      },
       image: 'https://picsum.photos/400/250?grayscale',
       technologies: ['Python', 'TensorFlow', 'Pandas', 'Binance API'],
       tags:         ['Python', 'TensorFlow', 'Pandas', 'Binance API'],
