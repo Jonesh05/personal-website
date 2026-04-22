@@ -1,26 +1,13 @@
-import { createNavigation } from 'next-intl/navigation'
-import { defineRouting }    from 'next-intl/routing'
+/**
+ * i18n/routing.ts
+ *
+ * next-intl navigation utilities — ISOLATED to this file only.
+ * Only import from here when you need Link/redirect/useRouter from next-intl.
+ * Do NOT import from utils.ts or constants.ts here to avoid circular deps.
+ *
+ * ⚠️  Do NOT re-export from utils.ts — that would pull next-intl into the
+ *     client context chain and break components outside the IntlProvider.
+ */
 
-export const LOCALES         = ['en', 'es'] as const
-export const DEFAULT_LOCALE  = 'es'
-
-export const LOCALE_ICONS: Record<string, string> = {
-  en: 'En',
-  es: 'Es',
-}
-
-export const LOCALE_TO_HREFLANG: Record<Locale, string> = {
-  en: 'en-US',
-  es: 'es-ES',
-}
-
-export const routing = defineRouting({
-  locales:       LOCALES,
-  defaultLocale: DEFAULT_LOCALE,
-  localePrefix:  'as-needed',
-})
-
-export const { Link, redirect, usePathname, useRouter, getPathname } =
-  createNavigation(routing)
-
-export type Locale = (typeof routing.locales)[number]
+export { LOCALES, DEFAULT_LOCALE, LOCALE_KEY, LOCALE_TO_HREFLANG, type Locale }
+  from './constants';

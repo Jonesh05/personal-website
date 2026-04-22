@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* ── Tailwind v4 class-based dark mode ── */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    PLASMA THEME — Purple × Green × Dark
    Stack: Tailwind v4 · Next.js 16 · React 19

@@ -234,10 +234,11 @@ export const ProjectsPresentational: FC<Props> = ({
   }, [projects]);
 
   return (
-    <section className="py-24">
+    <section id="projects" className="py-24" aria-labelledby="projects-heading">
       <div className="container mx-auto px-4">
         {/* Header */}
         <h2
+          id="projects-heading"
           className="text-4xl font-bold text-center mb-3"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
         >

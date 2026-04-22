@@ -227,14 +227,14 @@ const Hero = () => {
                 boxShadow: '0 0 32px rgba(124, 58, 237, 0.4)',
               }}
             >
-              <span>View My Work</span>
+              View My Work
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:border-plasma"
+              className="group relative inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:border-plasma"
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.1)',
@@ -271,7 +271,7 @@ const Hero = () => {
       </div>
       
 
-      {/* Indicador de scroll animado con Tailwind */}
+      {/* Scroll pending */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
         <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce" />

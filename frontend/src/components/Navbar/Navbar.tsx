@@ -311,7 +311,8 @@ export default Navbar */
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "@/i18n/utils";
+import { useTranslations, useLocale } from "@/i18n";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import {
   House,
   Buildings,
@@ -335,18 +336,6 @@ const NAV_ICONS: Record<NavKey, React.ComponentType<any>> = {
   timeline: Suitcase,
   blog: Article,
   contact: EnvelopeSimple,
-};
-
-/* Theme helpers */
-const THEME_KEY = "site-theme";
-const readInitialTheme = (): "dark" | "light" => {
-  try {
-    const v = localStorage.getItem(THEME_KEY);
-    if (v === "light" || v === "dark") return v;
-    return "dark";
-  } catch {
-    return "dark";
-  }
 };
 
 const IconBtn: React.FC<
@@ -385,50 +374,32 @@ const useScrollDirection = () => {
 
 /* Navbar Component */
 const Navbar: React.FC = () => {
-  const t = useTranslations("Navbar");
-  const scrollDirection = useScrollDirection();
-
+  const t              = useTranslations('Navbar');
+  const { locale, toggleLocale } = useLocale();
+  const { theme, toggleTheme }   = useTheme();
+  const scrollDirection          = useScrollDirection();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
-  useEffect(() => {
-    const init = readInitialTheme();
-    setTheme(init);
-    document.documentElement.classList.toggle("dark", init === "dark");
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
-    } catch {}
-  }, [theme]);
-
-  // Cerrar menú con Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === "Escape" && mobileOpen) {
-        setMobileOpen(false);
-      }
+      if (e.key === 'Escape' && mobileOpen) setMobileOpen(false);
     };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [mobileOpen]);
 
   const navLinks: NavLinkItem[] = [
-    { key: "home", name: t("Home"), href: "/" },
-    { key: "projects", name: t("Projects"), href: "/projects" },
-    { key: "timeline", name: t("Timeline"), href: "/timeline" },
-    { key: "blog", name: t("Blog"), href: "/blog" },
-    { key: "contact", name: t("Contact"), href: "/contact" },
+    { key: 'home',     name: t('Home'),     href: '/'          },
+    { key: 'projects', name: t('Projects'), href: '/#projects'  },
+    { key: 'timeline', name: t('Timeline'), href: '/#timeline'  },
+    { key: 'blog',     name: t('Blog'),     href: '/blog'      },
+    { key: 'contact',  name: t('Contact'),  href: '/#contact'   },
   ];
 
   const socialLinks: SocialLinkItem[] = [
-    { name: "GitHub", href: "https://github.com/jonesh05", iconPath: "/icons/github.svg" },
-    { name: "LinkedIn", href: "https://linkedin.com/in/jhonny-pimiento", iconPath: "/icons/linkedin.svg" },
+    { name: 'GitHub',   href: 'https://github.com/jonesh05',             iconPath: '/icons/github.svg'   },
+    { name: 'LinkedIn', href: 'https://linkedin.com/in/jhonny-pimiento', iconPath: '/icons/linkedin.svg' },
   ];
-
-  const toggleTheme = () => setTheme((s) => (s === "dark" ? "light" : "dark"));
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 max-w-7xl mx-auto px-4 
@@ -477,7 +448,15 @@ const Navbar: React.FC = () => {
                 <Image src={s.iconPath} alt={`${s.name} icon`} width={20} height={20} />
               </Link>
             ))}
-            <IconBtn label="Toggle language" ><Globe size={18} /></IconBtn>
+            <IconBtn
+              label={`Switch language (current: ${locale})`}
+              onClick={toggleLocale}
+              className="flex items-center gap-1.5"
+            >
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                {locale}
+              </span>
+            </IconBtn>
             <IconBtn label={`Toggle theme (current: ${theme})`} onClick={toggleTheme}>
               {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
             </IconBtn>
