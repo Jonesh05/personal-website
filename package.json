@@ -2,16 +2,21 @@
   "name": "personal-website",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+      "node": "22.x"
+    },
   "workspaces": [
     "frontend",
     "backend",
-    "shared"
+    "shared",
+    "functions"
   ],
+  "packageManager": "pnpm@10.33.1",
   "scripts": {
     "dev:frontend": "pnpm run dev --workspace=frontend",
     "dev:backend": "pnpm run dev --workspace=functions",
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
-    "build": "pnpm run build --workspace=frontend",
+    "build": "pnpm --filter frontend build",
     "deploy": "pnpm run build && firebase deploy",
     "deploy:hosting": "firebase deploy --only hosting",
     "deploy:functions": "firebase deploy --only functions",

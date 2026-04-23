@@ -130,7 +130,9 @@ dist
 
 # Docusaurus cache and generated files
 .docusaurus
-
+docs/
+ docs/.*
+ 
 # Serverless directories
 .serverless/
 
@@ -161,7 +163,6 @@ firebase-debug.log
 /node_modules
 /.pnp
 .pnp.js
-pnpm-lock.yaml
 .npmrc
 
 # yarn v3
