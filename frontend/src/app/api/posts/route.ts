@@ -2,6 +2,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPosts } from '@/lib/firestore/posts'
 
+// This route is request-driven (pagination, tag, search all come from
+// querystring) and should never be statically evaluated at build time.
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -37,7 +41,15 @@ export async function GET(req: NextRequest) {
       },
     })
   } catch (err) {
-    console.error('[api/posts]', err)
+    // Emit a structured, grep-able log so Vercel's function logs surface the
+    // actual cause (malformed FIREBASE_PRIVATE_KEY, missing index, etc.)
+    // instead of only the opaque digest the client sees.
+    const message = err instanceof Error ? err.message : String(err)
+    const code = (err as { code?: string | number } | null)?.code
+    // eslint-disable-next-line no-console
+    console.error(
+      `[api/posts] firestore read failed${code ? ` code=${code}` : ''}: ${message}`,
+    )
     return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
   }
 }

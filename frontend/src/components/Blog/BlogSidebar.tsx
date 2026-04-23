@@ -121,7 +121,20 @@ export async function BlogPostSidebar({ tags }: BlogPostSidebarProps) {
 // ── Popular Tags (mounted) ───────────────────────────────────────────────────
 async function PopularTags() {
   const { t } = await getServerTranslations('Blog')
-  const tags = await getPopularTags()
+  // Firestore failures must NEVER bring down the whole /blog page. The
+  // sidebar is decorative — if the read fails or the Admin SDK is
+  // misconfigured, render nothing and let the page keep serving.
+  let tags: string[] = []
+  try {
+    tags = await getPopularTags()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    // eslint-disable-next-line no-console
+    console.error(`[BlogSidebar.PopularTags] firestore read failed: ${message}`)
+    return null
+  }
+
+  if (tags.length === 0) return null
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -148,7 +161,18 @@ async function PopularTags() {
 // ── Featured Posts (mounted) ─────────────────────────────────────────────────
 async function FeaturedPosts() {
   const { t, locale } = await getServerTranslations('Blog')
-  const featuredPosts = await getFeaturedPosts()
+  // Degrade gracefully: no featured-posts widget if Firestore is
+  // unreachable or the Admin SDK failed to initialize.
+  let featuredPosts: Awaited<ReturnType<typeof getFeaturedPosts>> = []
+  try {
+    featuredPosts = await getFeaturedPosts()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    // eslint-disable-next-line no-console
+    console.error(`[BlogSidebar.FeaturedPosts] firestore read failed: ${message}`)
+    return null
+  }
+
   if (featuredPosts.length === 0) return null
 
   return (
