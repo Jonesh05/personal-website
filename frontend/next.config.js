@@ -25,7 +25,14 @@ const nextConfig = {
 
       // Google avatar URLs returned by Firebase Auth for admin sign-in.
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+
+      {
+        protocol: 'https',
+        hostname: 'uddgceawuhscynhavtda.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
+    
   },
 
   // Security headers applied to every route. Keep this set minimal and

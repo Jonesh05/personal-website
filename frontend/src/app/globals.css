@@ -3,13 +3,9 @@
 /* ── Tailwind v4 class-based dark mode ── */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ============================================================
-   PLASMA THEME — Purple × Green × Dark
-   Stack: Tailwind v4 · Next.js 16 · React 19
-   ============================================================ */
 
 @theme {
-  /* ── Legacy primary scale (kept for existing utilities) ── */
+
   --color-primary-50:  #f0f9ff;
   --color-primary-100: #e0f2fe;
   --color-primary-200: #bae6fd;

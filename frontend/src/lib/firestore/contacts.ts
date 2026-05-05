@@ -1,5 +1,7 @@
+import { FieldValue } from 'firebase-admin/firestore'
 import { adminDb } from '@/lib/firebase/admin'
 import type { ContactFormInput } from '@personal-website/shared/schemas/contact.schema'
+import type { ContactStatus } from '@personal-website/shared/types/newsletter.types'
 
 const COLLECTION = 'contacts'
 
@@ -8,17 +10,44 @@ export interface Contact {
   name:      string
   email:     string
   message:   string
+  status:    ContactStatus
+  source:    string
   read:      boolean
   createdAt: string
+  updatedAt: string
 }
 
-export async function createContact(data: ContactFormInput) {
+export async function createContact(
+  data: ContactFormInput,
+): Promise<{ id: string }> {
+  const now = FieldValue.serverTimestamp()
   const ref = await adminDb.collection(COLLECTION).add({
-    ...data,
+    name:      data.name,
+    email:     data.email,
+    message:   data.message,
+    source:    data.source ?? 'contact-page',
+    status:    'received' satisfies ContactStatus,
     read:      false,
-    createdAt: new Date(),
+    createdAt: now,
+    updatedAt: now,
   })
-  return ref.id
+  return { id: ref.id }
+}
+
+export async function updateContactStatus(
+  id: string,
+  status: ContactStatus,
+): Promise<void> {
+  await adminDb
+    .collection(COLLECTION)
+    .doc(id)
+    .set(
+      {
+        status,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    )
 }
 
 export async function getContacts(): Promise<Contact[]> {
@@ -29,13 +58,18 @@ export async function getContacts(): Promise<Contact[]> {
 
   return snapshot.docs.map(doc => {
     const d = doc.data()
+    const createdAt = d.createdAt?.toDate?.()?.toISOString() ?? String(d.createdAt ?? '')
+    const updatedAt = d.updatedAt?.toDate?.()?.toISOString() ?? createdAt
     return {
       id:        doc.id,
       name:      (d.name    as string) ?? '',
       email:     (d.email   as string) ?? '',
       message:   (d.message as string) ?? '',
+      status:    ((d.status as ContactStatus) ?? 'received'),
+      source:    (d.source  as string) ?? 'contact-page',
       read:      (d.read    as boolean) ?? false,
-      createdAt: d.createdAt?.toDate?.()?.toISOString() ?? String(d.createdAt ?? ''),
+      createdAt,
+      updatedAt,
     }
   })
 }

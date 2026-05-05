@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-      "node": "22.x"
-    },
+    "node": "22.x"
+  },
   "workspaces": [
     "frontend",
     "backend",
@@ -13,14 +13,14 @@
   ],
   "packageManager": "pnpm@10.33.1",
   "scripts": {
-    "dev:frontend": "pnpm run dev --workspace=frontend",
-    "dev:backend": "pnpm run dev --workspace=functions",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter functions dev",
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
-    "build": "pnpm --filter frontend build",
+    "build": "pnpm --filter frontend... build",
+    "vercel-build": "pnpm --filter frontend... build",
     "deploy": "pnpm run build && firebase deploy",
     "deploy:hosting": "firebase deploy --only hosting",
-    "deploy:functions": "firebase deploy --only functions",
-    "install:all": "pnpm install && pnpm install --workspaces"
+    "deploy:functions": "firebase deploy --only functions"
   },
   "devDependencies": {
     "concurrently": "^9.2.0",

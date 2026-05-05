@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getPopularTags, getFeaturedPosts } from '@/lib/firestore/posts'
 import { getServerTranslations } from '@/i18n/server'
 import { formatDateByLocale } from '@/utils/formatDate'
+import NewsletterForm from './NewsletterForm.client'
 
 /**
  * BlogSidebar — server-rendered sidebar fragments consumed by the blog page.
@@ -215,7 +216,7 @@ async function FeaturedPosts() {
   )
 }
 
-// ── Newsletter (unused, kept bilingual) ──────────────────────────────────────
+// Newsletter 
 async function Newsletter() {
   const { t } = await getServerTranslations('Blog')
   return (
@@ -228,25 +229,7 @@ async function Newsletter() {
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           {t('newsletterBody')}
         </p>
-        <div className="space-y-3">
-          <input
-            type="email"
-            placeholder={t('newsletterEmailPlaceholder')}
-            className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-              rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-              placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
-              focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <button
-            type="button"
-            className="w-full flex justify-center py-2 px-4 border border-transparent 
-              rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 
-              hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
-              focus:ring-blue-500 transition-colors"
-          >
-            {t('newsletterSubscribe')}
-          </button>
-        </div>
+        <NewsletterForm source="blog-sidebar" />
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
           {t('newsletterNoSpam')}
         </p>

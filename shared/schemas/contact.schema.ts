@@ -18,6 +18,8 @@ export const ContactFormSchema = z.object({
     .max(2000, "Message too long")
     .trim(),
 
+  source: z.string().max(64).default('contact-page'),
+
   // anti spam honeypot
   website: z.string().max(0).optional(),
 

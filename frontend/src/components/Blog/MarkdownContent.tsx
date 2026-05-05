@@ -1,250 +1,272 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import type { EditorialBlock } from '@personal-website/shared/types/editorial.types'
+import { parseEditorial } from './editorial/parser'
+import { renderInline } from './editorial/inline'
+import { CodeBlock } from './editorial/CodeBlock'
+import { Callout } from './editorial/Callout'
+import { Figure } from './editorial/Figure'
+import { EditorialTable } from './editorial/Table'
+import { TableOfContents } from './editorial/TableOfContents'
 
 /**
- * MarkdownContent — intentionally small, dependency-free renderer for the
- * subset of Markdown our blog actually produces. It fixes two problems with
- * the previous inline renderer:
+ * MarkdownContent — the editorial renderer.
  *
- *   1. Fenced code blocks (```) were rendered line-by-line, so multi-line
- *      snippets became stacked empty tags.
- *   2. Inline `code`, **bold**, *italic*, and [links](url) were dropped.
+ * This is intentionally not a generic Markdown engine. It targets the
+ * exact constructs an editorial post needs:
  *
- * Supported:
- *   - Headings (#, ##, ###)
- *   - Fenced code blocks with optional language hint
- *   - Blockquotes (>)
- *   - Ordered / unordered lists
- *   - Paragraphs with inline code, bold, italic, links
+ *   • Headings with anchor ids and section dividers
+ *   • A lead paragraph with a drop cap
+ *   • Auto-generated Table of Contents (3+ H2s)
+ *   • Code blocks with chrome bar, language label, copy button,
+ *     line numbers and minimal syntax highlighting
+ *   • Callouts: note / tip / info / warning / danger / quote
+ *   • Figures with numbered captions
+ *   • Tables with alignment
+ *   • Lists, blockquotes, hr, inline emphasis / code / links
  *
- * The renderer operates on a plain string and does not execute HTML, so it
- * is safe against injected markup from the editor.
+ * Container syntax for callouts:
+ *
+ *     :::tip Pro tip
+ *     Body content here, can include **markdown**.
+ *     :::
+ *
+ * Code blocks accept a `title` attribute next to the language:
+ *
+ *     ```ts title="server-action.ts"
+ *     export async function action() { ... }
+ *     ```
  */
 
-type Block =
-  | { type: 'heading'; level: 1 | 2 | 3; text: string }
-  | { type: 'code'; lang: string; code: string }
-  | { type: 'quote'; lines: string[] }
-  | { type: 'ul'; items: string[] }
-  | { type: 'ol'; items: string[] }
-  | { type: 'paragraph'; text: string }
-  | { type: 'spacer' }
-
-function parseBlocks(raw: string): Block[] {
-  const lines = raw.replace(/\r\n/g, '\n').split('\n')
-  const blocks: Block[] = []
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-
-    // Fenced code block
-    if (line.startsWith('```')) {
-      const lang = line.slice(3).trim()
-      const buf: string[] = []
-      i++
-      while (i < lines.length && !lines[i].startsWith('```')) {
-        buf.push(lines[i])
-        i++
-      }
-      blocks.push({ type: 'code', lang, code: buf.join('\n') })
-      continue
-    }
-
-    // Headings
-    if (line.startsWith('### ')) {
-      blocks.push({ type: 'heading', level: 3, text: line.slice(4) })
-      continue
-    }
-    if (line.startsWith('## ')) {
-      blocks.push({ type: 'heading', level: 2, text: line.slice(3) })
-      continue
-    }
-    if (line.startsWith('# ')) {
-      blocks.push({ type: 'heading', level: 1, text: line.slice(2) })
-      continue
-    }
-
-    // Blockquote (merge consecutive > lines)
-    if (line.startsWith('> ')) {
-      const buf: string[] = [line.slice(2)]
-      while (i + 1 < lines.length && lines[i + 1].startsWith('> ')) {
-        i++
-        buf.push(lines[i].slice(2))
-      }
-      blocks.push({ type: 'quote', lines: buf })
-      continue
-    }
-
-    // Unordered list
-    if (/^\s*[-*]\s+/.test(line)) {
-      const items: string[] = []
-      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\s*[-*]\s+/, ''))
-        i++
-      }
-      i--
-      blocks.push({ type: 'ul', items })
-      continue
-    }
-
-    // Ordered list
-    if (/^\s*\d+\.\s+/.test(line)) {
-      const items: string[] = []
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\s*\d+\.\s+/, ''))
-        i++
-      }
-      i--
-      blocks.push({ type: 'ol', items })
-      continue
-    }
-
-    // Empty line = spacer
-    if (line.trim() === '') {
-      if (blocks[blocks.length - 1]?.type !== 'spacer') {
-        blocks.push({ type: 'spacer' })
-      }
-      continue
-    }
-
-    // Default: paragraph (merge adjacent non-empty, non-special lines)
-    const paragraphLines = [line]
-    while (
-      i + 1 < lines.length &&
-      lines[i + 1].trim() !== '' &&
-      !lines[i + 1].startsWith('#') &&
-      !lines[i + 1].startsWith('```') &&
-      !lines[i + 1].startsWith('> ') &&
-      !/^\s*[-*]\s+/.test(lines[i + 1]) &&
-      !/^\s*\d+\.\s+/.test(lines[i + 1])
-    ) {
-      i++
-      paragraphLines.push(lines[i])
-    }
-    blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') })
-  }
-
-  return blocks
+interface Props {
+  source: string
 }
 
-// ── Inline renderer ───────────────────────────────────────────────────────
-// Supported inline tokens: **bold**, *italic*, `code`, [label](url)
-const INLINE_RE = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g
+export function MarkdownContent({ source }: Props) {
+  const { blocks, toc } = useMemo(() => parseEditorial(source), [source])
 
-function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
-  const parts = text.split(INLINE_RE)
-  return parts.filter(Boolean).map((part, idx) => {
-    const key = `${keyPrefix}-${idx}`
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={key} className="text-white font-semibold">{part.slice(2, -2)}</strong>
-    }
-    if (part.startsWith('*') && part.endsWith('*')) {
-      return <em key={key} className="italic text-gray-200">{part.slice(1, -1)}</em>
-    }
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return (
-        <code key={key}
-          className="rounded-md bg-gray-900 border border-gray-800 px-1.5 py-0.5
-            text-[0.9em] font-mono text-orange-300">
-          {part.slice(1, -1)}
-        </code>
-      )
-    }
-    const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
-    if (link) {
-      const isExternal = /^https?:/.test(link[2])
-      return (
-        <a key={key}
-          href={link[2]}
-          className="text-orange-400 underline underline-offset-4 decoration-orange-500/40 hover:decoration-orange-400"
-          target={isExternal ? '_blank' : undefined}
-          rel={isExternal ? 'noopener noreferrer' : undefined}>
-          {link[1]}
-        </a>
-      )
-    }
-    return <React.Fragment key={key}>{part}</React.Fragment>
-  })
-}
+  // Figures get a 1-based index so captions can read "Fig. 1", "Fig. 2", ...
+  let figureIdx = 0
+  let tocInjected = false
 
-// ── Block renderer ─────────────────────────────────────────────────────────
-function Heading({ level, text, idx }: { level: 1 | 2 | 3; text: string; idx: number }) {
-  const common = 'text-white font-bold scroll-mt-24 tracking-tight'
-  if (level === 1) return <h2 key={idx} className={`${common} text-3xl mt-14 mb-4`}>{renderInline(text, String(idx))}</h2>
-  if (level === 2) return <h2 key={idx} className={`${common} text-2xl mt-12 mb-3`}>{renderInline(text, String(idx))}</h2>
-  return <h3 key={idx} className={`${common} text-xl mt-10 mb-2`}>{renderInline(text, String(idx))}</h3>
-}
-
-function CodeBlock({ lang, code }: { lang: string; code: string }) {
   return (
-    <div className="my-6 overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
-      {lang && (
-        <div className="flex items-center justify-between bg-gray-900/80 px-4 py-1.5
-          text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-800">
-          <span>{lang}</span>
+    <div className="text-gray-300 text-[17px] leading-[1.78] font-light selection:bg-orange-500/30">
+      {blocks.map((block, i) => {
+        const node = renderBlock(block, i, () => ++figureIdx)
+
+        // Inject the TOC after the lead paragraph (or at the start if there
+        // isn't one). Keeps it close to the article opening without
+        // obstructing the hero/excerpt up top.
+        if (!tocInjected && block.type === 'paragraph' && block.lead) {
+          tocInjected = true
+          return (
+            <React.Fragment key={i}>
+              {node}
+              <TableOfContents entries={toc} />
+            </React.Fragment>
+          )
+        }
+
+        return <React.Fragment key={i}>{node}</React.Fragment>
+      })}
+
+      {!tocInjected && toc.length >= 3 && (
+        <div className="-mt-2">
+          <TableOfContents entries={toc} />
         </div>
       )}
-      <pre className="overflow-x-auto p-4 text-sm leading-relaxed">
-        <code className="font-mono text-orange-200 whitespace-pre">{code}</code>
-      </pre>
     </div>
   )
 }
 
-export function MarkdownContent({ source }: { source: string }) {
-  const blocks = useMemo(() => parseBlocks(source), [source])
+function renderBlock(
+  block: EditorialBlock,
+  i: number,
+  nextFigure: () => number,
+): React.ReactNode {
+  switch (block.type) {
+    case 'heading':
+      return <Heading idx={i} level={block.level} text={block.text} id={block.id} />
+
+    case 'paragraph':
+      if (block.lead) {
+        return (
+          <p
+            className="my-6 text-[1.18rem] sm:text-[1.22rem] leading-[1.7] text-gray-200/95
+              first-letter:float-left first-letter:mr-2 first-letter:mt-1
+              first-letter:text-[3.4rem] first-letter:leading-[0.9]
+              first-letter:font-display first-letter:font-bold
+              first-letter:text-orange-400 first-letter:pr-1"
+          >
+            {renderInline(block.text, `lead-${i}`)}
+          </p>
+        )
+      }
+      return (
+        <p className="my-5">
+          {renderInline(block.text, `p-${i}`)}
+        </p>
+      )
+
+    case 'code':
+      return <CodeBlock lang={block.lang} code={block.code} title={block.title} />
+
+    case 'quote':
+      return (
+        <blockquote
+          className="my-7 relative pl-6 pr-4 py-1 border-l-2 border-orange-500/70
+            text-gray-200 italic text-[1.05em]"
+        >
+          <span
+            aria-hidden="true"
+            className="absolute -left-[2px] -top-2 text-[2.6rem] font-display
+              leading-none text-orange-500/40 select-none"
+          >
+            “
+          </span>
+          {block.lines.map((line, li) => (
+            <p key={li} className="my-2">
+              {renderInline(line, `q-${i}-${li}`)}
+            </p>
+          ))}
+        </blockquote>
+      )
+
+    case 'ul':
+      return (
+        <ul className="my-5 space-y-2 pl-6 list-none">
+          {block.items.map((item, li) => (
+            <li key={li} className="relative pl-1">
+              <span
+                aria-hidden="true"
+                className="absolute -left-5 top-[0.7em] inline-block h-1.5 w-1.5
+                  rounded-full bg-orange-400"
+              />
+              {renderInline(item, `ul-${i}-${li}`)}
+            </li>
+          ))}
+        </ul>
+      )
+
+    case 'ol':
+      return (
+        <ol className="my-5 space-y-2 pl-2 list-none counter-reset-[ed]">
+          {block.items.map((item, li) => (
+            <li key={li} className="relative pl-10">
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-[0.1em] inline-flex h-6 w-7 items-center
+                  justify-center rounded-md border border-gray-800 bg-gray-900
+                  font-mono text-[11px] tabular-nums text-orange-300"
+              >
+                {String(li + 1).padStart(2, '0')}
+              </span>
+              {renderInline(item, `ol-${i}-${li}`)}
+            </li>
+          ))}
+        </ol>
+      )
+
+    case 'hr':
+      return (
+        <div
+          className="my-12 flex items-center justify-center gap-3"
+          role="separator"
+          aria-hidden="true"
+        >
+          <span className="h-px w-12 bg-gray-800" />
+          <span className="h-1 w-1 rounded-full bg-orange-500/70" />
+          <span className="h-px w-12 bg-gray-800" />
+        </div>
+      )
+
+    case 'figure':
+      return <Figure src={block.src} alt={block.alt} caption={block.caption} idx={nextFigure()} />
+
+    case 'table':
+      return <EditorialTable head={block.head} rows={block.rows} align={block.align} idx={i} />
+
+    case 'callout':
+      return (
+        <Callout variant={block.variant} title={block.title}>
+          {block.children.map((child, ci) => (
+            <React.Fragment key={ci}>
+              {renderBlock(child, ci, nextFigure)}
+            </React.Fragment>
+          ))}
+        </Callout>
+      )
+
+    case 'spacer':
+      return <div className="h-1" aria-hidden="true" />
+  }
+}
+
+// ── Heading with anchor link ─────────────────────────────────────────────
+interface HeadingProps {
+  level: 1 | 2 | 3 | 4
+  text: string
+  id: string
+  idx: number
+}
+
+function Heading({ level, text, id, idx }: HeadingProps) {
+  const inner = (
+    <a
+      href={`#${id}`}
+      className="group/h relative inline-flex items-baseline gap-2 no-underline
+        text-inherit hover:text-inherit"
+    >
+      <span>{renderInline(text, `h-${idx}`)}</span>
+      <span
+        aria-hidden="true"
+        className="opacity-0 group-hover/h:opacity-100 transition-opacity
+          font-mono text-orange-400 text-base font-normal"
+      >
+        #
+      </span>
+    </a>
+  )
+
+  const common = 'text-white font-bold scroll-mt-28 tracking-tight font-display'
+
+  if (level === 1) {
+    return (
+      <h2 id={id} className={`${common} text-[2rem] sm:text-[2.4rem] mt-16 mb-5 leading-[1.1]`}>
+        {inner}
+      </h2>
+    )
+  }
+
+  if (level === 2) {
+    return (
+      <div className="mt-14 mb-4">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="h-px w-8 bg-gradient-to-r from-orange-500 to-transparent"
+            aria-hidden="true" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-orange-400/80">
+            §
+          </span>
+        </div>
+        <h2 id={id} className={`${common} text-[1.7rem] sm:text-[1.9rem] leading-[1.15]`}>
+          {inner}
+        </h2>
+      </div>
+    )
+  }
+
+  if (level === 3) {
+    return (
+      <h3 id={id} className={`${common} text-[1.3rem] sm:text-[1.4rem] mt-10 mb-2`}>
+        {inner}
+      </h3>
+    )
+  }
 
   return (
-    <div className="text-gray-300 text-[17px] leading-[1.75]">
-      {blocks.map((block, idx) => {
-        switch (block.type) {
-          case 'heading':
-            return <Heading key={idx} idx={idx} level={block.level} text={block.text} />
-
-          case 'code':
-            return <CodeBlock key={idx} lang={block.lang} code={block.code} />
-
-          case 'quote':
-            return (
-              <blockquote key={idx}
-                className="my-6 border-l-4 border-orange-500 bg-orange-500/5 rounded-r-md
-                  pl-5 pr-4 py-3 text-gray-300 italic">
-                {block.lines.map((line, li) => (
-                  <p key={li} className="not-italic:first-of-type">{renderInline(line, `q-${idx}-${li}`)}</p>
-                ))}
-              </blockquote>
-            )
-
-          case 'ul':
-            return (
-              <ul key={idx} className="my-5 space-y-2 pl-6 list-disc marker:text-orange-400">
-                {block.items.map((item, li) => (
-                  <li key={li}>{renderInline(item, `ul-${idx}-${li}`)}</li>
-                ))}
-              </ul>
-            )
-
-          case 'ol':
-            return (
-              <ol key={idx} className="my-5 space-y-2 pl-6 list-decimal marker:text-orange-400 marker:font-semibold">
-                {block.items.map((item, li) => (
-                  <li key={li}>{renderInline(item, `ol-${idx}-${li}`)}</li>
-                ))}
-              </ol>
-            )
-
-          case 'paragraph':
-            return (
-              <p key={idx} className="my-5">
-                {renderInline(block.text, `p-${idx}`)}
-              </p>
-            )
-
-          case 'spacer':
-            return <div key={idx} className="h-2" aria-hidden="true" />
-        }
-      })}
-    </div>
+    <h4 id={id} className={`${common} text-[1.1rem] mt-8 mb-2 text-orange-200/90`}>
+      {inner}
+    </h4>
   )
 }

@@ -1,7 +1,10 @@
 export * from "./types/post.types"
 export * from "./types/user.types"
 export * from "./types/footer.types"
+export * from "./types/newsletter.types"
+export * from "./types/editorial.types"
 
 export * from "./schemas/contact.schema"
 export * from "./schemas/post.schema"
 export * from "./schemas/project.schema"
+export * from "./schemas/newsletter.schema"

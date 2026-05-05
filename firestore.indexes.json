@@ -25,13 +25,6 @@
         { "fieldPath": "tags", "arrayConfig": "CONTAINS" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "saves",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "savedAt", "order": "DESCENDING" }
-      ]
     }
   ],
   "fieldOverrides": []

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useId } from 'react';
-import { submitContactAction } from '@/app/actions/contacts';
 
 interface FieldProps {
   id: string;
@@ -107,21 +106,38 @@ export default function ContactForm() {
     if (!validate()) return;
 
     setStatus('submitting');
-    const fd = new FormData();
-    fd.append('name', name);
-    fd.append('email', email);
-    fd.append('message', message);
 
-    const result = await submitContactAction(fd);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message }),
+      });
 
-    if (result.error) {
-      setStatus('error');
-    } else {
+      const body = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        fieldErrors?: Record<string, string[]>;
+      };
+
+      if (!res.ok || body.ok === false) {
+        if (res.status === 400 && body.fieldErrors) {
+          const next: Record<string, string> = {};
+          for (const [k, v] of Object.entries(body.fieldErrors)) {
+            if (v && v.length > 0) next[k] = v[0];
+          }
+          setErrors(next);
+        }
+        setStatus('error');
+        return;
+      }
+
       setStatus('success');
       setName('');
       setEmail('');
       setMessage('');
       setErrors({});
+    } catch {
+      setStatus('error');
     }
   };
 
