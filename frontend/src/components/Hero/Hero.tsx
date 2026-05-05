@@ -18,7 +18,6 @@ const Hero = () => {
   const particlesRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   
-  // Datos de partículas generados una sola vez (estables entre renders)
   const particleData = useMemo(() => {
     const COLORS = [
       { bg: 'rgba(191, 94, 255, 0.9)',  shadow: '0 0 8px 2px rgba(191, 94, 255, 0.7)'  },
@@ -32,10 +31,9 @@ const Hero = () => {
       top:    Math.random() * 100,
       color:  COLORS[i % COLORS.length],
     }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
-  // ── Effect 1: entrada del hero + parallax (no toca partículas) ──
   useEffect(() => {
     const container = containerRef.current;
     const title     = titleRef.current;
@@ -73,8 +71,6 @@ const Hero = () => {
     };
   }, []);
 
-  // ── Effect 2: animación flotante de partículas ──
-  // Corre DESPUÉS de que React pinta los <span data-particle> en el DOM
   useEffect(() => {
     const container = particlesRef.current;
     if (!container) return;
@@ -95,12 +91,14 @@ const Hero = () => {
     );
 
     return () => tweens.forEach((t) => t.kill());
-  }, [particleData]); // particleData estable, corre 1 vez tras el primer paint
+  }, [particleData]); // particleData 
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 overflow-hidden
+        pt-[max(6.75rem,calc(env(safe-area-inset-top,0px)+5.25rem))] pb-10
+        sm:pt-16 md:pt-20 lg:pt-10"
       style={{
         
         backgroundImage:
@@ -176,7 +174,7 @@ const Hero = () => {
       
       <div className="relative flex flex-col-reverse items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-between md:gap-10 lg:gap-14">
       {/* Contenido */}
-        <div className="mx-auto px-4 py-20 relative z-10 text-center">
+        <div className="mx-auto px-4 py-10 mt-10 relative text-center ">
           {/* Name */}
           <h1
           className="reveal-up"
@@ -248,7 +246,8 @@ const Hero = () => {
           </div>
 
         </div>
-        <div className="relative w-52 h-52 mb-40 mx-auto">
+        <div className="relative w-52 h-52 md:w-64 md:h-64 lg:w-80 lg:h-80
+          mb-12 sm:mb-20 mx-auto mt-6 sm:mt-24 md:mt-32 lg:mt-36">
           {/* Spinners */}
           {/* <div className="absolute -inset-6 rounded-full bg-linear-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
           <div className="absolute -inset-4 rounded-full bg-linear-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-xs opacity-60"></div> */}
@@ -256,10 +255,12 @@ const Hero = () => {
           {/* Avatar visible */}
           <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">
             <Image
-              src="/images/about.webp"
+              src="/images/image-devcon.jpg"
               alt="Avatar"
-              width={208}
-              height={208}
+              width={320}
+              height={320}
+              priority
+              sizes="(max-width:768px) 208px,(max-width:1024px) 256px,320px"
               className="w-full h-full object-cover object-center rounded-full"
             />
             
@@ -273,7 +274,7 @@ const Hero = () => {
       
 
       {/* Scroll pending */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+      <div className="absolute bottom-[5px] pb-40 left-[41%] hidden lg:block -translate-x-1/2">
         <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce" />
         </div>

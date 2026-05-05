@@ -1,0 +1,61 @@
+<svg viewBox="0 0 260 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d946ef;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#c084fc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon Box with JP -->
+  <g transform="translate(0, 3)">
+    <rect x="0" y="0" width="44" height="44" rx="10" fill="url(#mainGradient)"/>
+    <text
+      font-family="system-ui, -apple-system, sans-serif"
+      font-size="20"
+      font-weight="800"
+      fill="white"
+      x="22"
+      y="30"
+      text-anchor="middle"
+    >
+      JP
+    </text>
+    <!-- Blockchain connection nodes -->
+    <circle cx="6" cy="6" r="2.5" fill="white" opacity="0.8"/>
+    <circle cx="38" cy="38" r="2.5" fill="white" opacity="0.8"/>
+    <circle cx="6" cy="38" r="1.5" fill="white" opacity="0.5"/>
+    <circle cx="38" cy="6" r="1.5" fill="white" opacity="0.5"/>
+  </g>
+  
+  <!-- Main Name with oklch(0.9 0.1 270) lavender color -->
+  <text
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="24"
+    font-weight="800"
+    fill="oklch(0.9 0.1 270)"
+    x="52"
+    y="28"
+    letter-spacing="-0.5"
+    style="text-shadow: 0 1px 3px rgba(0,0,0,0.4);"
+  >
+    Jhonny Pimiento
+  </text>
+  
+  <!-- Tagline -->
+  <text
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="10"
+    font-weight="600"
+    fill="url(#accentGradient)"
+    x="52"
+    y="42"
+    letter-spacing="1.5"
+  >
+    WEB3 • BLOCKCHAIN • DEV
+  </text>
+</svg>

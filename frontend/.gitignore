@@ -43,8 +43,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-public/images
-public/icons
+# Large / unused vector export — keep out of git to avoid bloating clones & deploys
+public/images/into.svg
 
 **/.vitepress/dist
 
