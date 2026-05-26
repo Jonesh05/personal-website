@@ -51,7 +51,7 @@ export function MarkdownContent({ source }: Props) {
   let tocInjected = false
 
   return (
-    <div className="text-gray-300 text-[17px] leading-[1.78] font-light selection:bg-orange-500/30">
+    <div className="text-slate-700 dark:text-gray-300 text-[17px] leading-[1.78] font-light selection:bg-orange-500/30">
       {blocks.map((block, i) => {
         const node = renderBlock(block, i, () => ++figureIdx)
 
@@ -93,7 +93,7 @@ function renderBlock(
       if (block.lead) {
         return (
           <p
-            className="my-6 text-[1.18rem] sm:text-[1.22rem] leading-[1.7] text-gray-200/95
+            className="my-6 text-[1.18rem] sm:text-[1.22rem] leading-[1.7] text-slate-800 dark:text-gray-200/95
               first-letter:float-left first-letter:mr-2 first-letter:mt-1
               first-letter:text-[3.4rem] first-letter:leading-[0.9]
               first-letter:font-display first-letter:font-bold
@@ -116,7 +116,7 @@ function renderBlock(
       return (
         <blockquote
           className="my-7 relative pl-6 pr-4 py-1 border-l-2 border-orange-500/70
-            text-gray-200 italic text-[1.05em]"
+            text-slate-700 dark:text-gray-200 italic text-[1.05em]"
         >
           <span
             aria-hidden="true"
@@ -157,7 +157,7 @@ function renderBlock(
               <span
                 aria-hidden="true"
                 className="absolute left-0 top-[0.1em] inline-flex h-6 w-7 items-center
-                  justify-center rounded-md border border-gray-800 bg-gray-900
+                  justify-center rounded-md border border-slate-200 bg-slate-100 dark:border-gray-800 dark:bg-gray-900
                   font-mono text-[11px] tabular-nums text-orange-300"
               >
                 {String(li + 1).padStart(2, '0')}
@@ -175,9 +175,9 @@ function renderBlock(
           role="separator"
           aria-hidden="true"
         >
-          <span className="h-px w-12 bg-gray-800" />
+          <span className="h-px w-12 bg-slate-200 dark:bg-gray-800" />
           <span className="h-1 w-1 rounded-full bg-orange-500/70" />
-          <span className="h-px w-12 bg-gray-800" />
+          <span className="h-px w-12 bg-slate-200 dark:bg-gray-800" />
         </div>
       )
 
@@ -229,7 +229,7 @@ function Heading({ level, text, id, idx }: HeadingProps) {
     </a>
   )
 
-  const common = 'text-white font-bold scroll-mt-28 tracking-tight font-display'
+  const common = 'text-slate-900 dark:text-white font-bold scroll-mt-28 tracking-tight font-display'
 
   if (level === 1) {
     return (

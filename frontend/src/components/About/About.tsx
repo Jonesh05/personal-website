@@ -124,7 +124,7 @@ const About: React.FC = () => {
   return (
     <section id="about" className="py-20">
       <div className="container mx-auto px-4">
-        <div className="md:col-span-5 backdrop-blur-xs border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up bg-gray-900">
+        <div className="md:col-span-5 backdrop-blur-xs border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up bg-white dark:bg-gray-900">
           <div className="space-y-6">
             <div className="flex flex-wrap pb-6">
               {/* "About" is a frozen term per product rules — rendered as a
@@ -135,8 +135,8 @@ const About: React.FC = () => {
                 About
               </h2>
             </div>
-            <p className="text-xl font-semibold text-zinc-50">{t('bio_1')}</p>
-            <p className="text-xl font-semibold text-zinc-50">{t('bio_2')}</p>
+            <p className="text-xl font-semibold text-slate-800 dark:text-zinc-50">{t('bio_1')}</p>
+            <p className="text-xl font-semibold text-slate-800 dark:text-zinc-50">{t('bio_2')}</p>
             <div className="flex flex-wrap gap-4 pb-6">
               {[t('role_1'), t('role_2'), t('role_3')].map(label => (
                 <span

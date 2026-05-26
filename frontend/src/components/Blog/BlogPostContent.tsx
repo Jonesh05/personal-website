@@ -69,7 +69,7 @@ function AuthorAvatar({ name }: { name: string }) {
 
   return (
     <div className="h-11 w-11 shrink-0 rounded-full bg-gradient-to-br from-orange-500 to-pink-500
-      grid place-items-center text-white font-semibold text-sm ring-2 ring-gray-900">
+      grid place-items-center text-white font-semibold text-sm ring-2 ring-white dark:ring-gray-900">
       {initials}
     </div>
   )
@@ -102,15 +102,15 @@ export function BlogPostContent({ post }: Props) {
     <>
       <ReadingProgress />
 
-      <article className="min-h-screen bg-gray-950 pt-[106px] text-gray-100">
+      <article className="min-h-screen bg-white text-slate-900 dark:bg-gray-950 dark:text-gray-100 pt-[106px]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
           {/* Top breadcrumb */}
           <div className="pt-10">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-medium text-gray-400
-                hover:text-orange-300 transition-colors focus:outline-none focus:ring-2
+              className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-orange-600 dark:text-gray-400
+                dark:hover:text-orange-300 transition-colors focus:outline-none focus:ring-2
                 focus:ring-orange-500/40 rounded"
             >
               <ArrowLeftIcon className="h-4 w-4" />
@@ -136,26 +136,26 @@ export function BlogPostContent({ post }: Props) {
               </div>
             )}
 
-            <h1 className="text-4xl sm:text-5xl font-bold text-white leading-[1.1] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight">
               {post.title}
             </h1>
 
             {post.excerpt && (
-              <p className="mt-5 text-lg sm:text-xl text-gray-400 leading-relaxed">
+              <p className="mt-5 text-lg sm:text-xl text-slate-600 dark:text-gray-400 leading-relaxed">
                 {post.excerpt}
               </p>
             )}
 
             {/* Author card */}
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4
-              rounded-2xl border border-gray-800 bg-gray-900/60 backdrop-blur-sm
+              rounded-2xl border border-slate-200 bg-slate-50 dark:border-gray-800 dark:bg-gray-900/60 backdrop-blur-sm
               px-4 py-3">
               <div className="flex items-center gap-3">
                 <AuthorAvatar name={authorName} />
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{authorName}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{authorName}</p>
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1
-                    text-xs text-gray-400">
+                    text-xs text-slate-600 dark:text-gray-400">
                     <span className="inline-flex items-center gap-1">
                       <CalendarIcon className="h-3.5 w-3.5" />
                       <time dateTime={post.createdAt}>{publishedLabel}</time>
@@ -185,7 +185,7 @@ export function BlogPostContent({ post }: Props) {
           {/* Cover image — stretches across the main column */}
           {coverImage && (
             <figure className="mb-12 max-w-4xl overflow-hidden rounded-2xl
-              ring-1 ring-gray-800 bg-gray-900">
+              ring-1 ring-slate-200 bg-slate-100 dark:ring-gray-800 dark:bg-gray-900">
               <div className="relative aspect-[16/9] w-full">
                 <Image
                   src={coverImage}
@@ -209,7 +209,7 @@ export function BlogPostContent({ post }: Props) {
               <div className="sticky top-28 flex flex-col items-center gap-3">
                 <LikeButton postId={post.id} initialLikes={post.likes ?? 0} size="sm" />
                 <SaveButton postId={post.id} slug={post.slug} title={post.title} size="sm" />
-                <div className="w-8 h-px bg-gray-800 my-1" aria-hidden="true" />
+                <div className="w-8 h-px bg-slate-200 dark:bg-gray-800 my-1" aria-hidden="true" />
                 {shareUrl && (
                   <ShareButtons
                     url={shareUrl}
@@ -227,8 +227,8 @@ export function BlogPostContent({ post }: Props) {
 
               {/* Tag cloud footer */}
               {post.tags?.length > 0 && (
-                <div className="mt-16 pt-8 border-t border-gray-800">
-                  <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                <div className="mt-16 pt-8 border-t border-slate-200 dark:border-gray-800">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-gray-500 mb-3">
                     #tags
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -236,9 +236,11 @@ export function BlogPostContent({ post }: Props) {
                       <Link
                         key={tag}
                         href={`/blog?tag=${encodeURIComponent(tag)}`}
-                        className="inline-flex items-center rounded-full bg-gray-900
-                          border border-gray-800 px-3 py-1 text-sm text-gray-300
-                          hover:text-white hover:border-gray-700 transition"
+                        className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 text-slate-700
+                          hover:text-slate-900 hover:border-slate-300
+                          dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300
+                          dark:hover:text-white dark:hover:border-gray-700
+                          px-3 py-1 text-sm transition"
                       >
                         #{tag}
                       </Link>
@@ -248,14 +250,14 @@ export function BlogPostContent({ post }: Props) {
               )}
 
               {/* Share CTA */}
-              <div className="mt-12 rounded-2xl border border-gray-800 bg-gray-900/50 p-6
+              <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 dark:border-gray-800 dark:bg-gray-900/50 p-6
                 sm:p-8 shadow-sm">
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                       {t('enjoyedPrompt')}
                     </h3>
-                    <p className="mt-1 text-sm text-gray-400">
+                    <p className="mt-1 text-sm text-slate-600 dark:text-gray-400">
                       {post.views != null && (
                         <>
                           {post.views.toLocaleString(locale === 'es' ? 'es-ES' : 'en-US')}{' '}
@@ -270,7 +272,7 @@ export function BlogPostContent({ post }: Props) {
                   </div>
                 </div>
                 {shareUrl && (
-                  <div className="mt-5 pt-5 border-t border-gray-800">
+                  <div className="mt-5 pt-5 border-t border-slate-200 dark:border-gray-800">
                     <ShareButtons
                       url={shareUrl}
                       title={post.title}
@@ -286,7 +288,7 @@ export function BlogPostContent({ post }: Props) {
                 <Link
                   href="/blog"
                   className="inline-flex items-center gap-2 text-sm font-medium
-                    text-orange-400 hover:text-orange-300 transition-colors
+                    text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors
                     focus:outline-none focus:ring-2 focus:ring-orange-500/40 rounded"
                 >
                   <ArrowLeftIcon className="h-4 w-4" />
@@ -301,7 +303,7 @@ export function BlogPostContent({ post }: Props) {
         <div className="sm:hidden fixed inset-x-0 bottom-0 z-40 pointer-events-none">
           <div className="mx-auto max-w-md px-4 pb-4">
             <div className="pointer-events-auto flex items-center justify-between gap-2
-              rounded-2xl border border-gray-800 bg-gray-900/95 backdrop-blur-md
+              rounded-2xl border border-slate-200 bg-white/95 dark:border-gray-800 dark:bg-gray-900/95 backdrop-blur-md
               px-3 py-2 shadow-lg shadow-black/40">
               <LikeButton postId={post.id} initialLikes={post.likes ?? 0} size="sm" />
               <SaveButton postId={post.id} slug={post.slug} title={post.title} size="sm" />
@@ -357,8 +359,10 @@ function MobileShareTrigger({
       type="button"
       onClick={handleShare}
       aria-label={t('shareArticle')}
-      className="inline-flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900
-        px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800 hover:text-white
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white text-slate-700
+        hover:bg-slate-50 hover:text-slate-900
+        dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white
+        px-3 py-2 text-sm font-medium
         focus:outline-none focus:ring-2 focus:ring-orange-500/50"
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"

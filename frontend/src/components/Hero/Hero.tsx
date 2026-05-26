@@ -96,22 +96,25 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 overflow-hidden
+      className="relative min-h-screen flex items-center justify-center bg-white dark:bg-gradient-to-br dark:from-primary-600 dark:via-primary-700 dark:to-primary-800 overflow-hidden
         pt-[max(6.75rem,calc(env(safe-area-inset-top,0px)+5.25rem))] pb-10
         sm:pt-16 md:pt-20 lg:pt-10"
-      style={{
-        
-        backgroundImage:
-          'radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), ' +
-          'radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
-      }}
     >
-      <div ref={glowRef} className="absolute inset-0 bg-gradient-to-br from-purple-900 via-gray-900 to-slate-950"/>
+      <div
+        className="hidden dark:block absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), ' +
+            'radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
+        }}
+      />
+      <div ref={glowRef} className="hidden dark:block absolute inset-0 bg-gradient-to-br from-purple-900 via-gray-900 to-slate-950"/>
 
       {/* Overlay ligero */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
+      <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
       {/* ── Plasma background blobs (CSS-only, SSR-safe) ── */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div className="hidden dark:block absolute inset-0 pointer-events-none" aria-hidden="true">
         {/* Purple blob — top left */}
         <div
           className="plasma-blob-a absolute -top-32 -left-32 w-[680px] h-[680px] rounded-full opacity-30"
@@ -145,11 +148,11 @@ const Hero = () => {
         />
       </div>
       {/* Grid overlay — encima de blobs */}
-      <div className="fixed inset-0 grid-overlay pointer-events-none opacity-20" aria-hidden="true" />
+      <div className="hidden dark:block fixed inset-0 grid-overlay pointer-events-none opacity-20" aria-hidden="true" />
       {/* Partículas — renderizadas por React, animadas por GSAP */}
       <div
         ref={particlesRef}
-        className="absolute inset-0 pointer-events-none"
+        className="hidden dark:block absolute inset-0 pointer-events-none"
         style={{ zIndex: 3 }}
       >
         {particleData.map((p) => (
@@ -174,7 +177,7 @@ const Hero = () => {
       
       <div className="relative flex flex-col-reverse items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-between md:gap-10 lg:gap-14">
       {/* Contenido */}
-        <div className="mx-auto px-4 py-10 mt-10 relative text-center ">
+        <div className="mx-auto px-4 py-10 mt-2.5 relative text-center ">
           {/* Name */}
           <h1
           className="reveal-up"
@@ -233,11 +236,8 @@ const Hero = () => {
             </a>
             <a
               href="#contact"
-              className="group relative inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:border-plasma"
+              className="group relative inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:border-plasma bg-slate-100 border border-slate-200 text-slate-900 dark:bg-white/[0.04] dark:border-white/10 dark:text-[color:var(--color-text)]"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'var(--color-text)',
                 fontFamily: 'var(--font-mono)',
               }}
             >
@@ -251,7 +251,7 @@ const Hero = () => {
           {/* Spinners */}
           {/* <div className="absolute -inset-6 rounded-full bg-linear-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
           <div className="absolute -inset-4 rounded-full bg-linear-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-xs opacity-60"></div> */}
-          <div className="absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
+          <div className="hidden dark:block absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
           {/* Avatar visible */}
           <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">
             <Image
@@ -274,7 +274,7 @@ const Hero = () => {
       
 
       {/* Scroll pending */}
-      <div className="absolute bottom-[5px] pb-40 left-[41%] hidden lg:block -translate-x-1/2">
+      <div className="absolute bottom-[5px] pb-40 left-[41%] hidden dark:lg:block -translate-x-1/2">
         <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce" />
         </div>

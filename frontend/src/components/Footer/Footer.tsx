@@ -39,7 +39,7 @@ function orderColumns(
 function AmbientOrbs() {
     return (
         <div
-            className="pointer-events-none absolute inset-0 overflow-hidden"
+            className="hidden dark:block pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden="true"
         >
             {/* teal — top center */}
@@ -57,7 +57,7 @@ function AmbientOrbs() {
 
 function Divider() {
     return (
-        <div className="my-8 h-px w-full bg-linear-to-r from-transparent via-white/10 to-transparent" />
+        <div className="my-8 h-px w-full bg-linear-to-r from-transparent via-slate-300 dark:via-white/10 to-transparent" />
     );
 }
 
@@ -65,7 +65,7 @@ function Divider() {
 
 function ColumnHeading({ children }: { children: React.ReactNode }) {
     return (
-        <span className="mb-1 font-mono text-[0.67rem] font-medium uppercase tracking-[0.13em] text-white/25">
+        <span className="mb-1 font-mono text-[0.67rem] font-medium uppercase tracking-[0.13em] text-slate-500 dark:text-white/25">
             {children}
         </span>
     );
@@ -74,7 +74,7 @@ function ColumnHeading({ children }: { children: React.ReactNode }) {
 
 function NavLink({ label, href }: FooterLink) {
     const sharedClasses =
-        "inline-block text-[0.83rem] font-light leading-relaxed tracking-wide text-white/44 transition-all duration-150 ease-out hover:translate-x-1 hover:text-white/88";
+        "inline-block text-[0.83rem] font-light leading-relaxed tracking-wide text-slate-600 dark:text-white/44 transition-all duration-150 ease-out hover:translate-x-1 hover:text-slate-900 dark:hover:text-white/88";
 
     return isExternalHref(href) ? (
         <a href={href} target="_blank" rel="noopener noreferrer" className={sharedClasses}>
@@ -95,7 +95,7 @@ function SocialButton({ label, href, icon: Icon }: SocialLink) {
             aria-label={label}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex size-9 items-center justify-center rounded-[10px] border border-white/10 bg-white/5 text-white/45 backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:text-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.30),inset_0_1px_0_rgba(255,255,255,0.10)]"
+            className="flex size-9 items-center justify-center rounded-[10px] border border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/45 backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 hover:text-slate-900 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.30),inset_0_1px_0_rgba(255,255,255,0.10)]"
         >
             <Icon className="size-15px" />
         </a>
@@ -122,15 +122,15 @@ function BrandBlock({ config }: { config: FooterConfig }) {
         <div className="flex max-w-272px flex-col gap-4">
             {/* Logo — ✦ rotates on hover via group-hover, zero JS */}
             <Link href="/" className="group inline-flex w-fit items-center gap-2.5">
-                <span className="font-serif text-lg leading-none text-white/75 transition-transform duration-300 group-hover:rotate-45">
+                <span className="font-serif text-lg leading-none text-slate-700 dark:text-white/75 transition-transform duration-300 group-hover:rotate-45">
                     {brand.logo}
                 </span>
-                <span className="font-serif text-xl font-semibold tracking-[0.05em] text-white">
+                <span className="font-serif text-xl font-semibold tracking-[0.05em] text-slate-900 dark:text-white">
                     {brand.name}
                 </span>
             </Link>
 
-            <p className="text-[0.8rem] font-light leading-[1.75] tracking-wide text-white/36">
+            <p className="text-[0.8rem] font-light leading-[1.75] tracking-wide text-slate-500 dark:text-white/36">
                 {brand.tagline}
             </p>
 
@@ -148,7 +148,7 @@ function LegalBar({ config, year }: { config: FooterConfig; year: number }) {
     return (
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
             {/* Auto-updating year — no hardcoded date */}
-            <span className="text-[0.73rem] tracking-wide text-white/25">
+            <span className="text-[0.73rem] tracking-wide text-slate-400 dark:text-white/25">
                 © {year} {config.brand.name}. All rights reserved.
             </span>
 
@@ -157,7 +157,7 @@ function LegalBar({ config, year }: { config: FooterConfig; year: number }) {
                     <Link
                         key={href}
                         href={href}
-                        className="text-[0.73rem] tracking-wide text-white/28 transition-colors duration-150 hover:text-white/65"
+                        className="text-[0.73rem] tracking-wide text-slate-500 dark:text-white/28 transition-colors duration-150 hover:text-slate-900 dark:hover:text-white/65"
                     >
                         {label}
                     </Link>
@@ -182,15 +182,15 @@ export default function Footer({
     const columns = orderColumns(config.columns, variant);
 
     return (
-        <footer className="relative w-full overflow-hidden border-t border-white/[0.07]  backdrop-blur-xl shadow-2xl hover:shadow-3xl hover:border-white/20 backdrop-saturate-150 bg-none bg-gray-900">
+        <footer className="relative w-full overflow-hidden border-t border-slate-200 bg-white dark:border-white/[0.07] dark:bg-gray-900  backdrop-blur-xl shadow-2xl hover:shadow-3xl hover:border-slate-300 dark:hover:border-white/20 backdrop-saturate-150 bg-none">
 
             <AmbientOrbs />
 
             {/* Top-edge shimmer */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/[0.07] to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200 dark:via-white/[0.07] to-transparent" />
 
             {/* Frosted glass sheen */}
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/[0.016] to-transparent" />
+            <div className="hidden dark:block pointer-events-none absolute inset-0 bg-linear-to-b from-white/[0.016] to-transparent" />
 
             <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-10 pt-14 sm:px-10">
 

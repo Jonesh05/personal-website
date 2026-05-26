@@ -58,8 +58,8 @@ export function TableOfContents({ entries }: Props) {
   return (
     <nav
       aria-label="Table of contents"
-      className="my-10 not-prose rounded-2xl border border-gray-800 bg-gray-900/40
-        ring-1 ring-white/[0.02] px-5 sm:px-6 py-5"
+      className="my-10 not-prose rounded-2xl border border-slate-200 bg-slate-50 dark:border-gray-800 dark:bg-gray-900/40
+        ring-1 ring-slate-200/40 dark:ring-white/[0.02] px-5 sm:px-6 py-5"
     >
       <header className="flex items-center gap-2 mb-4">
         <span className="inline-flex h-1.5 w-1.5 rounded-full bg-orange-400" aria-hidden="true" />
@@ -79,14 +79,14 @@ export function TableOfContents({ entries }: Props) {
                 className={[
                   'group relative inline-flex items-baseline gap-3 py-1 text-sm transition-colors',
                   isActive
-                    ? 'text-orange-300'
-                    : 'text-gray-400 hover:text-orange-200',
+                    ? 'text-orange-600 dark:text-orange-300'
+                    : 'text-slate-600 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-200',
                 ].join(' ')}
               >
                 <span
                   className={[
                     'font-mono text-[11px] tabular-nums',
-                    isActive ? 'text-orange-400' : 'text-gray-600',
+                    isActive ? 'text-orange-400' : 'text-slate-400 dark:text-gray-600',
                   ].join(' ')}
                   aria-hidden="true"
                 >

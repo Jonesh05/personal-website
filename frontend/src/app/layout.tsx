@@ -24,6 +24,13 @@ export default async function RootLayout({
     // suppressHydrationWarning needed because ThemeProvider may toggle `class`
     // client-side. `lang` is now resolved server-side via cookie/accept-language.
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='site-theme';var t=localStorage.getItem(k);if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var r=document.documentElement;if(t==='dark'){r.classList.add('dark');r.classList.remove('light');}else{r.classList.add('light');r.classList.remove('dark');}}catch(e){document.documentElement.classList.add('dark');}})();`,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <LocaleProvider initialLocale={locale}>

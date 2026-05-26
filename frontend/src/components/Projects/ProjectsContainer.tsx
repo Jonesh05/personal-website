@@ -18,7 +18,7 @@ const ProjectsContainer = () => {
   if (loading) {
     return (
       <section className="py-20 text-center">
-        <p className="text-white">{t('loading')}</p>
+        <p className="text-slate-900 dark:text-white">{t('loading')}</p>
       </section>
     );
   }

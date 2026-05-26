@@ -60,8 +60,8 @@ function renderToken(token: string, key: string): React.ReactNode {
     return (
       <code
         key={key}
-        className="rounded-md bg-gray-900 border border-gray-800 px-1.5 py-0.5
-          text-[0.88em] font-mono text-orange-300 align-baseline"
+        className="rounded-md bg-slate-100 border border-slate-200 dark:bg-gray-900 dark:border-gray-800 px-1.5 py-0.5
+          text-[0.88em] font-mono text-orange-600 dark:text-orange-300 align-baseline"
       >
         {token.slice(1, -1)}
       </code>
@@ -70,7 +70,7 @@ function renderToken(token: string, key: string): React.ReactNode {
 
   if (token.startsWith('**') && token.endsWith('**')) {
     return (
-      <strong key={key} className="font-semibold text-white">
+      <strong key={key} className="font-semibold text-slate-900 dark:text-white">
         {token.slice(2, -2)}
       </strong>
     )
@@ -78,7 +78,7 @@ function renderToken(token: string, key: string): React.ReactNode {
 
   if (token.startsWith('~~') && token.endsWith('~~')) {
     return (
-      <s key={key} className="text-gray-500 decoration-gray-600">
+      <s key={key} className="text-slate-400 decoration-slate-400 dark:text-gray-500 dark:decoration-gray-600">
         {token.slice(2, -2)}
       </s>
     )
@@ -86,7 +86,7 @@ function renderToken(token: string, key: string): React.ReactNode {
 
   if (token.startsWith('*') && token.endsWith('*')) {
     return (
-      <em key={key} className="italic text-gray-200">
+      <em key={key} className="italic text-slate-700 dark:text-gray-200">
         {token.slice(1, -1)}
       </em>
     )

@@ -54,6 +54,18 @@
   --color-text-muted:  #7A8FAD;
   --color-text-faint:  #3D4F6E;
 
+  /* ── Semantic tokens (dark defaults = existing palette; light overrides in html.light) ── */
+  --color-bg:              var(--color-void);
+  --color-surface-elev:    var(--color-surface);
+  --color-surface-elev-2:  var(--color-surface-2);
+  --color-fg:              var(--color-text);
+  --color-fg-muted:        var(--color-text-muted);
+  --color-fg-faint:        var(--color-text-faint);
+  --color-border-soft:     var(--color-border);
+  --color-accent:          var(--color-purple-neon);
+  --color-link:            var(--color-purple-bright);
+  --color-link-hover:      var(--color-green-neon);
+
   /* ── Gradients ── */
   --gradient-plasma:      linear-gradient(135deg, var(--color-purple-bright) 0%, var(--color-green-bright) 100%);
   --gradient-plasma-text: linear-gradient(90deg, #BF5EFF 0%, #00FFB2 100%);
@@ -75,6 +87,43 @@
   --shadow-card:   0 4px 32px rgba(4, 8, 15, 0.6), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
+/* ── Light mode semantic overrides ── */
+:where(html.light) {
+  color-scheme: light;
+
+  /* Semantic tokens */
+  --color-bg:              #ffffff;
+  --color-surface-elev:    #ffffff;
+  --color-surface-elev-2:  #f8fafc;
+  --color-fg:              #0f172a;
+  --color-fg-muted:        #475569;
+  --color-fg-faint:        #94a3b8;
+  --color-border-soft:     #e2e8f0;
+  --color-accent:          #7c3aed;
+  --color-link:            #6d28d9;
+  --color-link-hover:      #059669;
+
+  /* Bridge legacy tokens referenced by inline styles (Projects, Timeline, Contact, HeroClient) */
+  --color-void:            #ffffff;
+  --color-surface:         #ffffff;
+  --color-surface-2:       #f8fafc;
+  --color-surface-3:       #f1f5f9;
+  --color-border:          #e2e8f0;
+  --color-border-glow:     #cbd5e1;
+  --color-text:            #0f172a;
+  --color-text-muted:      #475569;
+  --color-text-faint:      #94a3b8;
+
+  /* Shadows */
+  --shadow-card:           0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+:where(html.light) .tag-default {
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--color-fg-muted);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
 /* ── Tailwind v4 border-color compatibility ── */
 @layer base {
   *,
@@ -94,8 +143,8 @@ html {
 }
 
 body {
-  background-color: var(--color-void);
-  color: var(--color-text);
+  background-color: var(--color-bg);
+  color: var(--color-fg);
   font-family: var(--font-body);
   overflow-x: hidden;
 }
@@ -187,14 +236,6 @@ body {
   box-shadow: var(--shadow-green);
 }
 
-/* ── Grid overlay ── */
-.grid-overlay {
-  background-image:
-    linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
 /* ── Tag pill styles ── */
 .tag-purple {
   background: rgba(124, 58, 237, 0.15);
@@ -217,6 +258,11 @@ body {
 ::-webkit-scrollbar-track { background: var(--color-void); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--color-purple) 0%, var(--color-green) 100%);
+  border-radius: 3px;
+}
+:where(html.light) ::-webkit-scrollbar-track { background: #f1f5f9; }
+:where(html.light) ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a78bfa 0%, #34d399 100%);
   border-radius: 3px;
 }
 

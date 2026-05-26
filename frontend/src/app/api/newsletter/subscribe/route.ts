@@ -29,6 +29,7 @@ import {
 } from '@/lib/rateLimit'
 import { getVisitorId } from '@/lib/visitor'
 import * as leads from '@/lib/firestore/newsletter'
+import * as events from '@/lib/firestore/newsletter_events'
 import { subscribe as listmonkSubscribe } from '@/lib/listmonk/client'
 
 export const dynamic = 'force-dynamic'
@@ -100,11 +101,28 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  // Best-effort funnel event. Never blocks the response.
+  void events
+    .recordEvent({ emailHash: leadId, type: 'subscribe_requested', source })
+    .catch(err => logError('event_subscribe_requested_failed', err))
+
   // 5) Forward to listmonk. Fire-and-respond: from here on the user always
   //    sees success. A listmonk outage is recorded on the lead as `failed`
   //    so ops can replay later, but it is never exposed on the response.
   try {
-    await listmonkSubscribe(email, source)
+    const ack = await listmonkSubscribe(email, source)
+    void events
+      .recordEvent({
+        emailHash: leadId,
+        type:      'listmonk_accepted',
+        source,
+        meta: {
+          listmonkId:        ack.id,
+          listmonkStatus:    ack.status,
+          alreadySubscribed: ack.alreadySubscribed,
+        },
+      })
+      .catch(err => logError('event_listmonk_accepted_failed', err))
   } catch (err) {
     logError('listmonk_subscribe_failed', err)
     try {
@@ -112,6 +130,14 @@ export async function POST(req: NextRequest) {
     } catch (updateErr) {
       logError('firestore_lead_mark_failed_failed', updateErr)
     }
+    void events
+      .recordEvent({
+        emailHash: leadId,
+        type:      'listmonk_failed',
+        source,
+        meta:      { reason: err instanceof Error ? err.message : String(err) },
+      })
+      .catch(evErr => logError('event_listmonk_failed_failed', evErr))
   }
 
   return NextResponse.json(

@@ -159,7 +159,6 @@ const Node: FC<NodeProps> = ({ entry, accent }) => {
   );
 };
 
-// ─── Card ──────────────────────────────────────────────────────────────────
 interface CardProps {
   entry: TimelineEntry;
   accent: Accent;
@@ -179,13 +178,7 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
   return (
     <article
       aria-current={entry.current ? 'step' : undefined}
-      className={`group relative rounded-2xl p-6 transition-transform duration-300 ease-out hover:-translate-y-1 ${desktopAlign}`}
-      style={{
-        background:
-          'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.45)',
-      }}
+      className={`group relative rounded-2xl p-6 transition-transform duration-300 dark:bg-gray-900 ease-out hover:-translate-y-1 bg-white border border-slate-200 shadow-sm dark:bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] dark:border-white/[0.08] dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)] ${desktopAlign}`}
     >
       {/* Top accent stripe */}
       <span
@@ -347,7 +340,7 @@ const Timeline: FC = () => {
       {/* Ambient background — subtle plasma wash, zero motion cost. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-60"
+        className="hidden dark:block pointer-events-none absolute inset-0 opacity-60"
         style={{
           background:
             'radial-gradient(ellipse 600px 400px at 20% 10%, rgba(124,58,237,0.15) 0%, transparent 55%), ' +

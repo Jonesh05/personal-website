@@ -83,7 +83,7 @@ export function Callout({ variant, title, children }: Props) {
     >
       <div className="flex items-start gap-3">
         <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full
-          bg-black/30 ${s.iconColor}`}>
+          bg-slate-900/10 dark:bg-black/30 ${s.iconColor}`}>
           <s.Icon />
         </div>
         <div className="min-w-0 flex-1">
@@ -91,7 +91,7 @@ export function Callout({ variant, title, children }: Props) {
             {title || s.defaultTitle}
           </p>
           <div className="mt-2 [&>p:first-child]:mt-0 [&>:last-child]:mb-0
-            text-gray-200/95 [&>p]:my-3">
+            text-slate-700 dark:text-gray-200/95 [&>p]:my-3">
             {children}
           </div>
         </div>

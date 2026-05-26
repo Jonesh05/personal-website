@@ -8,7 +8,7 @@ interface PostCardProps {
 
 
 export default function PostCard({ post }: PostCardProps) {
-  const { title, slug, excerpt, featuredImage, tags, authorId } = post;
+  const { title, slug, excerpt, featuredImage, tags, authorName } = post;
 
   return (
     <Link href={`/blog/${slug}`} className="block group">
@@ -50,7 +50,7 @@ export default function PostCard({ post }: PostCardProps) {
           </p>
 
           {/* Author */}
-          <p className="text-sm font-medium text-gray-500">By {authorId}</p>
+          <p className="text-sm font-medium text-gray-500">By {authorName ?? 'Jhonny Pimiento'}</p>
         </div>
       </article>
     </Link>

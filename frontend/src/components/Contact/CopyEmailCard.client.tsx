@@ -178,9 +178,11 @@ export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
               onClick={handleCopyOnly}
               aria-label={copied ? t('emailCopied') : `${t('copyEmailAria')} ${email}`}
               className="group/email inline-flex items-center gap-2 rounded-xl
-                border border-white/10 bg-white/[0.04] px-3 py-2
+                border border-slate-200 bg-slate-50 px-3 py-2
                 text-[15px] sm:text-base font-medium transition-colors
-                hover:border-white/25 hover:bg-white/[0.08]
+                hover:border-slate-300 hover:bg-slate-100
+                dark:border-white/10 dark:bg-white/[0.04]
+                dark:hover:border-white/25 dark:hover:bg-white/[0.08]
                 focus-visible:outline-none focus-visible:ring-2
                 focus-visible:ring-purple-400/70 focus-visible:ring-offset-2
                 focus-visible:ring-offset-transparent"

@@ -5,20 +5,10 @@ import { getServerTranslations } from '@/i18n/server'
 import { formatDateByLocale } from '@/utils/formatDate'
 import NewsletterForm from './NewsletterForm.client'
 
-/**
- * BlogSidebar — server-rendered sidebar fragments consumed by the blog page.
- *
- * Only `PopularTags` and `FeaturedPosts` are currently mounted on
- * `/blog`, but we keep the full module bilingual so any future additions
- * (Newsletter, AboutAuthor, etc.) don't re-introduce Spanish leaks.
- */
-
 interface BlogPostSidebarProps {
   postId: string
   tags: string[]
 }
-
-// ── Table of Contents ────────────────────────────────────────────────────────
 async function TableOfContents({ content }: { content: string }) {
   const { t } = await getServerTranslations('Blog')
   const headings = content.match(/#{1,6} .+/g) || []
@@ -52,7 +42,6 @@ async function TableOfContents({ content }: { content: string }) {
   )
 }
 
-// ── Reading Progress ─────────────────────────────────────────────────────────
 async function ReadingProgress() {
   const { t } = await getServerTranslations('Blog')
   return (
@@ -80,7 +69,6 @@ async function ReadingProgress() {
   )
 }
 
-// ── Per-post sidebar (not currently mounted, kept bilingual) ─────────────────
 export async function BlogPostSidebar({ tags }: BlogPostSidebarProps) {
   const { t } = await getServerTranslations('Blog')
 
@@ -119,7 +107,6 @@ export async function BlogPostSidebar({ tags }: BlogPostSidebarProps) {
   )
 }
 
-// ── Popular Tags (mounted) ───────────────────────────────────────────────────
 async function PopularTags() {
   const { t } = await getServerTranslations('Blog')
   // Firestore failures must NEVER bring down the whole /blog page. The
@@ -159,7 +146,6 @@ async function PopularTags() {
   )
 }
 
-// ── Featured Posts (mounted) ─────────────────────────────────────────────────
 async function FeaturedPosts() {
   const { t, locale } = await getServerTranslations('Blog')
   // Degrade gracefully: no featured-posts widget if Firestore is
@@ -238,7 +224,6 @@ async function Newsletter() {
   )
 }
 
-// ── About Author (unused, kept bilingual) ────────────────────────────────────
 async function AboutAuthor() {
   const { t } = await getServerTranslations('Blog')
   return (

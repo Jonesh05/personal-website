@@ -42,11 +42,11 @@ function Field({ id, label, error, required, children }: FieldProps) {
 
 const inputBase: React.CSSProperties = {
   width: '100%',
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'var(--color-surface-elev-2)',
+  border: '1px solid var(--color-border-soft)',
   borderRadius: '10px',
   padding: '10px 14px',
-  color: 'var(--color-text)',
+  color: 'var(--color-fg)',
   fontFamily: 'var(--font-body)',
   fontSize: '14px',
   outline: 'none',
@@ -188,12 +188,9 @@ export default function ContactForm() {
           </p>
           <button
             onClick={() => setStatus('idle')}
-            className="mt-2 px-5 py-2 rounded-full text-sm transition-all duration-200"
+            className="mt-2 px-5 py-2 rounded-full text-sm transition-all duration-200 bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 dark:bg-white/[0.05] dark:border-white/10 dark:text-[color:var(--color-text-muted)] dark:hover:bg-white/10"
             style={{
               fontFamily: 'var(--font-mono)',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'var(--color-text-muted)',
               cursor: 'pointer',
             }}
           >

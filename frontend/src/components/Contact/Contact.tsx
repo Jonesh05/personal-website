@@ -15,7 +15,7 @@ export default async function Contact() {
       aria-labelledby="contact-heading"
     >
       {/* Plasma blobs */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div className="hidden dark:block absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
           className="plasma-blob-a absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full opacity-20"
           style={{

@@ -1,0 +1,93 @@
+# infra/listmonk/docker-compose.yml
+# Self-hosted listmonk + PostgreSQL.
+#
+# Two profiles are supported:
+#   - local        docker compose --profile local up -d        (full stack: db + app)
+#   - railway      docker compose --profile railway up -d      (app only; DB is Railway-managed)
+#
+# Railway one-off services consume DB env vars directly, so on Railway we
+# only run the `listmonk` container and point it at the managed Postgres
+# add-on via DATABASE_URL / LISTMONK_db__* envs. Locally we run both.
+
+name: listmonk
+
+services:
+  # ------------------------------------------------------------------
+  # PostgreSQL — local profile only.
+  # On Railway, attach a Postgres add-on and skip this service.
+  # ------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    profiles: ["local"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-listmonk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB:       ${POSTGRES_DB:-listmonk}
+    volumes:
+      - listmonk_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-listmonk} -d ${POSTGRES_DB:-listmonk}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    ports:
+      # Exposed locally only; never expose Postgres publicly in prod.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+  # ------------------------------------------------------------------
+  # listmonk application
+  # ------------------------------------------------------------------
+  listmonk:
+    image: listmonk/listmonk:${LISTMONK_VERSION:-latest}
+    profiles: ["local", "railway"]
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false
+    environment:
+      TZ: ${TZ:-UTC}
+
+      # listmonk reads any env var prefixed with LISTMONK_ and maps it
+      # into config.toml via double-underscore nesting.
+      LISTMONK_app__address:        "0.0.0.0:9000"
+      LISTMONK_app__admin_username: ${LISTMONK_ADMIN_USER:?LISTMONK_ADMIN_USER is required}
+      LISTMONK_app__admin_password: ${LISTMONK_ADMIN_PASSWORD:?LISTMONK_ADMIN_PASSWORD is required}
+
+      LISTMONK_db__host:     ${LISTMONK_DB_HOST:-db}
+      LISTMONK_db__port:     ${LISTMONK_DB_PORT:-5432}
+      LISTMONK_db__user:     ${POSTGRES_USER:-listmonk}
+      LISTMONK_db__password: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      LISTMONK_db__database: ${POSTGRES_DB:-listmonk}
+      LISTMONK_db__ssl_mode: ${LISTMONK_DB_SSL_MODE:-disable}
+
+      # SMTP for outbound newsletter + transactional email from listmonk.
+      # Configure inside the listmonk UI after first boot OR via the
+      # LISTMONK_smtp__* envs here. Pre-seeding keeps prod reproducible.
+      LISTMONK_smtp__enabled:        "true"
+      LISTMONK_smtp__host:           ${SMTP_HOST:?SMTP_HOST is required}
+      LISTMONK_smtp__port:           ${SMTP_PORT:-587}
+      LISTMONK_smtp__auth_protocol:  ${SMTP_AUTH_PROTOCOL:-login}
+      LISTMONK_smtp__username:       ${SMTP_USER}
+      LISTMONK_smtp__password:       ${SMTP_PASSWORD}
+      LISTMONK_smtp__tls_type:       ${SMTP_TLS_TYPE:-STARTTLS}
+      LISTMONK_smtp__email_headers:  ${SMTP_HEADERS:-[]}
+
+    ports:
+      - "${LISTMONK_PORT:-9000}:9000"
+
+    # Persist uploads (subscriber CSVs, campaign assets) outside the
+    # container so upgrades don't wipe them.
+    volumes:
+      - listmonk_uploads:/listmonk/uploads
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  listmonk_db:
+  listmonk_uploads:

@@ -27,7 +27,7 @@ import {
 } from '@/lib/rateLimit'
 import { getVisitorId } from '@/lib/visitor'
 import * as contactsDb from '@/lib/firestore/contacts'
-import { sendContactNotification } from '@/lib/mailer/resend'
+import { sendContactNotification } from '@/lib/mailer'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'

@@ -23,8 +23,8 @@ interface Props {
 export function Figure({ src, alt, caption, idx }: Props) {
   return (
     <figure className="my-8 group/fig">
-      <div className="overflow-hidden rounded-2xl border border-gray-800
-        bg-gray-900/40 ring-1 ring-white/[0.02] shadow-lg shadow-black/30">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 ring-1 ring-slate-200/40 shadow-sm
+        dark:border-gray-800 dark:bg-gray-900/40 dark:ring-white/[0.02] dark:shadow-lg dark:shadow-black/30">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
@@ -36,7 +36,7 @@ export function Figure({ src, alt, caption, idx }: Props) {
         />
       </div>
       {caption && (
-        <figcaption className="mt-3 flex items-start gap-2 text-sm text-gray-400">
+        <figcaption className="mt-3 flex items-start gap-2 text-sm text-slate-600 dark:text-gray-400">
           <span
             aria-hidden="true"
             className="mt-1.5 inline-block h-px w-6 shrink-0 bg-orange-500/60"

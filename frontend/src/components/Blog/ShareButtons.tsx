@@ -205,8 +205,9 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
               onClick={() => handlePlatform(p)}
               aria-label={t(meta.ariaKey)}
               title={meta.label}
-              className={`h-10 w-10 grid place-items-center rounded-full bg-gray-900 text-gray-400
-                border border-gray-800 transition-colors focus:outline-none focus:ring-2
+              className={`h-10 w-10 grid place-items-center rounded-full bg-slate-100 text-slate-600 border border-slate-200
+                dark:bg-gray-900 dark:text-gray-400 dark:border-gray-800
+                transition-colors focus:outline-none focus:ring-2
                 focus:ring-orange-500/50 ${meta.hover}`}
             >
               <Icon className="h-4 w-4" />
@@ -221,8 +222,8 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
           className={`h-10 w-10 grid place-items-center rounded-full border transition-colors
             focus:outline-none focus:ring-2 focus:ring-orange-500/50
             ${copied
-              ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-300'
-              : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+              ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-700 dark:text-emerald-300'
+              : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'}`}
         >
           {copied ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
         </button>
@@ -236,7 +237,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
       aria-label={t('shareArticle')}
       className={`flex flex-wrap items-center gap-2 ${className}`}
     >
-      <span className="text-sm font-medium text-gray-400 mr-1">{t('shareArticle')}</span>
+      <span className="text-sm font-medium text-slate-600 dark:text-gray-400 mr-1">{t('shareArticle')}</span>
 
       {platforms.map((p) => {
         const Icon = PLATFORM_ICON[p]
@@ -247,8 +248,9 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
             type="button"
             onClick={() => handlePlatform(p)}
             aria-label={t(meta.ariaKey)}
-            className={`inline-flex items-center gap-2 h-10 px-3 rounded-lg bg-gray-900
-              text-gray-300 border border-gray-800 text-sm font-medium transition-colors
+            className={`inline-flex items-center gap-2 h-10 px-3 rounded-lg bg-slate-100 text-slate-700 border border-slate-200
+              dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800
+              text-sm font-medium transition-colors
               focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${meta.hover}`}
           >
             <Icon className="h-4 w-4" />
@@ -264,8 +266,8 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         className={`inline-flex items-center gap-2 h-10 px-3 rounded-lg border text-sm font-medium
           transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/50
           ${copied
-            ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-300'
-            : 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white'}`}
+            ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-700 dark:text-emerald-300'
+            : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'}`}
       >
         {copied ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
         <span className="hidden sm:inline">{copied ? t('linkCopied') : t('copyLink')}</span>
@@ -276,9 +278,10 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
           type="button"
           onClick={handleNativeShare}
           aria-label={t('shareOther')}
-          className="inline-flex items-center gap-2 h-10 px-3 rounded-lg bg-gray-900
-            text-gray-300 border border-gray-800 text-sm font-medium transition-colors
-            hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2
+          className="inline-flex items-center gap-2 h-10 px-3 rounded-lg bg-slate-100 text-slate-700 border border-slate-200
+            hover:bg-slate-200 hover:text-slate-900
+            dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800 dark:hover:bg-gray-800 dark:hover:text-white
+            text-sm font-medium transition-colors focus:outline-none focus:ring-2
             focus:ring-orange-500/50 sm:hidden"
         >
           <ShareIcon className="h-4 w-4" />

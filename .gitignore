@@ -180,3 +180,5 @@ vite.config.ts.timestamp-*
 
 node_modules
 
+backups/
+*.sql.gz
