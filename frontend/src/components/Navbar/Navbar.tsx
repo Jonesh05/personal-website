@@ -104,7 +104,7 @@ const Navbar: React.FC = () => {
           transition-all duration-300 ease-in-out
           hover:shadow-3xl hover:border-white/20">
           
-          <div className="shrink-0 w-[260px] h-[50px] flex items-center">
+          <div className="flex items-center min-w-0 flex-1 lg:flex-none lg:w-[260px] h-[50px]">
             <Link href="/" aria-label="Jonesh Logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -178,7 +178,7 @@ const Navbar: React.FC = () => {
               className="text-slate-900 dark:text-white"
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
+                fontSize: '14px',
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}

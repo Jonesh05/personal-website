@@ -4,7 +4,7 @@ import Projects from '@/components/Projects/Projects'
 import { getServerTranslations } from '@/i18n/server'
 
 /**
- * /work — standalone landing page for the portfolio.
+ * /work standalone landing page for the portfolio.
  *
  * Design intent:
  *   • Acts as the canonical destination for external "portfolio" links
@@ -34,7 +34,7 @@ export default async function WorkPage() {
     >
       <header className="relative mx-auto w-full max-w-5xl px-6 pb-4">
         <p
-          className="mb-3 text-xs uppercase tracking-[0.22em]"
+          className="mb-3 mt-20 text-xs uppercase tracking-[0.22em]"
           style={{
             fontFamily: 'var(--font-mono)',
             color: 'var(--color-green-neon)',

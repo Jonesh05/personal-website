@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react'
 
 /**
- * ReadingProgress — slim scroll-tracked bar anchored at the top of the
+ * ReadingProgress, slim scroll-tracked bar anchored at the top of the
  * viewport. Uses `requestAnimationFrame` so it stays silky smooth during
  * fast scrolls.
  *
- * Renders nothing on the server to avoid hydration mismatches — the bar
+ * Renders nothing on the server to avoid hydration mismatches the bar
  * fades in after mount.
  */
 export function ReadingProgress() {

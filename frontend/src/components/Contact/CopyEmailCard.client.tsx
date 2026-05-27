@@ -5,12 +5,12 @@ import { toast } from '@/lib/toast'
 import { useTranslations } from '@/i18n'
 
 /**
- * CopyEmailCard — single source of truth for the "contact by email" UX.
+ * CopyEmailCard, single source of truth for the "contact by email" UX.
  *
  * The component exposes two actions on the same address:
- *   • Primary  — copies the email to the clipboard AND opens the user's mail
+ *   • Primary,  copies the email to the clipboard AND opens the user's mail
  *                client (mailto:). One click delivers both expected outcomes.
- *   • Secondary — a focused "copy only" button for users who prefer to paste
+ *   • Secondary, a focused "copy only" button for users who prefer to paste
  *                the address elsewhere (Slack, CRM, etc.).
  *
  * Visual style: vibrant gradient plasma ring around a frosted-glass card,

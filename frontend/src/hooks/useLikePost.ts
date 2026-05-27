@@ -9,7 +9,7 @@ interface UseLikePostOptions {
 }
 
 /**
- * useLikePost — one hook for all like interactions.
+ * useLikePost, one hook for all like interactions.
  *
  * - Reads "is this post liked?" from the centralized store.
  * - Keeps the visible counter in sync with the optimistic toggle.

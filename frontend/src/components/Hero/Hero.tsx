@@ -111,11 +111,11 @@ const Hero = () => {
       />
       <div ref={glowRef} className="hidden dark:block absolute inset-0 bg-gradient-to-br from-purple-900 via-gray-900 to-slate-950"/>
 
-      {/* Overlay ligero */}
+      {/* Overlay */}
       <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
       {/* ── Plasma background blobs (CSS-only, SSR-safe) ── */}
       <div className="hidden dark:block absolute inset-0 pointer-events-none" aria-hidden="true">
-        {/* Purple blob — top left */}
+        {/* Purple blob, top left */}
         <div
           className="plasma-blob-a absolute -top-32 -left-32 w-[680px] h-[680px] rounded-full opacity-30"
           style={{
@@ -123,7 +123,7 @@ const Hero = () => {
             filter: 'blur(80px)',
           }}
         />
-        {/* Green blob — bottom right */}
+        {/* Green blob, bottom right */}
         <div
           className="plasma-blob-b absolute -bottom-32 -right-32 w-[560px] h-[560px] rounded-full opacity-25"
           style={{
@@ -131,7 +131,7 @@ const Hero = () => {
             filter: 'blur(80px)',
           }}
         />
-        {/* Accent blob — center */}
+        {/* Accent blob, center */}
         <div
           className="plasma-blob-c absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-10"
           style={{
@@ -147,9 +147,9 @@ const Hero = () => {
           }}
         />
       </div>
-      {/* Grid overlay — encima de blobs */}
+      {/* Grid overlay, over blobs */}
       <div className="hidden dark:block fixed inset-0 grid-overlay pointer-events-none opacity-20" aria-hidden="true" />
-      {/* Partículas — renderizadas por React, animadas por GSAP */}
+
       <div
         ref={particlesRef}
         className="hidden dark:block absolute inset-0 pointer-events-none"
@@ -176,7 +176,7 @@ const Hero = () => {
 
       
       <div className="relative flex flex-col-reverse items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-between md:gap-10 lg:gap-14">
-      {/* Contenido */}
+      {/* Content */}
         <div className="mx-auto px-4 py-10 mt-2.5 relative text-center ">
           {/* Name */}
           <h1
@@ -197,7 +197,7 @@ const Hero = () => {
           <span className="text-plasma">Pimiento</span>
           </h1>
 
-          {/* Typewriter role — delegated to client */}
+          {/* Typewriter role, delegated to client */}
           <HeroClient />
           {/* Tech stack pills */}
         <div

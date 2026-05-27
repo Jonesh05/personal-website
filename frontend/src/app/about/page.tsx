@@ -3,16 +3,10 @@ import Link from 'next/link'
 import About from '@/components/About/About'
 import { getServerTranslations } from '@/i18n/server'
 
-/**
- * /about — standalone landing page for biographical context.
- * Embeds the existing home-page `<About />` section so content remains
- * a single source of truth, and adds a focused hero + CTA to reach out.
- */
-
 export const metadata: Metadata = {
   title: 'About · Jhonny Pimiento',
   description:
-    'About Jhonny Pimiento — a developer focused on web systems, blockchain and thoughtful UX.',
+    'About Jhonny Pimiento a developer focused on web systems, blockchain and thoughtful UX.',
   alternates: { canonical: '/about' },
 }
 
@@ -26,7 +20,7 @@ export default async function AboutPage() {
     >
       <header className="relative mx-auto w-full max-w-5xl px-6 pb-6">
         <p
-          className="mb-3 text-xs uppercase tracking-[0.22em]"
+          className="mb-3 mt-20 text-xs uppercase tracking-[0.22em]"
           style={{
             fontFamily: 'var(--font-mono)',
             color: 'var(--color-green-neon)',

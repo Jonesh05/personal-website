@@ -1,6 +1,6 @@
 // frontend/src/lib/firebase/client.ts
-// Client-side Firebase SDK — AUTH ONLY
-// No Firestore client imports allowed — all Firestore access via Admin SDK on server
+// Client-side Firebase SDK | AUTH ONLY
+// No Firestore client imports allowed, all Firestore access via Admin SDK on server
 'use client'
 
 import { initializeApp, getApps, getApp } from 'firebase/app'
@@ -25,4 +25,4 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULAT
 }
 
 export { app, auth }
-// NO Firestore exports — all Firestore access is via Admin SDK on server
+// NO Firestore exports, all Firestore access is via Admin SDK on server

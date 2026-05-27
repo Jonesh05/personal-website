@@ -164,7 +164,7 @@ export async function listLikedPostIds(visitorId: string): Promise<string[]> {
 }
 
 /**
- * Mirror a like to visitors/{id}/likes/{postId} (or remove it) — keeps a
+ * Mirror a like to visitors/{id}/likes/{postId} (or remove it) keeps a
  * cheap query path for "what posts has this visitor liked" without
  * collection-group scans. Called from the like API route.
  */

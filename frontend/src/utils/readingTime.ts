@@ -1,6 +1,6 @@
 /**
  * Estimate reading time in minutes based on a word-count heuristic.
- * Uses 220 wpm — a common value for technical English/Spanish prose — and
+ * Uses 220 wpm a common value for technical English/Spanish prose and
  * always returns at least one minute.
  */
 export function estimateReadingTime(text: string | undefined | null): number {

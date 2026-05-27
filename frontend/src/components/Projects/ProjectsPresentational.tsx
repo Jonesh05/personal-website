@@ -6,15 +6,6 @@ import gsap from 'gsap';
 import { useTranslations, useLocale } from '@/i18n';
 import type { Locale } from '@/i18n/constants';
 
-/**
- * Translate a category *label* for display. The identifier stays in the
- * underlying data ("blockchain", "AI/ML", …) — we only convert it to
- * human-readable copy here.
- *
- * Frozen categories (Blockchain, AI/ML) are rendered as-is per product
- * rules; "all" and "web" pick up localized strings from the Projects
- * namespace so they switch with the rest of the UI.
- */
 function displayCategory(
   cat: string,
   tAll: string,
@@ -35,7 +26,6 @@ interface Props {
   onCategoryChange: (category: string) => void;
 }
 
-// Glow values por accentColor — leídos por proyecto, no por array
 const ACCENT = {
   purple: {
     border: 'rgba(124, 58, 237, 0.4)',
@@ -49,7 +39,6 @@ const ACCENT = {
   },
 } as const;
 
-// Card individual con hover gestionado por state local
 const ProjectCard: FC<{
   project: Project;
   idx: number;
@@ -85,7 +74,7 @@ const ProjectCard: FC<{
         aria-hidden="true"
       />
 
-      {/* Imagen */}
+      {/* Image */}
       <img
         src={project.image}
         alt={project.title}
@@ -147,7 +136,7 @@ const ProjectCard: FC<{
           {project.title}
         </h3>
 
-        {/* Description — per-locale text picked up from `project.description` */}
+        {/* Description, per-locale text picked up from `project.description` */}
         <p className="text-sm leading-relaxed flex-1 mb-4" style={{ color: 'var(--color-text-muted)' }}>
           {description}
         </p>
@@ -248,7 +237,6 @@ const ProjectCard: FC<{
   );
 };
 
-// ── Componente principal ──────────────────────────────────────────────────────
 export const ProjectsPresentational: FC<Props> = ({
   projects,
   selectedCategory,
@@ -280,20 +268,39 @@ export const ProjectsPresentational: FC<Props> = ({
   }, [projects]);
 
   return (
-    <section id="projects" className="py-24" aria-labelledby="projects-heading">
-      <div className="container mx-auto px-4">
-        {/* Header — title/subtitle come from the i18n dictionary */}
-        <h2
-          id="projects-heading"
-          className="text-4xl font-bold text-center mb-3"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-        >
-          {t('heading_line1')} <span className="text-plasma">{t('heading_line2')}</span>
-        </h2>
-        <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--color-text-muted)' }}>
-          {t('subtitle')}
-        </p>
-
+    <section 
+      id="projects" 
+      className="py-24" 
+      aria-labelledby="projects-heading"
+      >
+        
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6">
+        <header className="text-center mb-16">
+          <div
+            className="absolute top-0 inset-x-0 h-px rounded-t-2xl mb-16"
+            style={{
+              background: 'linear-gradient(90deg, transparent, #059669, #00FFB2, transparent)',
+            }}
+            aria-hidden="true"
+          />
+          <p
+            className="text-lg tracking-widest uppercase mb-3 pt-5"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-green-neon)' }}
+          >
+            {t('section_label')}
+          </p>
+          <h2
+            id="projects-heading"
+            className="text-4xl font-bold text-center mb-3 text-balance"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+          >
+            {t('heading_line1')} <span className="text-plasma">{t('heading_line2')}</span>
+          </h2>
+          <p className="text-center mb-12 mt-8 max-w-2xl mx-auto whitespace-pre-line" style={{ color: 'var(--color-text-muted)' }}>
+            {t('subtitle')}
+          </p>
+        </header>
+        
         {/* Filter tabs */}
         <div
           className="flex justify-center gap-1 p-1.5 mb-12 rounded-full mx-auto w-fit"
@@ -327,7 +334,6 @@ export const ProjectsPresentational: FC<Props> = ({
           })}
         </div>
 
-        {/* Grid — cada card es un grid item directo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, idx) => (
             <ProjectCard

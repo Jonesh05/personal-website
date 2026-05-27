@@ -1,5 +1,5 @@
 /**
- * i18n/index.ts — public barrel
+ * i18n/index.ts  public barrel
  *
  * Single import point for all i18n utilities.
  *
@@ -13,7 +13,7 @@
  *   import { LOCALES, DEFAULT_LOCALE } from '@/i18n/constants'
  */
 
-// Hooks + pure function — all from utils (safe import chain)
+// Hooks + pure function, all from utils (safe import chain)
 export {
   useTranslations,
   useLocale,
@@ -26,5 +26,5 @@ export {
   type Namespace,
 } from './utils';
 
-// Provider — needs to stay imported from LocaleContext directly in layout
+// Provider, needs to stay imported from LocaleContext directly in layout
 export { LocaleProvider } from './LocaleContext';

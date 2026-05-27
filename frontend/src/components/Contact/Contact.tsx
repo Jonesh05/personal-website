@@ -36,7 +36,7 @@ export default async function Contact() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">
 
-        {/* ── Section header ── */}
+        {/* Section header */}
         <header className="text-center mb-16">
           <p
             className="text-lg tracking-widest uppercase mb-3 pt-5"
@@ -59,17 +59,17 @@ export default async function Contact() {
             <span className="text-plasma">{t('heading_line2')}</span>
           </h2>
           <p
-            className="mt-4 max-w-md mx-auto text-sm"
+            className="mt-8 max-w-md mx-auto text-sm whitespace-pre-line"
             style={{ color: 'var(--color-text-muted)' }}
           >
             {t('subtitle')}
           </p>
         </header>
 
-        {/* ── Two-column layout ── */}
+        {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
 
-          {/* Left column — email-first contact card */}
+          {/* Left column email-first contact card */}
           <aside className="lg:col-span-2" aria-label={t('emailLabel')}>
             <CopyEmailCard
               email={EMAIL}
@@ -77,7 +77,7 @@ export default async function Contact() {
             />
           </aside>
 
-          {/* Right column — full contact form */}
+          {/* Right column full contact form */}
           <div className="lg:col-span-3">
             <ContactForm />
           </div>

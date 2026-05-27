@@ -5,7 +5,7 @@ import { TerminalIcon } from '@/components/ui/Icons';
 import { useTranslations } from '@/i18n';
 
 /**
- * About — bilingual (EN default, ES via navbar toggle).
+ * About (EN default, ES via navbar toggle).
  *
  * Translation scope (per product rules):
  *   • Section heading "About" → never translates (static key).
@@ -53,8 +53,6 @@ const About: React.FC = () => {
   const [showCursor, setShowCursor] = useState(true);
   const [displayedLines, setDisplayedLines] = useState<TerminalLine[]>([]);
 
-  // Reset the typewriter whenever the language (and therefore the sequence)
-  // changes, so the user never sees half-English / half-Spanish lines.
   useEffect(() => {
     setDisplayedLines([]);
     setCurrentLineIndex(0);
@@ -113,7 +111,7 @@ const About: React.FC = () => {
 
   const getLineColor = (type: LineType | undefined) => {
     switch (type) {
-      case 'command': return 'text-blue-400';
+      case 'command': return 'text-zinc-50';
       case 'success': return 'text-green-400';
       case 'error':   return 'text-red-400';
       case 'warning': return 'text-yellow-400';
@@ -127,7 +125,7 @@ const About: React.FC = () => {
         <div className="md:col-span-5 backdrop-blur-xs border-3 shadow-[4px_4px_0_rgba(0,0,0,1)] rounded-2xl p-6 flex flex-col transition-all duration-300 animate-slide-up bg-white dark:bg-gray-900">
           <div className="space-y-6">
             <div className="flex flex-wrap pb-6">
-              {/* "About" is a frozen term per product rules — rendered as a
+              {/* "About" is a frozen term per product rules rendered as a
                   literal so it never flips to another language. */}
               <h2
                 className={`px-4 py-2 rounded-full bg-primary-50 font-bold text-4xl transition text-center mb-6 shadow-lg ${gradientText} hover:text-cyan-400`}
@@ -135,8 +133,8 @@ const About: React.FC = () => {
                 About
               </h2>
             </div>
-            <p className="text-xl font-semibold text-slate-800 dark:text-zinc-50">{t('bio_1')}</p>
-            <p className="text-xl font-semibold text-slate-800 dark:text-zinc-50">{t('bio_2')}</p>
+            <p className="text-lg leading-relaxed text-slate-800 dark:text-zinc-50">{t('bio_1')}</p>
+            <p className="text-lg leading-relaxed text-slate-800 dark:text-zinc-50">{t('bio_2')}</p>
             <div className="flex flex-wrap gap-4 pb-6">
               {[t('role_1'), t('role_2'), t('role_3')].map(label => (
                 <span
@@ -160,7 +158,7 @@ const About: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-2 text-gray-400">
                   <TerminalIcon className="w-4 h-4" />
-                  <span className="text-sm font-mono">{t('terminal_heading_title')}</span>
+                  <span className="text-sm text-slate-800 dark:text-zinc-50 font-mono">{t('terminal_heading_title')}</span>
                 </div>
               </div>
 

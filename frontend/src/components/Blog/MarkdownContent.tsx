@@ -11,7 +11,7 @@ import { EditorialTable } from './editorial/Table'
 import { TableOfContents } from './editorial/TableOfContents'
 
 /**
- * MarkdownContent — the editorial renderer.
+ * MarkdownContent, the editorial renderer.
  *
  * This is intentionally not a generic Markdown engine. It targets the
  * exact constructs an editorial post needs:
@@ -203,7 +203,7 @@ function renderBlock(
   }
 }
 
-// ── Heading with anchor link ─────────────────────────────────────────────
+//  Heading with anchor link
 interface HeadingProps {
   level: 1 | 2 | 3 | 4
   text: string

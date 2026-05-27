@@ -8,13 +8,13 @@
 // failure (listmonk unreachable, misconfigured, etc.) is recorded internally
 // on the Firestore lead as `status: 'failed'` and logged, but never leaked
 // to the client. This follows "fail closed" only at the validation boundary
-// — after that, we own the signal and don't expose outages.
+// after that, we own the signal and don't expose outages.
 //
 // Lifecycle
 // ---------
-//   pending   — row exists in Firestore. Submission is captured even if
+//   pending    row exists in Firestore. Submission is captured even if
 //               listmonk is down.
-//   failed    — internal-only marker that provider delivery never happened,
+//   failed     internal-only marker that provider delivery never happened,
 //               used for alerting and manual replay. Never returned to user.
 // listmonk itself owns the real subscriber lifecycle (double opt-in,
 // confirmation, unsubscribe, bounces). We do NOT mirror `confirmed` here
@@ -38,7 +38,7 @@ export const runtime = 'nodejs'
 const RATE_LIMIT = { limit: 5, windowMs: 10 * 60_000 }
 
 export async function POST(req: NextRequest) {
-  // 1) Rate limit — cheap check, run before body parse.
+  // 1) Rate limit, cheap check, run before body parse.
   const clientKey = getRateLimitClientKey({
     visitorId: await getVisitorId(),
     request:   req,
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 2) Validate payload BEFORE anything else. Malformed or invalid email
-  //    addresses are rejected hard — we never want junk in the lead log.
+  //    addresses are rejected hard, we never want junk in the lead log.
   let raw: unknown
   try {
     raw = await req.json()
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
   const { email, source } = parsed.data
 
   // 4) Persist the lead first. If Firestore itself is unreachable we reject
-  //    hard — we have nothing durable to return a stable response against.
+  //    hard  we have nothing durable to return a stable response against.
   let leadId: string
   try {
     const created = await leads.createLead({ email, source })

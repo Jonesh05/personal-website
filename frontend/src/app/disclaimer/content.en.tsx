@@ -43,7 +43,7 @@ export function DisclaimerBodyEN() {
       <h2>Accuracy over time</h2>
       <p>
         Software moves fast. A pattern that was best-practice a year ago may
-        be outdated today. Each article displays its publication date — use
+        be outdated today. Each article displays its publication date, use
         it to weigh how current the recommendations still are.
       </p>
 

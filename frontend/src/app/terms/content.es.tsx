@@ -3,7 +3,7 @@ export function TermsBodyES() {
     <>
       <p>
         Al acceder a jhonnypimiento.com aceptas los términos siguientes. Son
-        intencionalmente breves. Si algo no queda claro, pregúntame — prefiero
+        intencionalmente breves. Si algo no queda claro, pregúntame, prefiero
         responder a que lo adivines.
       </p>
 

@@ -14,7 +14,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true
-      checkSession()          // returns Promise<void> — no cleanup needed
+      checkSession()          // returns Promise<void>  no cleanup needed
     }
     return () => {
       initializedRef.current = false

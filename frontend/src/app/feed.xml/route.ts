@@ -1,7 +1,7 @@
 import { getPosts, type Post } from '@/lib/firestore/posts'
 
 /**
- * /feed.xml — RSS 2.0 feed of the 20 most recent published posts.
+ * /feed.xml  RSS 2.0 feed of the 20 most recent published posts.
  *
  * The feed is built on-demand from Firestore (same source of truth as the
  * blog). We cache the response for one hour at the edge so feed readers
@@ -63,7 +63,7 @@ export async function GET(): Promise<Response> {
     posts = await getPosts({ published: true, limit: 20 })
   } catch (error) {
     console.error('[feed.xml] Failed to read posts from Firestore:', error)
-    // Serve an empty (but valid) feed rather than a 500 — RSS readers
+    // Serve an empty (but valid) feed rather than a 500  RSS readers
     // should never break for downstream outages.
   }
 
@@ -87,7 +87,7 @@ ${posts.map(renderItem).join('\n')}
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      // Edge/browser caching — max-age is short, s-maxage longer so CDNs
+      // Edge/browser caching, max-age is short, s-maxage longer so CDNs
       // serve the cached response for 1h before hitting Firestore again.
       'Cache-Control': 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400',
     },

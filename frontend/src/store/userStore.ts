@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * userStore — centralized client state for visitor-scoped interactions.
+ * userStore centralized client state for visitor-scoped interactions.
  *
  * Single source of truth for:
  *   - visitorId    (read from the `visitor-id` cookie set by middleware)

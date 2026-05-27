@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
     set({ loading: true, error: null })
     try {
       // Admin identity is enforced server-side in /api/auth/login against the
-      // ADMIN_EMAILS env allow-list. No account hint is set here — leaking a
+      // ADMIN_EMAILS env allow-list. No account hint is set here leaking a
       // specific email into the client bundle is avoided on purpose.
       const provider = new GoogleAuthProvider()
       provider.addScope('email')

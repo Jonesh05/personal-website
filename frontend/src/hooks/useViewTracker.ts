@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useUserStore } from '@/store/userStore'
 
 /**
- * useViewTracker — fires exactly one view-tracking request per mount.
+ * useViewTracker, fires exactly one view-tracking request per mount.
  *
  * Dedup happens on the server (per visitor per UTC day). The client-side guard
  * here just prevents duplicate pings caused by React Strict Mode double-mounts

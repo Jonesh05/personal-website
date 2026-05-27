@@ -86,7 +86,7 @@ export function BlogPostContent({ post }: Props) {
     [post.readingTime, post.content]
   )
 
-  // Canonical share URL — prefers the configured site URL so shared links
+  // Canonical share URL prefers the configured site URL so shared links
   // always point to production even if a visitor shares while on staging.
   const [shareUrl, setShareUrl] = useState<string>('')
   useEffect(() => {
@@ -182,7 +182,7 @@ export function BlogPostContent({ post }: Props) {
             </div>
           </header>
 
-          {/* Cover image — stretches across the main column */}
+          {/* Cover image stretches across the main column */}
           {coverImage && (
             <figure className="mb-12 max-w-4xl overflow-hidden rounded-2xl
               ring-1 ring-slate-200 bg-slate-100 dark:ring-gray-800 dark:bg-gray-900">

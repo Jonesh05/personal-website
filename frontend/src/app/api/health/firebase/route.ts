@@ -61,7 +61,7 @@ export async function GET() {
   const env = checkEnvPresence()
 
   // Short-circuit: if any required server-side credential is missing, don't
-  // even try to import the admin module — we already know it will throw.
+  // even try to import the admin module, we already know it will throw.
   const missingCreds =
     !env.FIREBASE_PROJECT_ID ||
     !env.FIREBASE_CLIENT_EMAIL ||

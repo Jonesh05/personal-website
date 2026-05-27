@@ -18,7 +18,7 @@ interface Props {
  * hosts (S3, Supabase, Unsplash, hand-uploaded), and routing them through
  * next/image would force authors to update next.config.js every time a
  * new domain shows up. The hero/cover image at the top of the article
- * still uses next/image — that one's known and curated.
+ * still uses next/image, that one's known and curated.
  */
 export function Figure({ src, alt, caption, idx }: Props) {
   return (

@@ -13,7 +13,7 @@ name: listmonk
 
 services:
   # ------------------------------------------------------------------
-  # PostgreSQL — local profile only.
+  # PostgreSQL local profile only.
   # On Railway, attach a Postgres add-on and skip this service.
   # ------------------------------------------------------------------
   db:

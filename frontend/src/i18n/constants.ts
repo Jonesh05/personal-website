@@ -2,7 +2,7 @@
  * i18n/constants.ts
  *
  * Single source of truth for locale config.
- * NO imports — pure constants only.
+ * NO imports, pure constants only.
  * Safe to import from Server Components, Client Components, and middleware.
  *
  * Dependency graph BEFORE fix:

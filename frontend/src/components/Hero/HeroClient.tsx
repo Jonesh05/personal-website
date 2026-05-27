@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * HeroClient.tsx — Client Component
+ * HeroClient.tsx Client Component
  * Handles: typewriter role animation, scroll-based CTA
  *
  * Phase 3.1 extract: only interactive logic lives here.

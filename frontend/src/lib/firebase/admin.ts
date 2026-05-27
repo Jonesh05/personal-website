@@ -72,7 +72,7 @@ function stripQuotes(value: string): string {
 }
 
 function normalizePrivateKey(raw: string): string {
-  // Strip wrapping quotes first — Vercel's UI sometimes keeps them on paste,
+  // Strip wrapping quotes first Vercel's UI sometimes keeps them on paste,
   // which leaves the outer `"…"` inside the value and corrupts the PEM.
   const unquoted = stripQuotes(raw)
   // Vercel, GitHub Actions, and most CI systems escape real newlines as `\n`
@@ -90,7 +90,7 @@ function parseServiceAccount(raw: string): ServiceAccountJson {
     try {
       jsonText = Buffer.from(unquoted, 'base64').toString('utf8')
     } catch {
-      // fall through — let the JSON.parse below surface the real error
+      // fall through, let the JSON.parse below surface the real error
     }
   }
 
@@ -227,7 +227,7 @@ function initialize(): AdminBundle {
   return cached
 }
 
-// Lazy proxies — the underlying SDK is only initialized on first property
+// Lazy proxies, the underlying SDK is only initialized on first property
 // access. Module import is always cheap, which is what keeps the build from
 // crashing on routes whose env is not fully populated at build time.
 function lazyProxy<T extends object>(getTarget: () => T): T {

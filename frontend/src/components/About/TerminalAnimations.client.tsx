@@ -77,7 +77,7 @@ export default function TerminalAnimations() {
 
   const getLineColor = (type: string) => {
     switch (type) {
-      case 'command': return 'text-blue-400';
+      case 'command': return 'text-zinc-50';
       case 'success': return 'text-green-400';
       case 'error': return 'text-red-400';
       case 'warning': return 'text-yellow-400';

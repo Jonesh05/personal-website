@@ -1,16 +1,3 @@
-/**
- * Footer data — source of truth for every link that appears in the site footer.
- *
- * Rules we follow here:
- *   1. Every internal href in this file MUST resolve to a real route inside
- *      `src/app`. We don't link to placeholder pages because broken links
- *      erode trust and hurt SEO.
- *   2. External links live at their canonical URLs with https:// and no
- *      trailing slash.
- *   3. Contact uses the on-page anchor (`/#contact`) so visitors jump
- *      directly to the form without a full navigation.
- */
-
 export const footerData = {
     brand: {
         name: "Jhonny Pimiento",

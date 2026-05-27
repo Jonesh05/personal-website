@@ -18,10 +18,10 @@ const en = {
     subtitle:    'AWS Cloud Architect',
   },
   About: {
-    section_label: '— About me',
+    section_label: 'About me',
     heading:       "Hi, I'm Jhonny 👋",
     bio_1:         "Colombian entrepreneur with a passion for Web3 and blockchain technology. With a background in full-stack development, I specialize in creating innovative solutions that leverage the power of decentralized technologies.",
-    bio_2:         "I'm a Cybersecurity Engineering student. My journey in tech started with traditional web development, but I quickly found my passion in the decentralized space. I keep exploring Web3 — from DeFi apps to NFTs and beyond.",
+    bio_2:         "I'm a Cybersecurity Engineering student. My journey in tech started with traditional web development, but I quickly found my passion in the decentralized space. I keep exploring Web3, from DeFi apps to NFTs and beyond.",
     role_1:        'Full Stack Developer',
     role_2:        'DevRel',
     role_3:        'Web3 Enthusiast',
@@ -35,10 +35,10 @@ const en = {
     terminal_error:            'ERROR [Code: 0xE45F]',
   },
   Projects: {
-    section_label:  '— Selected Work',
+    section_label:  'Selected Work',
     heading_line1:  'Projects that',
     heading_line2:  'push boundaries',
-    subtitle:       'A selection of my work in Web3, AI, and frontend engineering.',
+    subtitle:       'A selection of my work in Web3, AI, and frontend engineering',
     view_all:       'View all on GitHub',
     filter_all:     'All',
     filter_web:     'Web',
@@ -52,32 +52,34 @@ const en = {
     error:          'Could not load projects.',
   },
   Timeline: {
-    section_label: '— My Journey',
+    section_label: 'My Journey',
     heading:       'The road so far',
-    subtitle:      'Milestones from systems engineering and Blockchain to AI, quantum research, and Web3 product work.',
+    subtitle:       `Exploring and building across cybersecurity engineering, AI,
+                    blockchain, quantum research, and Web3 products`,
     now_badge:     'Now',
-    // Category labels — shown above each title.
+    // Category labels shown above each title.
     cat_foundations: 'Foundations',
     cat_career:      'Career',
     cat_product:     'Product',
     cat_research:    'Research',
     cat_current:     'Current',
-    // Per-entry descriptions. Titles are NOT translated — see
+    // Per-entry descriptions. Titles are NOT translated see
     // `timeline.data.ts` for the frozen English titles.
-    entry_2020_desc: 'Shipped my first production web systems and learned the fundamentals of architecture, APIs, and frontend performance by building real products end-to-end.',
-    entry_2021_desc: 'Went deeper into cloud architecture on AWS — infrastructure-as-code, serverless, and fault-tolerant backends for growing product teams.',
-    entry_2022_desc: 'Started building on-chain. Shipped DeFi integrations, smart contracts, and NFT infrastructure with a focus on security and developer experience.',
-    entry_2023_desc: 'Launched multiple Web3 products and prototypes, including hackathon-winning entries in supply-chain traceability and regenerative finance.',
-    entry_2024_desc: 'Began research in quantum computing and its intersection with cryptography, optimization, and machine-learning workloads.',
-    entry_2025_desc: 'Now shipping the intersection of AI, Web3, and ReFi — production systems that pair intelligent automation with on-chain rails.',
+    entry_2021_desc: 'Shipped my first production web systems and learned the fundamentals of architecture, APIs, and frontend performance by building real products end-to-end.',
+    entry_2022_desc: 'Went deeper into cloud architecture on AWS infrastructure-as-code, serverless, and fault-tolerant backends for growing product teams.',
+    entry_2023_desc: 'Started building on-chain. Shipped DeFi integrations, smart contracts, and NFT infrastructure with a focus on security and developer experience.',
+    entry_2024_desc: 'Launched multiple Web3 products and prototypes, including hackathon-winning entries in supply-chain traceability and regenerative finance.',
+    entry_2025_desc: 'Began research in quantum computing and its intersection with cryptography, optimization, and machine-learning workloads.',
+    entry_2026_desc: 'Now shipping the intersection of AI, Web3, and ReFi production systems that pair intelligent automation with on-chain rails.',
     // Legacy key kept for any older consumers; prefer `now_badge` going forward.
     entry_current_label: 'Current',
   },
   Contact: {
-    section_label:   '— Get In Touch',
+    section_label:   'Get In Touch',
     heading_line1:   "Let's build something",
     heading_line2:   'together',
-    subtitle:        "Have a project in mind or just want to connect? Send a message and I'll get back to you.",
+    subtitle:        `Building across AI, Web3, and applied research
+                      Open to interesting conversations`,
     chat_cta:        'Want to chat? Feel free to reach out',
     via_email_label: 'Via Email',
     ask_heading:     'Ask questions',
@@ -106,7 +108,7 @@ const en = {
     copyEmailAria:       'Copy email address:',
     sendEmailAria:       'Send email to:',
     emailCopied:         'Email copied to clipboard',
-    emailCopiedAndOpening: 'Email copied — opening your mail app…',
+    emailCopiedAndOpening: 'Email copied, opening your mail app…',
     emailCopyError:      'Could not copy the email. You can still click to send.',
   },
   Footer: {
@@ -116,8 +118,9 @@ const en = {
     connect:    'Connect',
   },
   Blog: {
-    title: 'Blog',
-    subtitle: 'Technical insights on Web3, blockchain development, cloud architecture, and the latest technology trends.',
+    section_label:   'Blog',
+    title: 'Latest Articles',
+    subtitle: 'Technical insights on Web3, blockchain development, cloud architecture, and the latest technology trends',
     adminAccessHint: 'Double click for admin access',
     showingResultsFor: 'Showing results for:',
     clearFilters: 'Clear filters',
@@ -140,7 +143,7 @@ const en = {
     newsletterEmailPlaceholder: 'you@email.com',
     newsletterSubscribe: 'Subscribe',
     newsletterSubmitting: 'Subscribing…',
-    newsletterSuccess: 'You\'re in — check your inbox to confirm.',
+    newsletterSuccess: 'You\'re in, check your inbox to confirm.',
     newsletterError: 'Subscription failed. Please try again in a moment.',
     newsletterInvalidEmail: 'Please enter a valid email.',
     newsletterNoSpam: 'No spam. Quality content only.',
@@ -238,7 +241,7 @@ const en = {
     termsSubtitle: 'The rules of the road for using this site and its content.',
     disclaimerEyebrow: 'Disclaimer',
     disclaimerTitle: 'Disclaimer',
-    disclaimerSubtitle: 'What this site is — and what it is not.',
+    disclaimerSubtitle: 'What this site is and what it is not.',
   },
   Work: {
     eyebrow: 'Work',
@@ -254,25 +257,19 @@ const en = {
   },
   AboutPage: {
     eyebrow: 'About',
-    title: 'Building software that respects attention.',
+    title: 'Building software that respects attention',
     subtitle:
-      "I'm Jhonny — a developer focused on building web systems that are fast, honest, and pleasant to use.",
+      "I’m Jhonny. I build web, AI, and Web3 products with precision and thoughtful design",
     sectionWhat: 'What I do',
     sectionHow: 'How I work',
     sectionStack: 'The stack I reach for',
     contactCtaHeading: 'Working on something interesting?',
     contactCtaBody:
-      "Short projects, product rebuilds, audits, blockchain integrations — happy to chat. The fastest channel is email.",
+      "Short projects, product rebuilds, audits, blockchain integrations, happy to chat. The fastest channel is email.",
     contactCtaAction: 'Say hello',
   },
 } as const;
 
-/**
- * `Translations` is the shape every locale must satisfy. We widen literal
- * string types to plain `string` so non-English locales can supply their
- * own copy without TypeScript rejecting "Hogar" because it is not "Home".
- * The widening is structural — missing keys are still caught.
- */
 export type Translations = {
   readonly [N in keyof typeof en]: {
     readonly [K in keyof (typeof en)[N]]: string;

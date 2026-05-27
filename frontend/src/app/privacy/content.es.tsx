@@ -2,7 +2,7 @@ export function PrivacyBodyES() {
   return (
     <>
       <p>
-        Este sitio pertenece a Jhonny Pimiento — un único autor independiente.
+        Este sitio pertenece a Jhonny Pimiento, un único autor independiente.
         El objetivo de esta política es describir, en lenguaje claro, qué
         datos se recopilan, por qué y cómo se manejan.
       </p>

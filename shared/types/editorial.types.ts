@@ -1,5 +1,5 @@
 /**
- * Editorial renderer types — shared between the parser, the renderer, and
+ * Editorial renderer types, shared between the parser, the renderer, and
  * any tooling (linters, preview shells, exporters) that needs to reason
  * about parsed post content.
  *

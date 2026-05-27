@@ -1,11 +1,8 @@
 import type { Translations } from './en';
 
-/**
- * Spanish translations — locale por defecto
- */
 const es: Translations = {
   Navbar: {
-    Home:     'Hogar',
+    Home:     'Home',
     Projects: 'Proyectos',
     Timeline: 'Cronología',
     Blog:     'Blog',
@@ -19,10 +16,10 @@ const es: Translations = {
     subtitle:    'Arquitecto Cloud AWS',
   },
   About: {
-    section_label: '— Sobre mí',
+    section_label: 'Sobre mí',
     heading:       'Hola, soy Jhonny 👋',
     bio_1:         'Emprendedor colombiano apasionado por Web3 y la tecnología Blockchain. Con experiencia en desarrollo full-stack, me especializo en crear soluciones innovadoras que aprovechan el poder de las tecnologías descentralizadas.',
-    bio_2:         'Soy estudiante de Ingeniería en Ciberseguridad. Mi camino en tecnología comenzó con el desarrollo web tradicional, pero rápidamente encontré mi pasión en el espacio descentralizado. Sigo explorando Web3 — desde aplicaciones DeFi hasta NFTs y más allá.',
+    bio_2:         'Soy estudiante de Ingeniería en Ciberseguridad. Mi camino en tecnología comenzó con el desarrollo web tradicional, pero rápidamente encontré mi pasión en el espacio descentralizado. Sigo explorando Web3, desde aplicaciones DeFi hasta NFTs y más allá.',
     role_1:        'Desarrollador Full Stack',
     role_2:        'DevRel',
     role_3:        'Entusiasta Web3',
@@ -36,10 +33,11 @@ const es: Translations = {
     terminal_error:            'ERROR [Código: 0xE45F]',
   },
   Projects: {
-    section_label:  '— Trabajo Selecto',
+    section_label:  'Trabajos Realizados',
     heading_line1:  'Proyectos que',
     heading_line2:  'rompen límites',
-    subtitle:       'Una selección de mis trabajos en Web3, IA y desarrollo frontend.',
+    subtitle:        `Una selección de mis trabajos en Web3, IA
+                      y desarrollo frontend`,
     view_all:       'Ver todos en GitHub',
     filter_all:     'Todos',
     filter_web:     'Web',
@@ -48,33 +46,34 @@ const es: Translations = {
     featured_badge: '★ Destacado',
     link_github:    'GitHub',
     link_demo:      'Demo',
-    link_live:      'En vivo',
+    link_live:      'Live',
     loading:        'Cargando proyectos…',
     error:          'No se pudieron cargar los proyectos.',
   },
   Timeline: {
-    section_label: '— Mi trayectoria',
+    section_label: 'Mi trayectoria',
     heading:       'El camino recorrido',
-    subtitle:      'Hitos desde la ingeniería de sistemas y Blockchain hasta AI, investigación cuántica y producto Web3.',
+    subtitle:      'Explorando y construyendo con ingeniería en ciberseguridad, AI, blockchain, investigación cuántica y productos Web3',
     now_badge:     'Ahora',
     cat_foundations: 'Fundamentos',
     cat_career:      'Carrera',
     cat_product:     'Producto',
     cat_research:    'Investigación',
     cat_current:     'Actualidad',
-    entry_2020_desc: 'Entregué mis primeros sistemas web en producción y aprendí los fundamentos de arquitectura, APIs y rendimiento de frontend construyendo productos reales de punta a punta.',
-    entry_2021_desc: 'Profundicé en arquitectura cloud sobre AWS — infraestructura como código, serverless y backends tolerantes a fallos para equipos de producto en crecimiento.',
-    entry_2022_desc: 'Comencé a construir on-chain. Entregué integraciones DeFi, smart contracts e infraestructura NFT con foco en seguridad y experiencia de desarrollador.',
-    entry_2023_desc: 'Lancé varios productos y prototipos Web3, incluidos proyectos ganadores en hackathones sobre trazabilidad de cadena de suministro y finanzas regenerativas.',
-    entry_2024_desc: 'Empecé a investigar computación cuántica y su intersección con criptografía, optimización y cargas de trabajo de machine learning.',
-    entry_2025_desc: 'Actualmente entrego la intersección entre AI, Web3 y ReFi — sistemas de producción que combinan automatización inteligente con rieles on-chain.',
+    entry_2021_desc: 'Realicé mis primeros aplicaciones web en producción y aprendí los fundamentos de arquitectura, APIs y rendimiento de frontend construyendo productos reales de punta a punta.',
+    entry_2022_desc: 'Profundicé en arquitectura cloud sobre AWS infraestructura como código, serverless y backends tolerantes a fallos para equipos de producto en crecimiento.',
+    entry_2023_desc: 'Comencé a construir on-chain. Entregué integraciones DeFi, smart contracts e infraestructura NFT con foco en seguridad y experiencia de desarrollador.',
+    entry_2024_desc: 'Lancé varios productos y prototipos Web3, incluidos proyectos ganadores en hackathones sobre trazabilidad de cadena de suministro y finanzas regenerativas.',
+    entry_2025_desc: 'Empecé a investigar computación cuántica y su intersección con criptografía, optimización y cargas de trabajo de machine learning.',
+    entry_2026_desc: 'Actualmente entrego la intersección entre AI, Web3 y ReFi sistemas de producción que combinan automatización inteligente con rieles on-chain y agentes de IA.',
     entry_current_label: 'Actual',
   },
   Contact: {
-    section_label:   '— Contáctame',
+    section_label:   'Contáctame',
     heading_line1:   'Construyamos algo',
     heading_line2:   'juntos',
-    subtitle:        '¿Tienes un proyecto en mente o simplemente quieres conectar? Envíame un mensaje y te responderé pronto.',
+    subtitle:         `Construyendo entre AI, Web3 e investigación aplicada
+                      Siempre abierto a conversaciones interesantes`,
     chat_cta:        '¿Quieres charlar? No dudes en escribirme',
     via_email_label: 'Por Email',
     ask_heading:     'Haz preguntas',
@@ -103,7 +102,7 @@ const es: Translations = {
     copyEmailAria:       'Copiar dirección de correo:',
     sendEmailAria:       'Enviar correo a:',
     emailCopied:         'Correo copiado al portapapeles',
-    emailCopiedAndOpening: 'Correo copiado — abriendo tu aplicación de email…',
+    emailCopiedAndOpening: 'Correo copiado, abriendo tu aplicación de email…',
     emailCopyError:      'No se pudo copiar el correo. Aún puedes hacer clic para enviar.',
   },
   Footer: {
@@ -113,8 +112,9 @@ const es: Translations = {
     connect:    'Conectar',
   },
   Blog: {
-    title: 'Blog',
-    subtitle: 'Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube y las últimas tendencias en tecnología.',
+    section_label:   'Blog',
+    title: 'Últimos Artículos',
+    subtitle: 'Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube y las últimas tendencias en tecnología',
     adminAccessHint: 'Doble clic para acceso admin',
     showingResultsFor: 'Mostrando resultados para:',
     clearFilters: 'Limpiar filtros',
@@ -235,7 +235,7 @@ const es: Translations = {
     termsSubtitle: 'Las reglas para usar este sitio y su contenido.',
     disclaimerEyebrow: 'Aviso legal',
     disclaimerTitle: 'Aviso legal',
-    disclaimerSubtitle: 'Lo que es este sitio — y lo que no es.',
+    disclaimerSubtitle: 'Lo que es este sitio y lo que no es.',
   },
   Work: {
     eyebrow: 'Trabajo',
@@ -251,15 +251,15 @@ const es: Translations = {
   },
   AboutPage: {
     eyebrow: 'Sobre mí',
-    title: 'Construyo software que respeta la atención del usuario.',
+    title: 'Construyo software que respeta la atención del usuario',
     subtitle:
-      'Soy Jhonny — un desarrollador enfocado en construir sistemas web rápidos, honestos y agradables de usar.',
+      'Soy Jhonny. Construyo productos web, AI y Web3 con precisión y buen diseño',
     sectionWhat: 'Qué hago',
     sectionHow: 'Cómo trabajo',
     sectionStack: 'El stack que uso',
     contactCtaHeading: '¿Trabajas en algo interesante?',
     contactCtaBody:
-      'Proyectos cortos, rediseños de producto, auditorías, integraciones blockchain — encantado de hablar. El canal más rápido es el correo.',
+      'Proyectos cortos, rediseños de producto, auditorías, integraciones blockchain, encantado de hablar. El canal más rápido es el correo.',
     contactCtaAction: 'Saluda',
   },
 };

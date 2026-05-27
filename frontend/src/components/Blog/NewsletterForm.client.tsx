@@ -87,7 +87,7 @@ export default function NewsletterForm({ source = 'blog-sidebar' }: { source?: s
           placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
           focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
       />
-      {/* Honeypot — visually hidden, auto-filled by bots. */}
+      {/* Honeypot visually hidden, auto-filled by bots. */}
       <input
         type="text"
         name="website"

@@ -1,5 +1,5 @@
 // frontend/src/lib/mailer/smtp.ts
-// Plain SMTP driver via nodemailer. Preferred default — works with any
+// Plain SMTP driver via nodemailer. Preferred default, works with any
 // self-hosted/open-source relay (Postfix, Haraka, the SMTP that ships with
 // listmonk's host, etc.) so we don't depend on a paid provider for the
 // site's transactional channel.

@@ -114,8 +114,8 @@ export default function NavbarMobile({ navLinks, socialLinks, children }: Navbar
               backdrop-blur-xl shadow-2xl p-6">
             <nav aria-label="Mobile Navigation">
               <ul className="flex flex-col gap-4 justify-center items-center">
-                {navLinks.map(({ name, href }, idx) => (
-                   <li key={idx}>
+                {navLinks.map(({ name, href }, idx) => (                 
+                  <li key={idx}>
                     <Link
                       href={href}
                       onClick={handleMobileLinkClick}
@@ -123,8 +123,8 @@ export default function NavbarMobile({ navLinks, socialLinks, children }: Navbar
                         transition-all duration-300 ease-out text-center py-2 px-4 rounded-lg hover:bg-white/10"
                     >
                       {name}
-                    </Link>
-                   </li> 
+                    </Link>                   
+                  </li> 
                 ))}
               </ul>
             </nav>

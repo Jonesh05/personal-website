@@ -7,16 +7,16 @@
 // user-facing response is deterministic: `200 { ok: true, id }`. A failing
 // mailer (Resend outage, bad config, etc.) is recorded on the Firestore
 // record as `status: 'failed'` for internal follow-up; it is never exposed
-// as a hard failure to the visitor. The message is durable — we own the
+// as a hard failure to the visitor. The message is durable, we own the
 // signal from that point on.
 //
 // Lifecycle
 // ---------
-//   received  — row exists. Nothing has been sent yet.
-//   delivered — notification email went out successfully.
-//   failed    — internal-only marker that delivery could not be completed;
-//               the admin follows up manually from the Firestore record.
-//   handled   — set manually by admin once follow-up is done.
+//   received   row exists. Nothing has been sent yet.
+//   delivered  notification email went out successfully.
+//   failed     internal-only marker that delivery could not be completed;
+//              the admin follows up manually from the Firestore record.
+//   handled    set manually by admin once follow-up is done.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { ContactFormSchema } from '@personal-website/shared/schemas/contact.schema'
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
   // 1) Persist first. Firestore is the durable record; email is just a
   //    notification channel. If Firestore itself is unreachable we reject
-  //    hard — there's nothing to follow up on otherwise.
+  //    hard  there's nothing to follow up on otherwise.
   let contactId: string
   try {
     const created = await contactsDb.createContact(parsed.data)
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       email:   parsed.data.email,
       message: parsed.data.message,
     })
-    // Best-effort status update — a failure here is cosmetic (the email did
+    // Best-effort status update, a failure here is cosmetic (the email did
     // go out). Swallow so the user response stays stable.
     try {
       await contactsDb.updateContactStatus(contactId, 'delivered')
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
       logError('firestore_mark_delivered_failed', updateErr)
     }
   } catch (err) {
-    // Provider outage — track internally, don't leak. The message is already
+    // Provider outage, track internally, don't leak. The message is already
     // persisted; admin will see `status: failed` and can reach out by hand.
     logError('mailer_send_failed', err)
     try {

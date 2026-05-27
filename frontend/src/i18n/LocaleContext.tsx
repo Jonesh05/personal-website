@@ -90,7 +90,7 @@ export function LocaleProvider({
 }: LocaleProviderProps) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const router = useRouter();
-  // Track the first effect so we don't `router.refresh()` on initial mount —
+  // Track the first effect so we don't `router.refresh()` on initial mount,
   // server components are already rendered with the correct locale from the
   // cookie on first paint.
   const firstRunRef = useRef(true);

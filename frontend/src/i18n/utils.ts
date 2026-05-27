@@ -17,12 +17,12 @@
  *         AFTER:  useMemo for section, t() reads from the memoized section
  *                 always in sync with current locale
  *
- * [FIX-3] Static keys — some words should NEVER translate (brand names,
+ * [FIX-3] Static keys  some words should NEVER translate (brand names,
  *         tech terms, internationally-recognized labels).
  *         Words in STATIC_KEYS always return the English value regardless
  *         of active locale.
  *
- * [FIX-4] getTranslations() — pure function (no hooks) for Server Components
+ * [FIX-4] getTranslations()  pure function (no hooks) for Server Components
  *         and utility files that need translations outside React tree.
  */
 
@@ -40,14 +40,14 @@ export { LOCALES, DEFAULT_LOCALE, LOCALE_KEY, LOCALE_TO_HREFLANG, type Locale }
 // Re-export hook
 export { useLocale } from './LocaleContext';
 
-// ── Dictionary registry ────────────────────────────────────────────────────
+//  Dictionary registry 
 const dictionaries = { en, es } as const;
 type DictLocale = keyof typeof dictionaries;
 
-// ── Static keys — always return English value regardless of locale ─────────
+//  Static keys  always return English value regardless of locale 
 // These are the "do not translate" terms enforced across the site. They fall
 // into two buckets:
-//   1. Tech / brand nouns — already English in every language (Blockchain,
+//   1. Tech / brand nouns, already English in every language (Blockchain,
 //      Web3, GitHub, TypeScript, etc.). We freeze them so a translator cannot
 //      accidentally localise them.
 //   2. Navigation anchors the product copy explicitly requires to stay
@@ -89,13 +89,12 @@ function resolve(
   return section[key] ?? (en[namespace] as Record<string, string>)[key] ?? key;
 }
 
-// ── useTranslations — Client Component hook ───────────────────────────────
 /**
  * useTranslations<N extends Namespace>(namespace: N)
  *
  * Returns a memoized `t(key)` function via useMemo ("use memory").
  * Recomputes only when locale or namespace changes.
- * Works on ALL routes — home, blog, blog/[slug], etc.
+ * Works on ALL routes home, blog, blog/[slug], etc.
  *
  * @example
  *   const t = useTranslations('Contact')
@@ -105,7 +104,7 @@ function resolve(
 export function useTranslations<N extends Namespace>(namespace: N) {
   const { locale } = useLocale();
 
-  // FIX-2: useMemo — section AND t() both memoized, recompute only on
+  // FIX-2: useMemo, section AND t() both memoized, recompute only on
   //         locale/namespace change. No stale closure across route changes.
   const t = useMemo(() => {
     return (key: string): string => resolve(locale as DictLocale, namespace, key);
@@ -114,7 +113,7 @@ export function useTranslations<N extends Namespace>(namespace: N) {
   return t;
 }
 
-// ── getTranslations — pure function for Server Components ─────────────────
+// getTranslations pure function for Server Components 
 /**
  * getTranslations(locale, namespace)
  *
@@ -131,5 +130,5 @@ export function getTranslations(locale: string, namespace: Namespace) {
   return (key: string): string => resolve(safe, namespace, key);
 }
 
-// Type helper — kept for external consumers that use Namespace type
+// Type helper kept for external consumers that use Namespace type
 export type { Namespace };

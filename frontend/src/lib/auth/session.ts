@@ -1,14 +1,3 @@
-// frontend/src/lib/auth/session.ts
-// Server-side admin session utilities built on Firebase Admin SDK.
-//
-// Identity rules (production-safe):
-//   • Admin allow-list comes from the server-only `ADMIN_EMAILS` env var.
-//   • NO hardcoded fallback. NO `NEXT_PUBLIC_*` source — admin emails must
-//     never ship in the client bundle.
-//   • If `ADMIN_EMAILS` is empty, ALL admin checks fail closed; login is
-//     impossible. We log a clear error once at module load so the misconfig
-//     is loud in server logs (Vercel / container).
-
 import 'server-only'
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebase/admin'
@@ -25,7 +14,7 @@ const ADMIN_EMAILS: ReadonlyArray<string> = (() => {
 
   if (list.length === 0) {
     console.error(
-      '[auth/session] ADMIN_EMAILS is empty — admin login is disabled. ' +
+      '[auth/session] ADMIN_EMAILS is empty, admin login is disabled. ' +
         'Set ADMIN_EMAILS (comma-separated) in the server environment.',
     )
   }

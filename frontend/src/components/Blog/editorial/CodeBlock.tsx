@@ -35,7 +35,7 @@ export function CodeBlock({ lang, code, title }: Props) {
       setCopied(true)
       setTimeout(() => setCopied(false), 1600)
     } catch {
-      // clipboard blocked — silently no-op
+      // clipboard blocked, silently no-op
     }
   }
 

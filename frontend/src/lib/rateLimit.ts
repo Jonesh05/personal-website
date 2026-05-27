@@ -1,16 +1,3 @@
-// frontend/src/lib/rateLimit.ts
-// Lightweight, zero-dependency rate limiter for public API routes.
-//
-// Design notes
-// ------------
-// • Fixed-window counter keyed by (route + client identifier). Simpler than
-//   a token bucket and good enough to bound abuse on a personal-scale site.
-// • In-memory Map storage. On Vercel serverless, state is per warm instance,
-//   so a determined attacker could rotate across instances — accepted for
-//   Phase 1. Swap this module for Upstash/Redis when cross-instance
-//   consistency is required; route handlers do not need to change.
-// • Server-only. Never import from client code.
-
 import 'server-only'
 
 export interface RateLimitResult {

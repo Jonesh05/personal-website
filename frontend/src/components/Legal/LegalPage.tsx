@@ -4,7 +4,7 @@ import { formatDateByLocale } from '@/utils/formatDate'
 import type { Locale } from '@/i18n/constants'
 
 /**
- * LegalPage — shared chrome for static informational pages (Privacy, Terms,
+ * LegalPage, shared chrome for static informational pages (Privacy, Terms,
  * Disclaimer, About, Work, etc.). Centralising the layout here guarantees:
  *
  *   • Consistent spacing, typography and scroll behaviour across every static
@@ -25,7 +25,7 @@ export interface LegalPageProps {
    */
   updatedAt?: Date | string
   locale?: Locale
-  /** Optional "updated on" label — defaults to English/Spanish from locale. */
+  /** Optional "updated on" label, defaults to English/Spanish from locale. */
   updatedLabel?: string
   /** Back link shown in the breadcrumb row. Defaults to the home page. */
   backHref?: string
@@ -55,7 +55,7 @@ export function LegalPage({
       className="relative min-h-screen overflow-hidden pb-28 pt-28"
       style={{ background: 'var(--color-surface)' }}
     >
-      {/* Ambient plasma — matches the hero/contact visual language */}
+      {/* Ambient plasma matches the hero/contact visual language */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="absolute -top-40 left-[10%] h-[420px] w-[420px] rounded-full opacity-[0.18]"
@@ -150,7 +150,7 @@ export function LegalPage({
 }
 
 /**
- * Prose — scoped typographic styles for static informational pages.
+ * Prose scoped typographic styles for static informational pages.
  * Uses Tailwind's arbitrary child selectors so we don't depend on
  * @tailwindcss/typography and can match the site's custom type tokens.
  */

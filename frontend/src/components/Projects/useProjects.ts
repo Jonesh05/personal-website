@@ -13,14 +13,8 @@ const getFeaturedProjects = (projects: Project[]): Project[] => {
 };
 
 /**
- * PROJECTS_DATA — the single source of truth for the Projects section.
- *
- * Rules enforced by the shape:
- *   • `title` is a plain string → authored in English; never translated.
- *   • `description` is a `{ en, es }` record → both languages live side-by-side
- *     so the component can pick the right variant based on the active locale.
- *   • Category names (`web`, `blockchain`, `AI/ML`) are identifiers, not
- *     copy. They travel through the i18n layer only for display labels (see
+ * PROJECTS_DATA the single source of truth for the Projects section.
+  layer only for display labels (see
  *     `ProjectsPresentational`).
  */
 const PROJECTS_DATA: ProjectsData = {

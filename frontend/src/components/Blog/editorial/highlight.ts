@@ -1,7 +1,7 @@
 /**
  * Minimal, dependency-free syntax highlighter.
  *
- * Designed for editorial code blocks — tens to a few hundred lines, not
+ * Designed for editorial code blocks tens to a few hundred lines, not
  * full IDE buffers. We tokenize with priority-ordered regex (comments
  * first, then strings, then keywords/numbers/identifiers) so that
  * comments and strings always win over inner keywords.
@@ -80,7 +80,7 @@ function makeJsRules(): Rule[] {
     { type: 'string', re: /`(?:\\.|[^\\`])*`/y },
     { type: 'string', re: /"(?:\\.|[^\\"\n])*"/y },
     { type: 'string', re: /'(?:\\.|[^\\'\n])*'/y },
-    // Regex literal — heuristic: must follow `=,({[!&|?:;` or start
+    // Regex literal heuristic: must follow `=,({[!&|?:;` or start
     { type: 'regex', re: /\/(?:\\.|[^\\/\n])+\/[gimsuy]*/y },
     { type: 'number', re: /\b(?:0x[0-9a-fA-F_]+|0b[01_]+|0o[0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?n?)\b/y },
     { type: 'keyword', re: /\b[A-Za-z_$][A-Za-z0-9_$]*\b/y },
@@ -228,7 +228,7 @@ export function tokenize(code: string, lang: string): Token[] {
     flushPending()
 
     // Identifier refinement (e.g. JS "keyword" rule actually catches all
-    // identifiers — narrow it down to keyword/builtin/type/function/plain).
+    // identifiers, narrow it down to keyword/builtin/type/function/plain).
     if (matched.type === 'keyword' && (keywords || builtins)) {
       const next = code[i + matched.value.length]
       const refined = refineIdentifier(matched.value, next, keywords, builtins)

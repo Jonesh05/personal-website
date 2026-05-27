@@ -31,7 +31,6 @@ const ProjectsContainer = () => {
     );
   }
 
-  // 3. Render del presentational con datos garantizados no-null
   return (
     <ProjectsPresentational
       data={data}

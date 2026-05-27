@@ -11,7 +11,7 @@ interface AdminAuthModalProps {
 
 /**
  * Single-button Google sign-in for the site owner. Authorization is enforced
- * server-side against ADMIN_EMAILS — no identity hints are embedded in the
+ * server-side against ADMIN_EMAILS no identity hints are embedded in the
  * client bundle. On success the server issues an httpOnly session cookie
  * via `/api/auth/login`; this modal only drives the popup flow.
  */

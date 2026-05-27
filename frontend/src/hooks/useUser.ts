@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useUserStore } from '@/store/userStore'
 
 /**
- * useUser — lazily hydrates the centralized visitor store on first mount.
+ * useUser, lazily hydrates the centralized visitor store on first mount.
  * Subsequent calls are cheap (no-op on an already-hydrated store).
  *
  * Returns a subset of the store so consumers don't over-subscribe.

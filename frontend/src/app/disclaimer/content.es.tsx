@@ -44,7 +44,7 @@ export function DisclaimerBodyES() {
       <p>
         El software avanza rápido. Un patrón que era buena práctica hace un
         año puede estar obsoleto hoy. Cada artículo muestra su fecha de
-        publicación — úsala para valorar si las recomendaciones siguen
+        publicación úsala para valorar si las recomendaciones siguen
         siendo actuales.
       </p>
 

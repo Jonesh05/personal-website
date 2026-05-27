@@ -11,7 +11,7 @@ const nextConfig = {
     root: path.resolve(__dirname, '..'),
   },
 
-  // Remote image policy. Keep this explicit — a wildcard here would let any
+  // Remote image policy. Keep this explicit, a wildcard here would let any
   // upstream host load through the Next/Image optimizer, which widens the
   // attack surface and counts toward Image Optimization quotas.
   images: {
@@ -19,7 +19,7 @@ const nextConfig = {
       // Local development only. Ignored in production because requests are HTTPS.
       { protocol: 'http',  hostname: 'localhost' },
 
-      // Firebase Storage — primary host for editor-uploaded blog assets.
+      // Firebase Storage primary host for editor-uploaded blog assets.
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
       { protocol: 'https', hostname: 'storage.googleapis.com' },
 
@@ -36,7 +36,7 @@ const nextConfig = {
   },
 
   // Security headers applied to every route. Keep this set minimal and
-  // production-safe — a broken CSP here would be invisible in local dev and
+  // production-safe a broken CSP here would be invisible in local dev and
   // silently break prod, so CSP is intentionally omitted until it is
   // validated end-to-end.
   async headers() {

@@ -174,7 +174,7 @@ export async function getRelatedPosts(tags: string[], excludeId: string, limit =
 
 // Views and likes counters are mutated exclusively by the transactional
 // helpers in `lib/firestore/interactions.ts` (per-visitor dedup + atomic
-// counters). Do not add "blind" increment helpers here — they would bypass
+// counters). Do not add "blind" increment helpers here, they would bypass
 // the per-user rules and re-inflate the counters.
 
 export function generateSlug(title: string): string {

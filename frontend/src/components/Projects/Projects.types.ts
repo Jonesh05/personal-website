@@ -1,7 +1,7 @@
 import type { Locale } from '@/i18n/constants'
 
 /**
- * Localized string — used for project descriptions which the product rules
+ * Localized string, used for project descriptions which the product rules
  * explicitly require to translate with the rest of the site. Project titles
  * are intentionally NOT localized (they must stay English everywhere).
  */
@@ -9,7 +9,7 @@ export type LocalizedText = Record<Locale, string>
 
 export interface Project {
   id: string;
-  /** Always English — titles never translate (product rule). */
+
   title: string;
   /** Per-locale description. Rendered via `description[locale]` at runtime. */
   description: LocalizedText;

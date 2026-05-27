@@ -3,7 +3,7 @@ export function TermsBodyEN() {
     <>
       <p>
         By accessing jhonnypimiento.com you agree to the terms below. They
-        are intentionally short. If anything is unclear, ask — I would
+        are intentionally short. If anything is unclear, ask I would
         rather answer than have you guess.
       </p>
 

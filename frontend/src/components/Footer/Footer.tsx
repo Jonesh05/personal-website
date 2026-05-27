@@ -8,7 +8,7 @@ import { footerConfig } from "./footer.config";
 /**
  * Returns the current year server-side.
  * Because this runs in a RSC, it re-evaluates on every request in dev
- * and is baked in at build time for static pages — either way always correct.
+ * and is baked in at build time for static pages either way always correct.
  */
 function getCopyrightYear(): number {
     return new Date().getFullYear();
@@ -42,13 +42,13 @@ function AmbientOrbs() {
             className="hidden dark:block pointer-events-none absolute inset-0 overflow-hidden"
             aria-hidden="true"
         >
-            {/* teal — top center */}
+            {/* teal top center */}
             <div className="absolute -top-16 left-[43%] size-72 rounded-full bg-[radial-gradient(ellipse,rgba(56,189,168,0.22)_0%,transparent_70%)] blur-[36px]" />
-            {/* purple-pink — top right */}
+            {/* purple-pink, top right */}
             <div className="absolute -top-8 right-[8%] size-60 rounded-full bg-[radial-gradient(ellipse,rgba(185,90,215,0.18)_0%,transparent_70%)] blur-[44px]" />
-            {/* amber — mid right */}
+            {/* amber, mid right */}
             <div className="absolute top-[35%] right-[16%] h-44 w-64 rounded-full bg-[radial-gradient(ellipse,rgba(220,150,60,0.15)_0%,transparent_70%)] blur-[38px]" />
-            {/* soft blue — bottom left */}
+            {/* soft blue, bottom left */}
             <div className="absolute bottom-[8%] left-[27%] h-36 w-52 rounded-full bg-[radial-gradient(ellipse,rgba(80,120,220,0.13)_0%,transparent_70%)] blur-[32px]" />
         </div>
     );
@@ -95,9 +95,9 @@ function SocialButton({ label, href, icon: Icon }: SocialLink) {
             aria-label={label}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex size-9 items-center justify-center rounded-[10px] border border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/45 backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 hover:text-slate-900 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.30),inset_0_1px_0_rgba(255,255,255,0.10)]"
+            className="flex size-9 items-center justify-center rounded-[10px] border border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70 backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 hover:text-slate-900 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.30),inset_0_1px_0_rgba(255,255,255,0.10)]"
         >
-            <Icon className="size-15px" />
+            <Icon className="w-4 h-4" />
         </a>
     );
 }
@@ -120,7 +120,7 @@ function BrandBlock({ config }: { config: FooterConfig }) {
 
     return (
         <div className="flex max-w-272px flex-col gap-4">
-            {/* Logo — ✦ rotates on hover via group-hover, zero JS */}
+            {/* Logo, rotates on hover via group-hover, zero JS */}
             <Link href="/" className="group inline-flex w-fit items-center gap-2.5">
                 <span className="font-serif text-lg leading-none text-slate-700 dark:text-white/75 transition-transform duration-300 group-hover:rotate-45">
                     {brand.logo}
@@ -147,7 +147,7 @@ function BrandBlock({ config }: { config: FooterConfig }) {
 function LegalBar({ config, year }: { config: FooterConfig; year: number }) {
     return (
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-            {/* Auto-updating year — no hardcoded date */}
+            {/* Auto-updating year, no hardcoded date */}
             <span className="text-[0.73rem] tracking-wide text-slate-400 dark:text-white/25">
                 © {year} {config.brand.name}. All rights reserved.
             </span>

@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* ── Tailwind v4 class-based dark mode ── */
+/* Tailwind v4 class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
 
@@ -27,7 +27,7 @@
 
   --drop-shadow-text-glow: 0 0 4px rgba(0, 0, 0, 0.4);
 
-  /* ── Core palette ── */
+  /* Core palette */
   --color-void:        #04080F;
   --color-surface:     #080E18;
   --color-surface-2:   #0D1524;
@@ -35,26 +35,26 @@
   --color-border:      #1A2640;
   --color-border-glow: #2D3F5E;
 
-  /* ── Plasma purple ── */
+  /* Plasma purple */
   --color-purple-dim:    #3B1A6E;
   --color-purple:        #7C3AED;
   --color-purple-bright: #9B3FFB;
   --color-purple-neon:   #BF5EFF;
   --color-purple-glow:   rgba(124, 58, 237, 0.35);
 
-  /* ── Plasma green ── */
+  /* Plasma green */
   --color-green-dim:    #053D2A;
   --color-green:        #059669;
   --color-green-bright: #10B981;
   --color-green-neon:   #00FFB2;
   --color-green-glow:   rgba(16, 185, 129, 0.35);
 
-  /* ── Text ── */
+  /* Text  */
   --color-text:        #E8F0FE;
   --color-text-muted:  #7A8FAD;
   --color-text-faint:  #3D4F6E;
 
-  /* ── Semantic tokens (dark defaults = existing palette; light overrides in html.light) ── */
+  /* Semantic tokens (dark defaults = existing palette; light overrides in html.light) */
   --color-bg:              var(--color-void);
   --color-surface-elev:    var(--color-surface);
   --color-surface-elev-2:  var(--color-surface-2);
@@ -66,18 +66,18 @@
   --color-link:            var(--color-purple-bright);
   --color-link-hover:      var(--color-green-neon);
 
-  /* ── Gradients ── */
+  /* Gradients */
   --gradient-plasma:      linear-gradient(135deg, var(--color-purple-bright) 0%, var(--color-green-bright) 100%);
   --gradient-plasma-text: linear-gradient(90deg, #BF5EFF 0%, #00FFB2 100%);
   --gradient-surface:     linear-gradient(180deg, var(--color-surface) 0%, var(--color-void) 100%);
 
-  /* ── Typography ── */
+  /* Typography  */
   --font-sans:    Inter, system-ui, sans-serif;
   --font-display: 'Syne', sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
   --font-body:    'DM Sans', sans-serif;
 
-  /* ── Spacing ── */
+  /*  Spacing */
   --radius-card: 12px;
   --radius-pill: 999px;
 
@@ -124,7 +124,7 @@
   border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-/* ── Tailwind v4 border-color compatibility ── */
+/* Tailwind v4 border-color compatibility */
 @layer base {
   *,
   ::after,
@@ -136,7 +136,7 @@
   }
 }
 
-/* ── Base styles ── */
+/* Base styles */
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -149,7 +149,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Plasma text gradient ── */
+/* Plasma text gradient */
 .text-plasma {
   background: var(--gradient-plasma-text);
   -webkit-background-clip: text;
@@ -157,7 +157,7 @@ body {
   background-clip: text;
 }
 
-/* ── Plasma border ── */
+/* Plasma border */
 .border-plasma {
   border: 1px solid transparent;
   background-clip: padding-box;
@@ -173,7 +173,7 @@ body {
   opacity: 0.6;
 }
 
-/* ── Noise texture overlay ── */
+/* Noise texture overlay */
 .noise::after {
   content: '';
   position: fixed;
@@ -184,7 +184,7 @@ body {
   opacity: 0.4;
 }
 
-/* ── Plasma blob animations ── */
+/* Plasma blob animations */
 @keyframes plasma-float-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
   33%       { transform: translate(40px, -60px) scale(1.08); }
@@ -204,14 +204,14 @@ body {
 .plasma-blob-b { animation: plasma-float-b 22s ease-in-out infinite; }
 .plasma-blob-c { animation: plasma-float-c 15s ease-in-out infinite; }
 
-/* ── Cursor blink ── */
+/* Cursor blink  */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
 .cursor-blink { animation: blink 1s step-start infinite; }
 
-/* ── Reveal animations ── */
+/* Reveal animations  */
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -224,7 +224,7 @@ body {
 .reveal-up { animation: reveal-up 0.7s ease forwards; }
 .reveal-in { animation: reveal-in 0.5s ease forwards; }
 
-/* ── Card hover glow ── */
+/*  Card hover glow */
 .card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -236,7 +236,7 @@ body {
   box-shadow: var(--shadow-green);
 }
 
-/* ── Tag pill styles ── */
+/* Tag pill styles */
 .tag-purple {
   background: rgba(124, 58, 237, 0.15);
   color: var(--color-purple-neon);
@@ -253,7 +253,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ── Scrollbar ── */
+/* Scrollbar */
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-void); }
 ::-webkit-scrollbar-thumb {
@@ -266,13 +266,8 @@ body {
   border-radius: 3px;
 }
 
-/* ── Grid overlay ── */
-/*
-   Líneas visibles sobre fondo oscuro plasma.
-   Purple vertical + green horizontal — mezcla cromática sutil.
-   0.04 era invisible; 0.12-0.14 es el rango legible sin competir
-   con partículas ni blobs.
-*/
+/*  Grid overlay */
+
 .grid-overlay {
   background-image:
     linear-gradient(rgba(191, 94, 255, 0.13) 1px, transparent 1px),
@@ -281,7 +276,7 @@ body {
   background-position: center center;
 }
 
-/* ── Utilities ── */
+/*  Utilities */
 @utility container {
   padding-inline: 1rem;
   margin-inline: auto;

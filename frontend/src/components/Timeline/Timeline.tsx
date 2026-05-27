@@ -1,26 +1,5 @@
 'use client';
 
-/**
- * Timeline — cyberpunk vertical-spine layout.
- *
- * Architectural boundaries:
- *   • Data  : `timeline.data.ts` (typed, never renders)
- *   • Copy  : `i18n/locales/{en,es}.ts` under the `Timeline` namespace
- *   • View  : this file — pure composition over the two above
- *
- * Translation rules enforced here:
- *   • Entry `title` is rendered verbatim (English only).
- *   • Entry descriptions + category labels resolve through `useTranslations`.
- *   • Tag pills are literal strings; tech/brand terms already live in
- *     `STATIC_KEYS` so they won't localize.
- *
- * Layout:
- *   • Mobile (< lg): single column, spine anchored 22px from the left.
- *   • Desktop (>= lg): centered spine, alternating cards on either side.
- *   • No external libs — depth is simulated with layered gradients, blurs,
- *     and controlled hover transitions.
- */
-
 import type { FC } from 'react';
 import { useTranslations } from '@/i18n';
 import {
@@ -29,7 +8,7 @@ import {
   type TimelineEntry,
 } from './timeline.data';
 
-// ─── Accent palette ────────────────────────────────────────────────────────
+// Accent palette 
 // Each category carries its own colour identity so the eye can scan the
 // timeline by theme. Purple = career / product; green = foundations /
 // research; the current milestone amplifies both into the plasma gradient.
@@ -85,10 +64,10 @@ const ACCENTS: Record<TimelineCategory, Accent> = {
   },
 };
 
-// ─── Spine ─────────────────────────────────────────────────────────────────
+// Spine 
 const Spine: FC = () => (
   <>
-    {/* Mobile spine — anchored to the left of the node column. */}
+    {/* Mobile spine, anchored to the left of the node column. */}
     <div
       aria-hidden="true"
       className="pointer-events-none absolute top-0 bottom-0 left-[22px] w-px lg:hidden"
@@ -97,7 +76,7 @@ const Spine: FC = () => (
           'linear-gradient(to bottom, rgba(124,58,237,0) 0%, rgba(124,58,237,0.45) 12%, rgba(191,94,255,0.55) 50%, rgba(0,255,178,0.45) 88%, rgba(0,255,178,0) 100%)',
       }}
     />
-    {/* Desktop spine — perfectly centered. */}
+    {/* Desktop spine, perfectly centered. */}
     <div
       aria-hidden="true"
       className="pointer-events-none absolute top-0 bottom-0 hidden lg:block left-1/2 w-px -translate-x-1/2"
@@ -109,7 +88,6 @@ const Spine: FC = () => (
   </>
 );
 
-// ─── Node ──────────────────────────────────────────────────────────────────
 interface NodeProps {
   entry: TimelineEntry;
   accent: Accent;
@@ -119,7 +97,7 @@ const Node: FC<NodeProps> = ({ entry, accent }) => {
   const yearShort = String(entry.year).slice(-2);
   return (
     <div className="relative flex h-12 w-12 items-center justify-center">
-      {/* Pulse ring for the active milestone — pure CSS, no JS driver. */}
+      
       {entry.current && (
         <span
           aria-hidden="true"
@@ -186,7 +164,7 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
         className="absolute inset-x-6 top-0 h-px opacity-70"
         style={{ background: accent.stripe }}
       />
-      {/* Hover glow — activates via group-hover for smooth affordance */}
+      {/* Hover glow, activates via group-hover for smooth affordance */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -224,7 +202,7 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
         )}
       </div>
 
-      {/* Year — semantic <time> */}
+      {/* Year, semantic <time> */}
       <time
         dateTime={String(entry.year)}
         className="mt-2 block text-xs"
@@ -237,7 +215,6 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
         {entry.year}
       </time>
 
-      {/* Title — English only, never translated. */}
       <h3
         className="mt-1 leading-tight"
         style={{
@@ -251,7 +228,7 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
         {entry.title}
       </h3>
 
-      {/* Description — localized */}
+      {/* Description localized */}
       <p
         className="mt-3 text-sm leading-relaxed"
         style={{ color: 'var(--color-text-muted)' }}
@@ -286,9 +263,6 @@ const Card: FC<CardProps> = ({ entry, accent, alignment, t }) => {
   );
 };
 
-// ─── Row ───────────────────────────────────────────────────────────────────
-// One entry = one `<li>`. The node is absolutely positioned so the card can
-// flow naturally in its column.
 interface RowProps {
   entry: TimelineEntry;
   index: number;
@@ -300,9 +274,6 @@ const Row: FC<RowProps> = ({ entry, index, t }) => {
   // Even index → card on the LEFT of the spine (so it text-aligns right).
   const leftOfSpine = index % 2 === 0;
 
-  // Tailwind-only alignment: card occupies the appropriate desktop column
-  // via margins. This keeps the spine untouched by JS and reflows perfectly
-  // when the viewport resizes.
   const desktopSide = leftOfSpine
     ? 'lg:mr-[calc(50%+36px)]'
     : 'lg:ml-[calc(50%+36px)]';
@@ -327,7 +298,6 @@ const Row: FC<RowProps> = ({ entry, index, t }) => {
   );
 };
 
-// ─── Timeline ──────────────────────────────────────────────────────────────
 const Timeline: FC = () => {
   const t = useTranslations('Timeline');
 
@@ -337,7 +307,7 @@ const Timeline: FC = () => {
       className="relative py-24 overflow-hidden"
       aria-labelledby="timeline-heading"
     >
-      {/* Ambient background — subtle plasma wash, zero motion cost. */}
+      
       <div
         aria-hidden="true"
         className="hidden dark:block pointer-events-none absolute inset-0 opacity-60"
@@ -351,12 +321,16 @@ const Timeline: FC = () => {
       <div className="relative z-10 mx-auto w-full max-w-5xl px-6">
         {/* Section header */}
         <header className="text-center mb-16">
-          <p
-            className="text-xs uppercase tracking-[0.28em]"
+          <div
+            className="absolute top-0 inset-x-0 h-px rounded-t-2xl mb-16"
             style={{
-              fontFamily: 'var(--font-mono)',
-              color: 'var(--color-green-neon)',
+              background: 'linear-gradient(90deg, transparent, #059669, #00FFB2, transparent)',
             }}
+            aria-hidden="true"
+          />
+          <p
+            className="text-lg tracking-widest uppercase mb-3 pt-5"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-green-neon)' }}
           >
             {t('section_label')}
           </p>
@@ -375,7 +349,7 @@ const Timeline: FC = () => {
             {t('heading')}
           </h2>
           <p
-            className="mt-5 mx-auto max-w-2xl text-sm sm:text-base leading-relaxed"
+            className="mt-8 mx-auto max-w-2xl text-sm sm:text-base leading-relaxed whitespace-pre-line"
             style={{ color: 'var(--color-text-muted)' }}
           >
             {t('subtitle')}

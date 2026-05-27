@@ -6,7 +6,7 @@ const VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 2 // 2 years
 
 function isValidVisitorId(value: string | undefined): value is string {
   if (!value) return false
-  // UUID v4 format check — opaque to prevent spoofed short ids
+  // UUID v4 format check opaque to prevent spoofed short ids
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
 }
 

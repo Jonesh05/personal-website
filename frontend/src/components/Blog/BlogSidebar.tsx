@@ -101,7 +101,7 @@ export async function BlogPostSidebar({ tags }: BlogPostSidebarProps) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('sidebarQuickActions')}
         </h3>
-        {/* Actions are interactive — intentionally defer to client component */}
+        {/* Actions are interactive, intentionally defer to client component */}
       </div>
     </div>
   )
@@ -110,7 +110,7 @@ export async function BlogPostSidebar({ tags }: BlogPostSidebarProps) {
 async function PopularTags() {
   const { t } = await getServerTranslations('Blog')
   // Firestore failures must NEVER bring down the whole /blog page. The
-  // sidebar is decorative — if the read fails or the Admin SDK is
+  // sidebar is decorative if the read fails or the Admin SDK is
   // misconfigured, render nothing and let the page keep serving.
   let tags: string[] = []
   try {

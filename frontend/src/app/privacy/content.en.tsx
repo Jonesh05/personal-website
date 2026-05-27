@@ -2,7 +2,7 @@ export function PrivacyBodyEN() {
   return (
     <>
       <p>
-        This site belongs to Jhonny Pimiento — a single independent author. The
+        This site belongs to Jhonny Pimiento, a single independent author. The
         goal of this policy is to describe, in plain language, what data the
         site collects, why, and how it is handled.
       </p>

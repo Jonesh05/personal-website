@@ -5,7 +5,7 @@ import { toast } from '@/lib/toast'
 import { useTranslations } from '@/i18n'
 
 /**
- * ShareButtons — single-consistent component for all article share surfaces.
+ * ShareButtons, single-consistent component for all article share surfaces.
  *
  * Surfaces
  * ────────
@@ -14,12 +14,12 @@ import { useTranslations } from '@/i18n'
  *   • LinkedIn                 linkedin.com/sharing/share-offsite
  *   • Farcaster                warpcast.com/~/compose (primary Farcaster client)
  *   • Copy link                Clipboard API, with visual confirmation
- *   • Native share (mobile)    navigator.share — only rendered when available
+ *   • Native share (mobile)    navigator.share only rendered when available
  *
  * Variants
  * ────────
- *   variant="bar"  – horizontal bar with labels (used in article footer)
- *   variant="rail" – vertical icon-only rail (used in the sticky desktop rail)
+ *   variant="bar"   horizontal bar with labels (used in article footer)
+ *   variant="rail"  vertical icon-only rail (used in the sticky desktop rail)
  */
 
 type Platform = 'x' | 'facebook' | 'linkedin' | 'farcaster'
@@ -177,7 +177,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
     try {
       await navigator.share({ title, text: description, url })
     } catch {
-      // User cancelled — silent.
+      // User cancelled, silent.
     }
   }, [canNativeShare, title, description, url])
 
