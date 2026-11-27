@@ -37,7 +37,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const existing = await getPostById(id)
-    if (!existing) {
+    if (!existing || !existing.published) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
     }
 

@@ -29,6 +29,7 @@ export default async function WorkPage() {
 
   return (
     <main
+      id="main-content"
       className="relative min-h-screen pt-28"
       style={{ background: 'var(--color-surface)' }}
     >
@@ -79,9 +80,11 @@ export default async function WorkPage() {
           </Link>
           <Link
             href="/#contact"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04]
-              px-4 py-2 text-sm font-semibold text-white/80 transition-colors
-              hover:border-white/30 hover:bg-white/[0.08] hover:text-white
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-slate-100
+              px-4 py-2 text-sm font-semibold text-slate-900 transition-colors
+              hover:border-slate-400 hover:bg-slate-200
+              dark:border-white/15 dark:bg-white/[0.04] dark:text-white/80
+              dark:hover:border-white/30 dark:hover:bg-white/[0.08] dark:hover:text-white
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/80
               focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             style={{ fontFamily: 'var(--font-body)' }}

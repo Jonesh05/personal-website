@@ -44,7 +44,10 @@ export function BlogCoverImage({
         <img
           src={cleanSrc}
           alt={alt}
+          width={1200}
+          height={750}
           loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
           onError={() => setFailed(true)}
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
@@ -81,12 +84,31 @@ export function BlogCoverImage({
             />
           </div>
 
-          <p
-            className="relative z-10 line-clamp-2 text-base font-semibold leading-snug text-slate-200/90"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            {alt}
-          </p>
+          {/* Minimal geometric emblem instead of duplicating the card title */}
+          <div className="relative z-10 flex items-end justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-[2px] w-7 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 opacity-80" />
+              <span
+                className="text-[10px] uppercase tracking-[0.2em] text-slate-500"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                Article
+              </span>
+            </div>
+            <svg
+              className="h-7 w-7 text-cyan-400/30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.25"
+              aria-hidden="true"
+            >
+              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+              <line x1="12" y1="22" x2="12" y2="12" />
+              <line x1="22" y1="8.5" x2="12" y2="12" />
+              <line x1="2" y1="8.5" x2="12" y2="12" />
+            </svg>
+          </div>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ import { TermsBodyES } from './content.es'
 export const metadata: Metadata = {
   title: 'Terms of Service · Jhonny Pimiento',
   description:
-    'The rules for using jhonnypimiento.com, its articles, and its tools.',
+    'The rules for using jonesh.me, its articles, and its tools.',
   alternates: { canonical: '/terms' },
 }
 

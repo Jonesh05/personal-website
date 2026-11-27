@@ -24,7 +24,6 @@ interface AuthState {
   error: string | null
   displayName: string | null
   user: User | null      // <-- Agregado para resolver el error del Modal
-  token: string | null    // <-- Agregado para resolver el error del Modal
 }
 
 // 2. Definimos las acciones (Funciones)
@@ -44,7 +43,6 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
   error: null,
   displayName: null,
   user: null,
-  token: null,
 
   checkSession: async () => {
     try {
@@ -96,7 +94,6 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
         loading: false,
         displayName: result.user.displayName,
         user: result.user, // <-- Guardamos el usuario
-        token: idToken,    // <-- Guardamos el token
         error: null,
       })
     } catch (err) {
@@ -122,7 +119,6 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
         isAdmin: false,
         initialized: true,
         user: null,
-        token: null,
       })
       throw err
     }
@@ -140,7 +136,6 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
         loading: false, 
         displayName: null, 
         user: null, 
-        token: null, 
         error: null 
       })
     } catch {

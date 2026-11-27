@@ -19,21 +19,25 @@ import type {
 
 const COLLECTION = 'newsletter_subscribers'
 
+export type SubscriberLocale = 'en' | 'es'
+
 export interface SubscriberRecord {
-  id:        string
-  email:     string
-  status:    SubscriberStatus
-  tags:      string[]
+  id:         string
+  email:      string
+  status:     SubscriberStatus
+  tags:       string[]
   magicToken: string
-  source:    NewsletterSource
-  createdAt: Date
-  updatedAt: Date
+  source:     NewsletterSource
+  locale:     SubscriberLocale
+  createdAt:  Date
+  updatedAt:  Date
 }
 
 export interface UpsertSubscriberInput {
-  email:  string
-  tags:   string[]
-  source: NewsletterSource
+  email:   string
+  tags:    string[]
+  source:  NewsletterSource
+  locale?: SubscriberLocale
 }
 
 export interface UpsertSubscriberResult {
@@ -87,6 +91,8 @@ function parseDoc(id: string, data: FirebaseFirestore.DocumentData): SubscriberR
     ? data.tags.filter((t): t is string => typeof t === 'string')
     : ['web3']
 
+  const locale: SubscriberLocale = data.locale === 'es' ? 'es' : 'en'
+
   return {
     id,
     email:      typeof data.email === 'string' ? data.email : '',
@@ -94,6 +100,7 @@ function parseDoc(id: string, data: FirebaseFirestore.DocumentData): SubscriberR
     tags,
     magicToken: typeof data.magicToken === 'string' ? data.magicToken : '',
     source,
+    locale,
     createdAt:  toDate(data.createdAt, now),
     updatedAt:  toDate(data.updatedAt, now),
   }
@@ -123,6 +130,7 @@ export async function upsertSubscriber(
       const mergedTags = Array.from(new Set([...existing.tags, ...incomingTags]))
       const magicToken = existing.magicToken || randomUUID()
       const wasReactivated = existing.status === 'unsubscribed'
+      const nextLocale: SubscriberLocale = input.locale ?? existing.locale
 
       tx.set(
         docRef,
@@ -132,6 +140,7 @@ export async function upsertSubscriber(
           tags:      mergedTags,
           magicToken,
           source:    input.source,
+          locale:    nextLocale,
           updatedAt: serverNow,
         },
         { merge: true },
@@ -147,6 +156,7 @@ export async function upsertSubscriber(
           tags:      mergedTags,
           magicToken,
           source:    input.source,
+          locale:    nextLocale,
           createdAt: existing.createdAt,
           updatedAt: nowDate,
         },
@@ -154,12 +164,14 @@ export async function upsertSubscriber(
     }
 
     const magicToken = randomUUID()
+    const nextLocale: SubscriberLocale = input.locale ?? 'en'
     tx.set(docRef, {
       email:     normalizedEmail,
       status:    'active' satisfies SubscriberStatus,
       tags:      incomingTags,
       magicToken,
       source:    input.source,
+      locale:    nextLocale,
       createdAt: serverNow,
       updatedAt: serverNow,
     })
@@ -174,6 +186,7 @@ export async function upsertSubscriber(
         tags:      incomingTags,
         magicToken,
         source:    input.source,
+        locale:    nextLocale,
         createdAt: nowDate,
         updatedAt: nowDate,
       },
@@ -256,6 +269,7 @@ export async function updateSubscriberByMagicToken(
       tags:       nextTags,
       magicToken: found.magicToken,
       source:     found.source,
+      locale:     found.locale,
       createdAt:  Timestamp.fromDate(found.createdAt),
       updatedAt:  FieldValue.serverTimestamp(),
     })
@@ -273,8 +287,12 @@ export async function updateSubscriberByMagicToken(
 }
 
 /**
- * List active subscribers matching at least one of the provided tags
- * (or all active subscribers when `tags` is empty).
+ * List active subscribers.
+ *
+ * - `audienceMode = 'all'` (default): returns all active subscribers so new posts
+ *   on emerging topics never silently match 0 readers.
+ * - `audienceMode = 'matching-tags'`: filters to subscribers sharing at least one
+ *   tag with `tags` (or all active subscribers when `tags` is empty).
  *
  * Uses a single-field equality query on `status == 'active'` (auto-indexed,
  * no composite index required) with a hard upper bound to protect Spark quotas.
@@ -282,6 +300,7 @@ export async function updateSubscriberByMagicToken(
 export async function listActiveSubscribersByTags(
   tags: readonly string[],
   maxSubscribers = 500,
+  audienceMode: 'all' | 'matching-tags' = 'all',
 ): Promise<SubscriberRecord[]> {
   const snap = await adminDb
     .collection(COLLECTION)
@@ -298,6 +317,7 @@ export async function listActiveSubscribersByTags(
     const record = parseDoc(doc.id, doc.data())
     if (!record.email) continue
     if (
+      audienceMode === 'all' ||
       normalizedFilter.size === 0 ||
       record.tags.some(t => normalizedFilter.has(t.toLowerCase()))
     ) {

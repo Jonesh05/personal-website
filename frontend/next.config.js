@@ -7,6 +7,10 @@ const nextConfig = {
   // Do not advertise the runtime. Removes the `x-powered-by: Next.js` header.
   poweredByHeader: false,
 
+  experimental: {
+    optimizePackageImports: ['@phosphor-icons/react', 'date-fns'],
+  },
+
   turbopack: {
     root: path.resolve(__dirname, '..'),
   },
@@ -104,6 +108,18 @@ const nextConfig = {
           { key: 'Permissions-Policy',         value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
           { key: 'X-DNS-Prefetch-Control',     value: 'on' },
           { key: 'Strict-Transport-Security',  value: 'max-age=63072000; includeSubDomains; preload' },
+        ],
+      },
+      {
+        source: '/images/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/icons/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
     ]

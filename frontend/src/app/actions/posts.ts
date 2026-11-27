@@ -15,6 +15,7 @@ import {
 } from '@/lib/firestore/posts'
 import {
   broadcastPostToSubscribers,
+  type BroadcastAudienceMode,
   type BroadcastResult,
 } from '@/lib/mailer/dispatch'
 import {
@@ -29,6 +30,10 @@ export interface ActionResult {
   broadcast?: BroadcastResult | null
 }
 
+function parseAudienceMode(raw: FormDataEntryValue | null): BroadcastAudienceMode {
+  return raw === 'matching-tags' ? 'matching-tags' : 'all'
+}
+
 export async function createPostAction(formData: FormData): Promise<ActionResult> {
   const user = await getSessionUser()
   if (!user?.isAdmin) {
@@ -36,6 +41,7 @@ export async function createPostAction(formData: FormData): Promise<ActionResult
   }
 
   const notifySubscribers = formData.get('notifySubscribers') === 'true'
+  const audienceMode = parseAudienceMode(formData.get('audienceMode'))
   const rawData = {
     title: formData.get('title') as string,
     content: formData.get('content') as string,
@@ -76,6 +82,7 @@ export async function createPostAction(formData: FormData): Promise<ActionResult
           slug:            post.slug,
           excerpt:         post.excerpt,
           tags:            post.tags,
+          audienceMode,
           readTimeMinutes: Math.max(1, Math.ceil(post.content.split(/\s+/).length / 200)),
         })
       } catch (broadcastErr) {
@@ -115,6 +122,7 @@ export async function updatePostAction(
   }
 
   const notifySubscribers = formData.get('notifySubscribers') === 'true'
+  const audienceMode = parseAudienceMode(formData.get('audienceMode'))
   const rawData = {
     title: formData.get('title') as string,
     content: formData.get('content') as string,
@@ -164,6 +172,7 @@ export async function updatePostAction(
           slug:            finalSlug,
           excerpt:         finalExcerpt,
           tags:            finalTags,
+          audienceMode,
           readTimeMinutes: Math.max(1, Math.ceil(finalContent.split(/\s+/).length / 200)),
         })
       } catch (broadcastErr) {
@@ -247,6 +256,61 @@ export async function generatePostAiSuggestionsAction(input: {
     return { success: true, suggestion }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Azure OpenAI call failed'
+    return { success: false, error: message }
+  }
+}
+
+export async function resendPostBroadcastAction(
+  postId: string,
+  audienceMode: BroadcastAudienceMode = 'all',
+): Promise<ActionResult> {
+  const user = await getSessionUser()
+  if (!user?.isAdmin) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const cleanPostId = postId.trim()
+  if (!cleanPostId) {
+    return { success: false, error: 'Missing postId' }
+  }
+
+  try {
+    const post = await getPostById(cleanPostId)
+    if (!post) {
+      return { success: false, error: 'Post not found' }
+    }
+    if (!post.published) {
+      return {
+        success: false,
+        error: 'Publish the post before sending a newsletter broadcast',
+      }
+    }
+
+    const broadcast = await broadcastPostToSubscribers({
+      postId:          post.id,
+      title:           post.title,
+      slug:            post.slug,
+      excerpt:         post.excerpt,
+      tags:            post.tags,
+      audienceMode,
+      force:           true,
+      readTimeMinutes: Math.max(1, Math.ceil(post.content.split(/\s+/).length / 200)),
+    })
+
+    revalidatePath('/blog/admin')
+    revalidatePath('/blog/admin/posts')
+
+    const ok = broadcast.status === 'sent' || broadcast.status === 'partial'
+    return {
+      success: ok,
+      broadcast,
+      error: ok
+        ? undefined
+        : broadcast.skippedReason || broadcast.errors[0] || 'Broadcast failed',
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[actions/posts] Resend broadcast failed:', message)
     return { success: false, error: message }
   }
 }

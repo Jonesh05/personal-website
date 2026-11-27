@@ -1,39 +1,73 @@
 import { Suspense } from 'react'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
+import nextDynamic from 'next/dynamic'
 import { InfinitePostList } from '@/components/Blog/InfinitePostList'
 import BlogSidebar from '@/components/Blog/BlogSidebar'
 import { BlogHeader } from '@/components/Blog/BlogHeader'
-import PlantSidebar from '@/components/Blog/PlantSidebar'
 import BlogSectionSkeleton from '@/components/Blog/BlogSectionSkeleton'
 import NewsletterForm from '@/components/Blog/NewsletterForm.client'
 import { getPosts, type Post } from '@/lib/firestore/posts'
+import { matchesPostSearch, scorePostSearch } from '@/utils/postSearch'
 import { getServerTranslations } from '@/i18n/server'
+import {
+  buildBlogJsonLd,
+  buildBreadcrumbListJsonLd,
+  serializeJsonLd,
+  type JsonLdGraph,
+} from '@/lib/seo/jsonLd'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Blog | Jhonny Pimiento - Web3, Blockchain & Cloud Architecture',
-  description:
-    'Insights técnicos sobre Web3, desarrollo blockchain, arquitectura en la nube y las últimas tendencias en tecnología.',
-  keywords: ['Web3', 'Blockchain', 'Cloud Architecture', 'AWS', 'React', 'Next.js', 'TypeScript'],
-  openGraph: {
-    title: 'Blog - Jhonny Pimiento',
-    description: 'Insights técnicos sobre Web3, desarrollo blockchain y arquitectura en la nube.',
-    type: 'website',
-    url: '/blog',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Blog - Jhonny Pimiento',
-    description: 'Insights técnicos sobre Web3, desarrollo blockchain y arquitectura en la nube.',
-  },
-}
+const PlantSidebar = nextDynamic(() => import('@/components/Blog/PlantSidebar'), {
+  loading: () => (
+    <div
+      className="h-[540px] rounded-2xl bg-slate-200/60 dark:bg-slate-800/40 animate-pulse"
+      aria-hidden="true"
+    />
+  ),
+})
 
 interface BlogPageProps {
   searchParams: Promise<{
     tag?: string
     search?: string
   }>
+}
+
+export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
+  const { tag, search } = await searchParams
+  const hasFilter = Boolean(tag?.trim() || search?.trim())
+
+  return {
+    title: 'Blog | Jhonny Pimiento — Web3, Blockchain & Cloud Architecture',
+    description:
+      'Technical articles on Web3, blockchain engineering, distributed systems, and cloud architecture by Jhonny Pimiento.',
+    keywords: ['Web3', 'Blockchain', 'Cloud Architecture', 'AWS', 'React', 'Next.js', 'TypeScript'],
+    alternates: {
+      canonical: '/blog',
+    },
+    ...(hasFilter
+      ? {
+          robots: {
+            index: false,
+            follow: true,
+          },
+        }
+      : {}),
+    openGraph: {
+      title: 'Blog — Jhonny Pimiento',
+      description:
+        'Technical articles on Web3, blockchain engineering, distributed systems, and cloud architecture.',
+      type: 'website',
+      url: '/blog',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Blog — Jhonny Pimiento',
+      description:
+        'Technical articles on Web3, blockchain engineering, distributed systems, and cloud architecture.',
+    },
+  }
 }
 
 const INITIAL_PAGE_SIZE = 12
@@ -56,24 +90,38 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   }
 
   const filteredPosts = searchQuery
-    ? allPublishedPosts.filter(
-        p =>
-          p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+    ? allPublishedPosts
+        .filter((p) => matchesPostSearch(p, searchQuery))
+        .sort((a, b) => scorePostSearch(b, searchQuery) - scorePostSearch(a, searchQuery))
     : allPublishedPosts
 
   const initialPosts = filteredPosts.slice(0, INITIAL_PAGE_SIZE)
   const initialTotal = filteredPosts.length
   const initialHasNext = filteredPosts.length > INITIAL_PAGE_SIZE
 
+  const jsonLd: JsonLdGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      buildBlogJsonLd(initialPosts),
+      buildBreadcrumbListJsonLd([
+        { name: 'Home', path: '/' },
+        { name: 'Blog', path: '/blog' },
+      ]),
+    ],
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main id="main-content" className="min-h-screen bg-slate-50 dark:bg-[#070B14]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+
       {/* Header */}
       <BlogHeader />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+      <div className="mx-auto max-w-[90rem] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-10 xl:gap-12">
           {/* Plant Sidebar - Left Column */}
           <div className="hidden lg:block lg:col-span-3">
             <div className="sticky top-24">
@@ -85,22 +133,20 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <div className="lg:col-span-6">
             {/* Breadcrumbs y filtros activos */}
             {(selectedTag || searchQuery) && (
-              <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="mb-8 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-white/[0.08] dark:bg-[#0B111E]">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                     <span>{t('showingResultsFor')}</span>
                     {selectedTag && (
                       <span
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs 
-                        font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        className="inline-flex items-center rounded-lg border border-purple-300/60 bg-purple-500/10 px-2.5 py-0.5 font-mono text-xs font-medium text-purple-700 dark:border-purple-400/35 dark:bg-purple-500/15 dark:text-purple-300"
                       >
                         #{selectedTag}
                       </span>
                     )}
                     {searchQuery && (
                       <span
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs 
-                        font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                        className="inline-flex items-center rounded-lg border border-emerald-300/60 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-medium text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-500/15 dark:text-emerald-300"
                       >
                         &ldquo;{searchQuery}&rdquo;
                       </span>
@@ -108,10 +154,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   </div>
                   <a
                     href="/blog"
-                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 
-                      dark:hover:text-blue-300 flex items-center"
+                    className="inline-flex shrink-0 items-center text-xs font-mono text-slate-500 transition-colors hover:text-purple-700 dark:text-slate-400 dark:hover:text-emerald-300"
                   >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                     {t('clearFilters')}
@@ -128,89 +173,45 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 initialPosts={initialPosts}
                 initialTotal={initialTotal}
                 initialHasNext={initialHasNext}
+                allPosts={allPublishedPosts}
               />
             </Suspense>
           </div>
 
           {/* Sidebar */}
-          <div className="mt-12 lg:mt-0 lg:col-span-3">
-            <div className="sticky top-24 space-y-8">
-              {/* Search Widget */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  {t('searchArticles')}
-                </h3>
-                <form action="/blog" method="get" className="space-y-3">
-                  <div>
-                    <label htmlFor="search" className="sr-only">
-                      {t('searchButton')}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </div>
-                      <input
-                        id="search"
-                        name="search"
-                        type="text"
-                        defaultValue={searchQuery}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 
-                          rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                          placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none 
-                          focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        placeholder={t('searchPlaceholder')}
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md 
-                      shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
-                      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    {t('searchButton')}
-                  </button>
-                </form>
-              </div>
-
+          <aside className="mt-12 lg:mt-0 lg:col-span-3">
+            <div className="sticky top-24 space-y-6">
               {/* Popular Tags */}
               <Suspense
                 fallback={
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                    <div className="space-y-2">
+                  <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#0B111E]">
+                    <div className="mb-4 h-5 w-32 rounded bg-slate-200 dark:bg-white/[0.06]"></div>
+                    <div className="grid grid-cols-2 gap-2">
                       {[...Array(6)].map((_, i) => (
                         <div
                           key={i}
-                          className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 inline-block mr-2"
+                          className="h-8 rounded-xl bg-slate-200/80 dark:bg-white/[0.04]"
                         ></div>
                       ))}
                     </div>
                   </div>
                 }
               >
-                <BlogSidebar.PopularTags />
+                <BlogSidebar.PopularTags activeTag={selectedTag} />
               </Suspense>
 
               {/* Featured Posts */}
               <Suspense
                 fallback={
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                  <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#0B111E]">
+                    <div className="mb-4 h-5 w-32 rounded bg-slate-200 dark:bg-white/[0.06]"></div>
                     <div className="space-y-4">
                       {[...Array(3)].map((_, i) => (
                         <div key={i} className="flex space-x-3">
-                          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                          <div className="h-16 w-16 rounded-xl bg-slate-200/80 dark:bg-white/[0.04]"></div>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                            <div className="h-4 rounded bg-slate-200/80 dark:bg-white/[0.04]"></div>
+                            <div className="h-3 w-3/4 rounded bg-slate-200/60 dark:bg-white/[0.03]"></div>
                           </div>
                         </div>
                       ))}
@@ -221,57 +222,94 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 <BlogSidebar.FeaturedPosts />
               </Suspense>
 
-              {/* Newsletter Signup — Interactive Execution Layer Widget */}
-              <div
-                className="bg-linear-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 
-                dark:to-indigo-900/20 rounded-lg p-6 border border-blue-100 dark:border-blue-800"
-              >
-                <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-blue-600 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
+              {/* Newsletter Signup — Harmonized Editorial Card */}
+              <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#0B111E] dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.65)]">
+                {/* Subtle plasma top hairline */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(124,58,237,0.85) 35%, rgba(16,185,129,0.85) 65%, transparent)',
+                  }}
+                />
+                {/* Soft ambient corner glow */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-25 blur-2xl dark:opacity-20"
+                  style={{
+                    background:
+                      'radial-gradient(circle, rgba(124,58,237,0.55) 0%, rgba(16,185,129,0.3) 60%, transparent 100%)',
+                  }}
+                />
+
+                <div className="relative">
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-purple-300/50 bg-purple-500/10 text-purple-700 dark:border-emerald-400/25 dark:bg-white/[0.04] dark:text-emerald-300">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.75}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                    <h2
+                      className="text-xl font-bold tracking-tight text-slate-900 dark:text-white"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      {t('newsletterTitle')}
+                    </h2>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {t('newsletterTitle')}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+
+                  <p className="mb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     {t('newsletterBody')}
                   </p>
+
                   <NewsletterForm source="blog-sidebar" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+
+                  <p className="mt-3 text-center font-mono text-[11px] text-slate-400 dark:text-slate-500">
                     {t('newsletterNoSpam')}
                   </p>
                 </div>
               </div>
 
               {/* About Widget */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#0B111E] dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.65)]">
+                <h2
+                  className="mb-4 text-base font-bold tracking-tight text-slate-900 dark:text-slate-100"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
                   {t('authorCardTitle')}
-                </h3>
-                <div className="flex items-start space-x-3">
+                </h2>
+                <div className="flex items-start space-x-3.5">
                   <div
-                    className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 
-                    rounded-full flex items-center justify-center shrink-0"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #0284C7 0%, #06B6D4 52%, #10B981 100%)',
+                    }}
                   >
-                    <span className="text-white font-bold text-lg">JP</span>
+                    <span className="font-bold text-base tracking-tight text-white">JP</span>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">Jhonny Pimiento</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('authorBio')}</p>
+                    <h3
+                      className="font-semibold text-slate-900 dark:text-white"
+                      style={{ fontFamily: 'var(--font-display)' }}
+                    >
+                      Jhonny Pimiento
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {t('authorBio')}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

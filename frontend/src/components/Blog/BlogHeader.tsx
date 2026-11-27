@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminAuthModal } from '@/components/Auth/AdminAuthModal';
 import { useTranslations } from '@/i18n';
-import { BlogBanner3D } from './BlogBanner3D.client';
+
+const BlogBanner3D = dynamic(
+  () => import('./BlogBanner3D.client').then((mod) => mod.BlogBanner3D),
+  { ssr: false },
+);
 
 const BlogHeaderInner: React.FC = () => {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
@@ -51,10 +56,10 @@ const BlogHeaderInner: React.FC = () => {
         {/* Soft sculptural studio light wash behind the 3D stage */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute right-[8%] top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full opacity-55 blur-[120px] dark:opacity-35"
+          className="pointer-events-none absolute right-[10%] top-1/2 h-[440px] w-[440px] -translate-y-1/2 rounded-full opacity-60 blur-[120px] dark:opacity-40"
           style={{
             background:
-              'radial-gradient(circle, rgba(99,102,241,0.34) 0%, rgba(56,189,248,0.22) 45%, transparent 72%)',
+              'radial-gradient(circle, rgba(124,58,237,0.34) 0%, rgba(16,185,129,0.22) 48%, transparent 74%)',
           }}
         />
 
@@ -69,13 +74,13 @@ const BlogHeaderInner: React.FC = () => {
         />
 
         {/* Asymmetric Editorial + Interactive 3D Stage */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 pt-28 pb-10 sm:px-6 md:pt-32 md:pb-14 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-4">
+        <div className="relative z-10 mx-auto max-w-[90rem] px-4 pt-28 pb-10 sm:px-6 md:pt-32 md:pb-14 lg:px-8">
+          <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-8">
             {/* Editorial Copy Column */}
             <div className="text-center lg:col-span-6 lg:text-left">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/85 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-600 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
                 <span
-                  className="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400"
+                  className="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-emerald-400"
                   aria-hidden="true"
                 />
                 <span style={{ fontFamily: 'var(--font-mono)' }}>
@@ -84,7 +89,7 @@ const BlogHeaderInner: React.FC = () => {
               </div>
 
               <h1
-                className="mb-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl cursor-default dark:text-white"
+                className="mb-5 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl cursor-default dark:bg-gradient-to-b dark:from-white dark:via-slate-100 dark:to-slate-300/90 dark:bg-clip-text dark:text-transparent dark:drop-shadow-[0_2px_20px_rgba(255,255,255,0.12)]"
                 style={{ fontFamily: 'var(--font-display)', lineHeight: 1.06 }}
                 onDoubleClick={() => setIsAdminModalOpen(true)}
                 title={t('adminAccessHint')}
@@ -101,12 +106,12 @@ const BlogHeaderInner: React.FC = () => {
                 className="mt-6 text-xs tracking-wide text-slate-500 dark:text-slate-400"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
-                Drag sculpture to orbit 360° · Click to pulse
+                Move cursor or drag to orbit 360° · Click to pulse
               </p>
             </div>
 
-            {/* Interactive GPU 3D Sculpture Stage — generous, borderless */}
-            <div className="relative mx-auto h-[320px] w-full max-w-[440px] sm:h-[370px] sm:max-w-[500px] lg:col-span-6 lg:-my-6 lg:h-[420px] lg:max-w-none">
+            {/* Interactive GPU 3D Sculpture Stage — centered, generous, borderless */}
+            <div className="relative mx-auto flex h-[320px] w-full max-w-[440px] items-center justify-center sm:h-[380px] sm:max-w-[500px] lg:col-span-6 lg:-my-6 lg:h-[430px] lg:max-w-[540px]">
               <BlogBanner3D />
             </div>
           </div>

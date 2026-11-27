@@ -1,3 +1,5 @@
+import 'server-only'
+
 // frontend/src/lib/firestore/posts.ts
 // Server-side Firestore data access layer for posts
 // NEVER import this file in client components
@@ -185,5 +187,6 @@ export function generateSlug(title: string): string {
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
     .trim()
 }

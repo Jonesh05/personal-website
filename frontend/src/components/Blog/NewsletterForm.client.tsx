@@ -102,26 +102,28 @@ export default function NewsletterForm({ source = 'blog-sidebar' }: { source?: s
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-3" aria-label={t('newsletterTitle')}>
-      <input
-        id={inputId}
-        type="email"
-        required
-        autoComplete="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder={t('newsletterEmailPlaceholder')}
-        aria-invalid={status === 'error'}
-        aria-describedby={status === 'error' && error ? errorId : undefined}
-        disabled={disabled}
-        className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600
-          rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-          placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none
-          focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
-      />
+    <form onSubmit={handleSubmit} noValidate className="space-y-4 text-left" aria-label={t('newsletterTitle')}>
+      <div>
+        <label htmlFor={inputId} className="sr-only">
+          {t('newsletterEmailPlaceholder')}
+        </label>
+        <input
+          id={inputId}
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t('newsletterEmailPlaceholder')}
+          aria-invalid={status === 'error'}
+          aria-describedby={status === 'error' && error ? errorId : undefined}
+          disabled={disabled}
+          className="block w-full rounded-xl border border-slate-200 bg-slate-50/85 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-purple-400/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 disabled:opacity-60 dark:border-white/[0.09] dark:bg-white/[0.04] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-emerald-400/45 dark:focus:bg-white/[0.06] dark:focus:ring-emerald-400/15"
+        />
+      </div>
 
-      {/* Reading Segment Tag Pills */}
-      <div className="flex flex-wrap justify-center gap-1.5 pt-0.5" role="group" aria-label="Reading topics">
+      {/* Symmetrical 3x2 Reading Segment Tag Grid */}
+      <div className="grid grid-cols-3 gap-1.5" role="group" aria-label="Reading topics">
         {NEWSLETTER_TAGS.map((tag) => {
           const isSelected = selectedTags.includes(tag);
           return (
@@ -131,10 +133,10 @@ export default function NewsletterForm({ source = 'blog-sidebar' }: { source?: s
               disabled={disabled}
               aria-pressed={isSelected}
               onClick={() => toggleTag(tag)}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-mono transition-colors cursor-pointer border ${
+              className={`flex items-center justify-center rounded-lg border px-2 py-1.5 font-mono text-[11px] font-medium transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:border-blue-400'
-                  : 'bg-white/70 text-gray-600 border-gray-300 hover:border-blue-400 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600'
+                  ? 'border-purple-400/60 bg-purple-500/15 text-purple-700 dark:border-emerald-400/45 dark:bg-emerald-400/12 dark:text-emerald-300'
+                  : 'border-slate-200/80 bg-slate-50/70 text-slate-500 hover:border-slate-300 hover:text-slate-800 dark:border-white/[0.07] dark:bg-white/[0.02] dark:text-slate-400 dark:hover:border-white/[0.15] dark:hover:text-slate-200'
               }`}
             >
               {COMPACT_TAG_LABELS[tag] ?? `#${tag}`}
@@ -165,12 +167,18 @@ export default function NewsletterForm({ source = 'blog-sidebar' }: { source?: s
         type="submit"
         disabled={disabled}
         aria-disabled={disabled}
-        className="w-full flex justify-center py-2 px-4 border border-transparent
-          rounded-md shadow-sm text-sm font-medium text-white bg-blue-600
-          hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
-          focus:ring-blue-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-emerald-400/40 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        style={{
+          background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 55%, #10B981 100%)',
+          boxShadow: '0 8px 24px -10px rgba(124, 58, 237, 0.55)',
+        }}
       >
-        {disabled ? t('newsletterSubmitting') : t('newsletterSubscribe')}
+        <span>{disabled ? t('newsletterSubmitting') : t('newsletterSubscribe')}</span>
+        {!disabled && (
+          <span aria-hidden="true" className="font-mono text-xs opacity-85">
+            →
+          </span>
+        )}
       </button>
       {status === 'error' && error && (
         <p

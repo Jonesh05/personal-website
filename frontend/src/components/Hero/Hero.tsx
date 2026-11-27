@@ -1,161 +1,66 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
-import { HeroClient } from './HeroClient'
+import { HeroClient } from './HeroClient';
 import { useTranslations } from '@/i18n';
 
 const COLORS = [
   { bg: 'rgba(191, 94, 255, 0.9)',  shadow: '0 0 8px 2px rgba(191, 94, 255, 0.7)'  },
   { bg: 'rgba(0, 255, 178, 0.9)',   shadow: '0 0 8px 2px rgba(0, 255, 178, 0.7)'   },
   { bg: 'rgba(255, 255, 255, 0.7)', shadow: '0 0 5px 1px rgba(255, 255, 255, 0.4)' },
-] as const
+] as const;
 
 interface ParticleData {
-  id:    number
-  size:  number
-  left:  number
-  top:   number
-  color: typeof COLORS[number]
+  id:       number;
+  size:     number;
+  left:     number;
+  top:      number;
+  dx:       number;
+  dy:       number;
+  duration: number;
+  delay:    number;
+  color:    typeof COLORS[number];
 }
 
-function generateParticles(count: number): ParticleData[] {
+type ParticleStyle = CSSProperties & {
+  '--dx':    string;
+  '--dy':    string;
+  '--dur':   string;
+  '--delay': string;
+};
+
+function generateParticles(count: number, isMobile: boolean): ParticleData[] {
   return Array.from({ length: count }, (_, i) => ({
-    id:    i,
-    size:  2 + Math.random() * 4,
-    left:  Math.random() * 100,
-    top:   Math.random() * 100,
-    color: COLORS[i % COLORS.length],
-  }))
+    id:       i,
+    size:     2 + Math.random() * 4,
+    left:     Math.random() * 100,
+    top:      Math.random() * 100,
+    dx:       (isMobile ? -10 : -20) + Math.random() * (isMobile ? 20 : 40),
+    dy:       (isMobile ? -15 : -30) + Math.random() * (isMobile ? 30 : 60),
+    duration: (isMobile ? 4.5 : 3.5) + Math.random() * 2.5,
+    delay:    (i % 12) * 0.25,
+    color:    COLORS[i % COLORS.length],
+  }));
 }
 
 const Hero = () => {
   const t = useTranslations('Hero');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const buttonsRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   /**
-   * Particles are generated purely client-side after mount.
+   * Particles are generated purely client-side after mount and animated with
+   * lightweight CSS @keyframes (no GSAP runtime in the initial Hero bundle).
    * Server always renders an empty array → no hydration mismatch.
-   * Desktop: 55 particles (full experience).
-   * Mobile: 18 particles (same visual, same animation, lighter budget).
    */
-  const [particleData, setParticleData] = useState<ParticleData[]>([])
+  const [particleData, setParticleData] = useState<ParticleData[]>([]);
 
-  // Generate particles after mount — client-only, no SSR/hydration mismatch.
-  // No reduced-motion guard here: particles are a design feature the user
-  // wants visible. The GSAP animation guard below handles the motion pref.
   useEffect(() => {
-    const isMobile = window.innerWidth < 768
-    setParticleData(generateParticles(isMobile ? 18 : 55))
-  }, [])
-
-  // Entrance timeline + scroll parallax. GSAP is dynamically imported so it
-  // stays out of the initial bundle and loads only after hydration.
-  useEffect(() => {
-    let cancelled = false
-    let cleanup = () => {}
-
-    void (async () => {
-      const { gsap } = await import('gsap')
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      if (cancelled) return
-
-      gsap.registerPlugin(ScrollTrigger)
-
-      const container = containerRef.current;
-      const title     = titleRef.current;
-      const subtitle  = subtitleRef.current;
-      const buttons   = buttonsRef.current;
-      if (!container || !title || !subtitle || !buttons) return;
-
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (prefersReduced) {
-        gsap.set([title, subtitle, buttons], { opacity: 1, y: 0, scale: 1 })
-        return
-      }
-
-      // Estados iniciales
-      gsap.set([title, subtitle, buttons], { opacity: 0, y: 100, scale: 0.8 });
-
-      // Timeline de entrada
-      const tl = gsap.timeline();
-      tl.to(title,    { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out' })
-        .to(subtitle, { opacity: 1, y: 0, scale: 1, duration: 1,   ease: 'power3.out' }, '-=0.8')
-        .to(buttons,  { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' }, '-=0.6');
-
-      // ScrollTrigger parallax
-      ScrollTrigger.create({
-        trigger: container,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1,
-        onUpdate: (self) => {
-          const p = self.progress;
-          gsap.to(title,    { y: p * -100, scale: 1 - p * 0.3, opacity: 1 - p * 0.5, duration: 0.3 });
-          gsap.to(subtitle, { y: p * -80,  opacity: 1 - p * 0.7, duration: 0.3 });
-          gsap.to(buttons,  { y: p * -60,  opacity: 1 - p * 0.8, duration: 0.3 });
-          gsap.to(container, { backgroundPosition: `50% ${50 + p * 30}%`, duration: 0.3 });
-        },
-      });
-
-      cleanup = () => {
-        tl.kill();
-        ScrollTrigger.getAll().forEach((t) => t.kill());
-      }
-    })()
-
-    return () => {
-      cancelled = true
-      cleanup()
-    };
+    const isMobile = window.innerWidth < 768;
+    setParticleData(generateParticles(isMobile ? 18 : 55, isMobile));
   }, []);
-
-  useEffect(() => {
-    const container = particlesRef.current;
-    if (!container || particleData.length === 0) return;
-
-    const els = container.querySelectorAll<HTMLElement>('[data-particle]');
-    if (els.length === 0) return;
-
-    let cancelled = false
-    let cleanup = () => {}
-
-    void (async () => {
-      const { gsap } = await import('gsap')
-      if (cancelled) return
-
-      const isMobile = window.innerWidth < 768
-
-      const tweens = Array.from(els).map((el, i) =>
-        gsap.to(el, {
-          // Mobile: tighter movement so it stays light on the GPU
-          y:        (isMobile ? -15 : -30) + Math.random() * (isMobile ? 30 : 60),
-          x:        (isMobile ? -10 : -20) + Math.random() * (isMobile ? 20 : 40),
-          duration: (isMobile ? 4 : 3) + Math.random() * 2,
-          repeat:   -1,
-          yoyo:     true,
-          ease:     'sine.inOut',
-          delay:    i * 0.08,
-        })
-      );
-
-      cleanup = () => tweens.forEach((t) => t.kill())
-    })()
-
-    return () => {
-      cancelled = true
-      cleanup()
-    };
-  }, [particleData]);
 
   return (
     <section
-      ref={containerRef}
       className="relative min-h-screen flex items-center justify-center bg-white dark:bg-gradient-to-br dark:from-primary-600 dark:via-primary-700 dark:to-primary-800 overflow-hidden
         pt-[max(6.75rem,calc(env(safe-area-inset-top,0px)+5.25rem))] pb-10
         sm:pt-16 md:pt-20 lg:pt-10"
@@ -169,10 +74,10 @@ const Hero = () => {
             'radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
         }}
       />
-      <div ref={glowRef} className="hidden dark:block absolute inset-0 bg-gradient-to-br from-purple-900 via-gray-900 to-slate-950"/>
+      <div className="hidden dark:block absolute inset-0 bg-gradient-to-br from-purple-900 via-gray-900 to-slate-950" aria-hidden="true" />
 
       {/* Overlay */}
-      <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" />
+      <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-primary-500/20 to-transparent animate-pulse" aria-hidden="true" />
       {/* ── Plasma background blobs (CSS-only, SSR-safe) ── */}
       <div className="hidden dark:block absolute inset-0 pointer-events-none" aria-hidden="true">
         {/* Purple blob, top left */}
@@ -211,30 +116,37 @@ const Hero = () => {
       <div className="hidden dark:block fixed inset-0 grid-overlay pointer-events-none opacity-20" aria-hidden="true" />
 
       <div
-        ref={particlesRef}
         className="hidden dark:block absolute inset-0 pointer-events-none"
         style={{ zIndex: 3 }}
+        aria-hidden="true"
       >
-        {particleData.map((p) => (
-          <span
-            key={p.id}
-            data-particle
-            style={{
-              position:    'absolute',
-              width:       `${p.size}px`,
-              height:      `${p.size}px`,
-              borderRadius: '50%',
-              left:        `${p.left}%`,
-              top:         `${p.top}%`,
-              background:  p.color.bg,
-              boxShadow:   p.color.shadow,
-              pointerEvents: 'none',
-            }}
-          />
-        ))}
+        {particleData.map((p) => {
+          const style: ParticleStyle = {
+            position:      'absolute',
+            width:         `${p.size}px`,
+            height:        `${p.size}px`,
+            borderRadius:  '50%',
+            left:          `${p.left}%`,
+            top:           `${p.top}%`,
+            background:    p.color.bg,
+            boxShadow:     p.color.shadow,
+            pointerEvents: 'none',
+            '--dx':        `${p.dx.toFixed(1)}px`,
+            '--dy':        `${p.dy.toFixed(1)}px`,
+            '--dur':       `${p.duration.toFixed(2)}s`,
+            '--delay':     `${p.delay.toFixed(2)}s`,
+          };
+          return (
+            <span
+              key={p.id}
+              className="hero-particle"
+              style={style}
+            />
+          );
+        })}
       </div>
 
-      
+
       <div className="relative flex flex-col-reverse items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-between md:gap-10 lg:gap-14">
       {/* Content */}
         <div className="mx-auto px-4 py-10 mt-2.5 relative text-center ">
@@ -250,9 +162,7 @@ const Hero = () => {
             animationDelay: '80ms',
           }}
           >
-            <span
-              ref={titleRef}
-              style={{ color: 'var(--color-text)' }}>Jhonny</span>
+            <span style={{ color: 'var(--color-text)' }}>Jhonny</span>
           <br />
           <span className="text-plasma">Pimiento</span>
           </h1>
@@ -290,7 +200,7 @@ const Hero = () => {
               }}
             >
               {t('cta_work')}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
@@ -308,33 +218,29 @@ const Hero = () => {
         </div>
         <div className="relative w-52 h-52 md:w-64 md:h-64 lg:w-80 lg:h-80
           mb-12 sm:mb-20 mx-auto mt-6 sm:mt-24 md:mt-32 lg:mt-36">
-          {/* Spinners */}
-          {/* <div className="absolute -inset-6 rounded-full bg-linear-to-r from-fuchsia-500 via-purple-600 to-indigo-500 animate-spin-slow z-0 blur-md opacity-70"></div>
-          <div className="absolute -inset-4 rounded-full bg-linear-to-r from-purple-500 via-fuchsia-400 to-pink-500 animate-spin-reverse-slower z-0 blur-xs opacity-60"></div> */}
-          <div className="hidden dark:block absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40"></div>
+          <div className="hidden dark:block absolute -inset-2 rounded-full bg-linear-to-r from-fuchsia-400 to-purple-600 animate-spin-slowest z-0 opacity-40" aria-hidden="true" />
           {/* Avatar visible */}
           <div className="relative z-10 w-full h-full rounded-full overflow-hidden shadow-xl shadow-fuchsia-500/30">
             <Image
               src="/images/image-devcon.jpg"
-              alt="Avatar"
+              alt="Jhonny Pimiento — Senior Software & Web3 Engineer"
               width={320}
               height={320}
               priority
               sizes="(max-width:768px) 208px,(max-width:1024px) 256px,320px"
               className="w-full h-full object-cover object-center rounded-full"
             />
-            
           </div>
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full animate-ping"></div>
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full"></div>
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full animate-ping" aria-hidden="true" />
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full" aria-hidden="true" />
           </div>
-        
-        
+
+
       </div>
-      
+
 
       {/* Scroll pending */}
-      <div className="absolute bottom-[5px] pb-40 left-[41%] hidden dark:lg:block -translate-x-1/2">
+      <div className="absolute bottom-[5px] pb-40 left-[41%] hidden dark:lg:block -translate-x-1/2" aria-hidden="true">
         <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce" />
         </div>

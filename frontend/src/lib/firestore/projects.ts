@@ -1,3 +1,5 @@
+import 'server-only'
+
 // frontend/src/lib/firestore/projects.ts
 // Server-side Firestore data access layer for projects
 // NEVER import this file in client components

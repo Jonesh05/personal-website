@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useId } from 'react';
-import { useTranslations } from '@/i18n';
+import { useLocale, useTranslations } from '@/i18n';
 
 interface FieldProps {
   id: string;
@@ -73,6 +73,7 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 export default function ContactForm() {
   const t = useTranslations('Contact');
+  const { locale } = useLocale();
   const uid = useId();
   const nameId    = `${uid}-name`;
   const emailId   = `${uid}-email`;
@@ -116,6 +117,7 @@ export default function ContactForm() {
           name,
           email,
           message,
+          locale,
           ...(website ? { website } : {}),
         }),
       });
@@ -224,7 +226,7 @@ export default function ContactForm() {
                 aria-required="true"
                 aria-invalid={!!errors.name}
                 aria-describedby={errors.name ? `${nameId}-error` : undefined}
-                placeholder={t('placeholder_name')}
+                placeholder={t('form_name')}
                 style={useInputStyle(nameFocus, !!errors.name)}
               />
             </Field>

@@ -65,7 +65,7 @@ function Divider() {
 
 function ColumnHeading({ children }: { children: React.ReactNode }) {
     return (
-        <span className="mb-1 font-mono text-[0.67rem] font-medium uppercase tracking-[0.13em] text-slate-500 dark:text-white/25">
+        <span className="mb-1 font-mono text-[0.67rem] font-medium uppercase tracking-[0.13em] text-slate-600 dark:text-slate-400">
             {children}
         </span>
     );
@@ -74,7 +74,7 @@ function ColumnHeading({ children }: { children: React.ReactNode }) {
 
 function NavLink({ label, href }: FooterLink) {
     const sharedClasses =
-        "inline-block text-[0.83rem] font-light leading-relaxed tracking-wide text-slate-600 dark:text-white/44 transition-all duration-150 ease-out hover:translate-x-1 hover:text-slate-900 dark:hover:text-white/88";
+        "inline-block text-[0.83rem] font-light leading-relaxed tracking-wide text-slate-600 dark:text-slate-300 transition-all duration-150 ease-out hover:translate-x-1 hover:text-slate-900 dark:hover:text-white";
 
     return isExternalHref(href) ? (
         <a href={href} target="_blank" rel="noopener noreferrer" className={sharedClasses}>
@@ -130,7 +130,7 @@ function BrandBlock({ config }: { config: FooterConfig }) {
                 </span>
             </Link>
 
-            <p className="text-[0.8rem] font-light leading-[1.75] tracking-wide text-slate-500 dark:text-white/36">
+            <p className="text-[0.8rem] font-light leading-[1.75] tracking-wide text-slate-600 dark:text-slate-400">
                 {brand.tagline}
             </p>
 
@@ -148,7 +148,7 @@ function LegalBar({ config, year }: { config: FooterConfig; year: number }) {
     return (
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
             {/* Auto-updating year, no hardcoded date */}
-            <span className="text-[0.73rem] tracking-wide text-slate-400 dark:text-white/25">
+            <span className="text-[0.73rem] tracking-wide text-slate-600 dark:text-slate-400">
                 © {year} {config.brand.name}. All rights reserved.
             </span>
 
@@ -157,7 +157,7 @@ function LegalBar({ config, year }: { config: FooterConfig; year: number }) {
                     <Link
                         key={href}
                         href={href}
-                        className="text-[0.73rem] tracking-wide text-slate-500 dark:text-white/28 transition-colors duration-150 hover:text-slate-900 dark:hover:text-white/65"
+                        className="text-[0.73rem] tracking-wide text-slate-600 dark:text-slate-400 transition-colors duration-150 hover:text-slate-900 dark:hover:text-white"
                     >
                         {label}
                     </Link>

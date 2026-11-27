@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Post } from '@/lib/firestore/posts';
 import PostCard from '@/components/Blog/PostCard';
 import ApiError from '@/components/ui/ApiError';
@@ -91,8 +92,18 @@ export default async function BlogSection() {
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} headingLevel="h3" />
           ))}
+        </div>
+
+        <div className="mt-12 flex justify-center">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-6 py-2.5 text-sm font-medium text-slate-900 transition-all duration-200 hover:-translate-y-0.5 hover:border-purple-400 hover:text-purple-700 dark:border-white/15 dark:bg-white/[0.04] dark:text-slate-100 dark:hover:border-purple-400/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
+            style={{ fontFamily: 'var(--font-mono)' }}
+          >
+            {t('viewAllArticles')} <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </section>

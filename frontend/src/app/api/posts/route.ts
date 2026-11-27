@@ -1,6 +1,13 @@
 // frontend/src/app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getPosts } from '@/lib/firestore/posts'
+import { matchesPostSearch, scorePostSearch } from '@/utils/postSearch'
+import {
+  checkRateLimit,
+  DEFAULT_PUBLIC_LIMIT,
+  getRateLimitClientKey,
+  rateLimitHeaders,
+} from '@/lib/rateLimit'
 
 // This route is request-driven (pagination, tag, search all come from
 // querystring) and should never be statically evaluated at build time.
@@ -8,6 +15,21 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
+    const clientKey = getRateLimitClientKey({ request: req })
+    const rl = checkRateLimit(`posts:list:${clientKey}`, DEFAULT_PUBLIC_LIMIT)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            ...rateLimitHeaders(rl),
+            'Retry-After': String(Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000))),
+          },
+        },
+      )
+    }
+
     const { searchParams } = new URL(req.url)
     const limitParam = parseInt(searchParams.get('limit') ?? '10', 10)
     const offsetParam = parseInt(searchParams.get('offset') ?? '0', 10)
@@ -21,10 +43,9 @@ export async function GET(req: NextRequest) {
     const posts = await getPosts({ published: true, tag })
 
     const filtered = search
-      ? posts.filter(p =>
-          p.title.toLowerCase().includes(search.toLowerCase()) ||
-          p.excerpt?.toLowerCase().includes(search.toLowerCase())
-        )
+      ? posts
+          .filter((p) => matchesPostSearch(p, search))
+          .sort((a, b) => scorePostSearch(b, search) - scorePostSearch(a, search))
       : posts
 
     const paginatedPosts = filtered.slice(offset, offset + limit)

@@ -1,3 +1,5 @@
+import 'server-only'
+
 // frontend/src/lib/firestore/interactions.ts
 // Server-only. Durable blog interactions (likes, views, saves) backed by
 // Firestore subcollections with atomic counters.
@@ -177,6 +179,11 @@ export async function mirrorLike(
   if (liked) {
     await ref.set({ likedAt: FieldValue.serverTimestamp() })
   } else {
-    await ref.delete().catch(() => {})
+    await ref.delete().catch((err: unknown) => {
+      const code = (err as { code?: string | number } | null)?.code
+      if (code !== 5 && code !== 'not-found' && code !== 'NOT_FOUND') {
+        console.warn('[firestore/interactions] mirrorLike delete failed:', err)
+      }
+    })
   }
 }

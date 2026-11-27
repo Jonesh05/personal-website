@@ -42,12 +42,18 @@ async function getSubscriberTelemetry(): Promise<SubscriberTelemetry> {
 
 export default async function AdminPage() {
   const user = await getSessionUser()
-  if (!user?.isAdmin) redirect('/blog?login=required')
+  if (!user?.isAdmin) redirect('/blog/login')
   const { t } = await getServerTranslations('AdminDashboard')
 
   const [posts, contacts, subTelemetry] = await Promise.all([
-    getPosts().catch(() => []),
-    getContacts().catch(() => []),
+    getPosts().catch((err) => {
+      console.warn('[blog/admin] getPosts failed:', err)
+      return []
+    }),
+    getContacts().catch((err) => {
+      console.warn('[blog/admin] getContacts failed:', err)
+      return []
+    }),
     getSubscriberTelemetry(),
   ])
 
@@ -128,7 +134,7 @@ export default async function AdminPage() {
           {
             label: 'Active Subscribers',
             value: subTelemetry.active,
-            sub: subTelemetry.dbOnline ? `${subTelemetry.total} total in PG` : 'PG offline/unconfigured',
+            sub: subTelemetry.dbOnline ? `${subTelemetry.total} total in Firestore` : 'Firestore offline/unconfigured',
             color: 'text-teal-300',
             border: 'rgba(45, 212, 191, 0.3)',
           },
@@ -180,7 +186,7 @@ export default async function AdminPage() {
 
       {/* Execution Layer: Reading Segmentation & Azure OpenAI Copilot Status */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Newsletter Segmentation Distribution (PostgreSQL + Prisma) */}
+        {/* Newsletter Segmentation Distribution (Firestore + Resend) */}
         <div
           className="lg:col-span-7 rounded-2xl p-6 border"
           style={{
@@ -194,7 +200,7 @@ export default async function AdminPage() {
                 className="text-[11px] uppercase tracking-widest text-teal-400 block"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
-                [PRISMA + RESEND EXECUTION LAYER]
+                [FIRESTORE + RESEND EXECUTION LAYER]
               </span>
               <h2
                 className="text-lg font-bold text-white mt-0.5"
@@ -211,7 +217,7 @@ export default async function AdminPage() {
               }`}
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              {subTelemetry.dbOnline ? 'POSTGRES: CONNECTED' : 'POSTGRES: AWAITING DATABASE_URL'}
+              {subTelemetry.dbOnline ? 'FIRESTORE: CONNECTED' : 'FIRESTORE: OFFLINE'}
             </span>
           </div>
 

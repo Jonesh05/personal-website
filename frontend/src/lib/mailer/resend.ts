@@ -13,6 +13,12 @@ import 'server-only'
 import type { ContactNotification, Mailer, TransactionalEmail } from './types'
 import { MailerError } from './types'
 import { getContactFrom } from '@/lib/siteConfig'
+import {
+  buildContactAdminHtml,
+  buildContactAdminSubject,
+  buildContactAdminText,
+  sanitizeEmailHeaderValue,
+} from './contactFormatter'
 
 const DRIVER = 'resend'
 
@@ -43,41 +49,6 @@ function readConfig(): ResendConfig {
   return { apiKey, to, from }
 }
 
-function escapeHtml(raw: string): string {
-  return raw
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-function buildSubject(name: string): string {
-  const clean = name.trim().slice(0, 60) || 'a visitor'
-  return `[contact] new message from ${clean}`
-}
-
-function buildHtml(msg: ContactNotification): string {
-  const body = escapeHtml(msg.message).replace(/\n/g, '<br/>')
-  return [
-    '<div style="font-family:system-ui,Segoe UI,Roboto,sans-serif;line-height:1.5">',
-    `<p><strong>From:</strong> ${escapeHtml(msg.name)} &lt;${escapeHtml(msg.email)}&gt;</p>`,
-    `<p><strong>Message ID:</strong> <code>${escapeHtml(msg.id)}</code></p>`,
-    '<hr/>',
-    `<p>${body}</p>`,
-    '</div>',
-  ].join('')
-}
-
-function buildText(msg: ContactNotification): string {
-  return [
-    `From: ${msg.name} <${msg.email}>`,
-    `Message ID: ${msg.id}`,
-    '---',
-    msg.message,
-  ].join('\n')
-}
-
 async function postToResend(payload: {
   apiKey:   string
   from:     string
@@ -86,6 +57,7 @@ async function postToResend(payload: {
   subject:  string
   html:     string
   text?:    string
+  headers?: Record<string, string>
 }): Promise<void> {
   let res: Response
   try {
@@ -102,6 +74,9 @@ async function postToResend(payload: {
         subject:  payload.subject,
         html:     payload.html,
         ...(payload.text ? { text: payload.text } : {}),
+        ...(payload.headers && Object.keys(payload.headers).length > 0
+          ? { headers: payload.headers }
+          : {}),
       }),
       cache: 'no-store',
     })
@@ -132,10 +107,10 @@ async function send(msg: ContactNotification): Promise<void> {
     apiKey:  cfg.apiKey,
     from:    cfg.from,
     to:      cfg.to,
-    replyTo: msg.email,
-    subject: buildSubject(msg.name),
-    html:    buildHtml(msg),
-    text:    buildText(msg),
+    replyTo: sanitizeEmailHeaderValue(msg.email),
+    subject: buildContactAdminSubject(msg.name),
+    html:    buildContactAdminHtml(msg),
+    text:    buildContactAdminText(msg),
   })
 }
 
@@ -156,6 +131,7 @@ async function sendEmail(msg: TransactionalEmail): Promise<void> {
     subject: msg.subject,
     html:    msg.html,
     text:    msg.text,
+    headers: msg.headers,
   })
 }
 

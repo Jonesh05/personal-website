@@ -16,12 +16,15 @@ import { render } from '@react-email/render'
 import { Resend } from 'resend'
 import {
   buildBatchIdempotencyKey,
+  buildOneClickUnsubscribeUrl,
   buildPostUrl,
   buildPreferencesUrl,
   buildUnsubscribeUrl,
   chunkArray,
+  isDeliverableSubscriberEmail,
   normalizeTags,
   sanitizeEmailSubject,
+  type BroadcastAudienceMode,
   type BroadcastResult,
   type PostBroadcastInput,
 } from '@/domain/newsletter/broadcast'
@@ -32,13 +35,14 @@ import {
 } from '@/lib/firestore/dispatches'
 import { listActiveSubscribersByTags } from '@/lib/firestore/subscribers'
 import { getMailer, sendTransactionalEmail } from '@/lib/mailer'
-import { getNewsletterFrom, getSiteUrl } from '@/lib/siteConfig'
 import {
-  NewsletterTemplate,
-  type NewsletterArticleItem,
-} from '@/emails/NewsletterTemplate'
+  getNewsletterFrom,
+  getPublicContactEmail,
+  getSiteUrl,
+} from '@/lib/siteConfig'
+import { NewsletterTemplate } from '@/emails/NewsletterTemplate'
 
-export type { BroadcastResult, PostBroadcastInput }
+export type { BroadcastAudienceMode, BroadcastResult, PostBroadcastInput }
 
 const INTER_BATCH_DELAY_MS = 600
 
@@ -46,11 +50,40 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function buildBroadcastPlainText(params: {
+  metaLine: string
+  headline: string
+  excerpt: string
+  postUrl: string
+  preferencesUrl: string
+  unsubscribeUrl: string
+}): string {
+  return [
+    params.metaLine,
+    params.headline,
+    '',
+    params.excerpt,
+    '',
+    `Read the full article: ${params.postUrl}`,
+    '',
+    'Hit reply if you have thoughts or questions — I read every response.',
+    '',
+    'Best,',
+    'Jhonny Pimiento',
+    'jonesh.me',
+    '',
+    '---',
+    `Manage preferences: ${params.preferencesUrl}`,
+    `Unsubscribe: ${params.unsubscribeUrl}`,
+  ].join('\n')
+}
+
 /**
- * Dispatches a newly published blog post to all `active` Firestore subscribers
- * whose `tags` intersect with the post's tags (or all active subscribers when
- * the post has no tags). Guaranteed at-most-once per `postId` via an atomic
- * Firestore dispatch lock + Resend `Idempotency-Key`.
+ * Dispatches a newly published blog post to active Firestore subscribers.
+ * Defaults to `audienceMode: 'all'` so posts on new topics reach all active
+ * subscribers; pass `audienceMode: 'matching-tags'` to restrict by tag overlap.
+ * Guaranteed at-most-once per `postId` via an atomic Firestore dispatch lock
+ * + Resend `Idempotency-Key` (unless `force: true`).
  */
 export async function broadcastPostToSubscribers(
   post: PostBroadcastInput,
@@ -122,10 +155,27 @@ export async function broadcastPostToSubscribers(
     }
   }
 
+  const audienceMode: BroadcastAudienceMode = post.audienceMode ?? 'all'
   const normalizedTags = normalizeTags(post.tags)
-  const allMatched = await listActiveSubscribersByTags(normalizedTags)
-  const subscribers = allMatched.filter(
+  const allMatched = await listActiveSubscribersByTags(
+    normalizedTags,
+    500,
+    audienceMode,
+  )
+  const validTokenSubscribers = allMatched.filter(
     (sub) => Boolean(sub.email.trim()) && Boolean(sub.magicToken.trim()),
+  )
+  const skippedReservedEmails = validTokenSubscribers
+    .filter((sub) => !isDeliverableSubscriberEmail(sub.email))
+    .map((sub) => sub.email)
+  if (skippedReservedEmails.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[mailer/dispatch] Skipping ${skippedReservedEmails.length} non-deliverable/reserved test email(s): ${skippedReservedEmails.join(', ')}`,
+    )
+  }
+  const subscribers = validTokenSubscribers.filter((sub) =>
+    isDeliverableSubscriberEmail(sub.email),
   )
 
   if (subscribers.length === 0) {
@@ -137,24 +187,27 @@ export async function broadcastPostToSubscribers(
       matchedSubscribers: 0,
       sentCount:          0,
       failedCount:        0,
-      skippedReason:      'No active subscribers matched post tags',
+      skippedReason:
+        skippedReservedEmails.length > 0
+          ? 'Only reserved test email addresses (e.g. example.com) were found — no deliverable subscribers'
+          : audienceMode === 'matching-tags'
+            ? 'No active subscribers matched post tags'
+            : 'No active subscribers found',
       errors:             [],
     }
   }
 
   const baseUrl = getSiteUrl()
+  const replyTo = getPublicContactEmail()
   const postUrl = buildPostUrl(baseUrl, cleanSlug)
   const cleanExcerpt =
     post.excerpt.trim() ||
-    'A new technical article has been published on jonesh.me.'
-
-  const articleItem: NewsletterArticleItem = {
-    title:           cleanTitle,
-    excerpt:         cleanExcerpt,
-    url:             postUrl,
-    tag:             normalizedTags[0],
-    readTimeMinutes: post.readTimeMinutes ?? 5,
-  }
+    'I just published a new engineering note on jonesh.me.'
+  const readTimeMinutes = post.readTimeMinutes ?? 5
+  const primaryTag = normalizedTags[0]
+  const metaLine = primaryTag
+    ? `${primaryTag.toUpperCase()} · ${readTimeMinutes} MIN READ`
+    : `${readTimeMinutes} MIN READ`
 
   let sentCount = 0
   let failedCount = 0
@@ -170,47 +223,56 @@ export async function broadcastPostToSubscribers(
         const payloads = await Promise.all(
           batch.map(async (sub) => {
             const preferencesUrl = buildPreferencesUrl(baseUrl, sub.magicToken)
-            const unsubscribeUrl = buildUnsubscribeUrl(baseUrl, sub.magicToken)
+            const footerUnsubscribeUrl = buildUnsubscribeUrl(baseUrl, sub.magicToken)
+            const oneClickUnsubscribeUrl = buildOneClickUnsubscribeUrl(
+              baseUrl,
+              sub.magicToken,
+            )
 
             const html = await render(
               React.createElement(NewsletterTemplate, {
                 subscriberEmail: sub.email,
                 magicToken:      sub.magicToken,
                 previewText:     cleanExcerpt,
+                metaLine,
                 headline:        cleanTitle,
                 introParagraph:  cleanExcerpt,
-                articles:        [articleItem],
-                ctaLabel:        'Read Full Article →',
+                ctaLabel:        'Read the full article →',
                 ctaUrl:          postUrl,
+                replyHint:
+                  'Hit reply if you have thoughts or questions — I read every response.',
                 baseUrl,
               }),
             )
 
-            const text = [
-              cleanTitle,
-              '',
-              cleanExcerpt,
-              '',
-              `Read more: ${postUrl}`,
-              `Manage preferences: ${preferencesUrl}`,
-              `Unsubscribe: ${unsubscribeUrl}`,
-            ].join('\n')
+            const text = buildBroadcastPlainText({
+              metaLine,
+              headline:       cleanTitle,
+              excerpt:        cleanExcerpt,
+              postUrl,
+              preferencesUrl,
+              unsubscribeUrl: footerUnsubscribeUrl,
+            })
 
             return {
               from:    fromAddress,
               to:      [sub.email],
+              replyTo,
               subject: cleanTitle,
               html,
               text,
               headers: {
-                'List-Unsubscribe':      `<${unsubscribeUrl}>`,
+                'List-Unsubscribe':      `<${oneClickUnsubscribeUrl}>`,
                 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+                'X-Entity-Ref-ID':       `post-broadcast:${post.postId}:${sub.id.slice(0, 12)}`,
               },
             }
           }),
         )
 
-        const idempotencyKey = buildBatchIdempotencyKey(post.postId, batchIndex)
+        const idempotencyKey = post.force
+          ? `${buildBatchIdempotencyKey(post.postId, batchIndex)}:${Date.now()}`
+          : buildBatchIdempotencyKey(post.postId, batchIndex)
         const res = await resend.batch.send(payloads, { idempotencyKey })
         if (res.error) {
           failedCount += batch.length
@@ -238,18 +300,24 @@ export async function broadcastPostToSubscribers(
     for (const sub of subscribers) {
       try {
         const preferencesUrl = buildPreferencesUrl(baseUrl, sub.magicToken)
-        const unsubscribeUrl = buildUnsubscribeUrl(baseUrl, sub.magicToken)
+        const footerUnsubscribeUrl = buildUnsubscribeUrl(baseUrl, sub.magicToken)
+        const oneClickUnsubscribeUrl = buildOneClickUnsubscribeUrl(
+          baseUrl,
+          sub.magicToken,
+        )
 
         const html = await render(
           React.createElement(NewsletterTemplate, {
             subscriberEmail: sub.email,
             magicToken:      sub.magicToken,
             previewText:     cleanExcerpt,
+            metaLine,
             headline:        cleanTitle,
             introParagraph:  cleanExcerpt,
-            articles:        [articleItem],
-            ctaLabel:        'Read Full Article →',
+            ctaLabel:        'Read the full article →',
             ctaUrl:          postUrl,
+            replyHint:
+              'Hit reply if you have thoughts or questions — I read every response.',
             baseUrl,
           }),
         )
@@ -257,17 +325,22 @@ export async function broadcastPostToSubscribers(
         await sendTransactionalEmail({
           from:    fromAddress,
           to:      sub.email,
+          replyTo,
           subject: cleanTitle,
           html,
-          text: [
-            cleanTitle,
-            '',
-            cleanExcerpt,
-            '',
-            `Read more: ${postUrl}`,
-            `Manage preferences: ${preferencesUrl}`,
-            `Unsubscribe: ${unsubscribeUrl}`,
-          ].join('\n'),
+          text: buildBroadcastPlainText({
+            metaLine,
+            headline:       cleanTitle,
+            excerpt:        cleanExcerpt,
+            postUrl,
+            preferencesUrl,
+            unsubscribeUrl: footerUnsubscribeUrl,
+          }),
+          headers: {
+            'List-Unsubscribe':      `<${oneClickUnsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            'X-Entity-Ref-ID':       `post-broadcast:${post.postId}:${sub.id.slice(0, 12)}`,
+          },
         })
         sentCount += 1
       } catch (err) {
@@ -300,6 +373,15 @@ export async function broadcastPostToSubscribers(
         errors,
       })
     }
+  } else if (post.force && sentCount > 0) {
+    // Record forced/retried dispatch outcome so Admin Posts reflects latest delivery
+    await finalizeBroadcastLock(post.postId, {
+      status,
+      matchedSubscribers: subscribers.length,
+      sentCount,
+      failedCount,
+      errors,
+    })
   }
 
   return {

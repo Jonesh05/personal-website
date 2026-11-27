@@ -27,12 +27,45 @@ import {
 } from '@/lib/rateLimit'
 import { getVisitorId } from '@/lib/visitor'
 import * as contactsDb from '@/lib/firestore/contacts'
-import { sendContactNotification } from '@/lib/mailer'
+import {
+  buildContactAutoReply,
+  sendContactNotification,
+  sendTransactionalEmail,
+  type ContactAutoReplyLocale,
+} from '@/lib/mailer'
+import {
+  getContactFrom,
+  getNewsletterFrom,
+  getPublicContactEmail,
+  getSiteUrl,
+} from '@/lib/siteConfig'
+import { LOCALE_KEY } from '@/i18n/constants'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const RATE_LIMIT = { limit: 3, windowMs: 10 * 60_000 }
+
+function resolveContactLocale(
+  raw: unknown,
+  req: NextRequest,
+): ContactAutoReplyLocale {
+  if (raw && typeof raw === 'object' && 'locale' in raw) {
+    const bodyLocale = (raw as { locale?: unknown }).locale
+    if (typeof bodyLocale === 'string') {
+      const lower = bodyLocale.toLowerCase()
+      if (lower === 'es' || lower.startsWith('es-')) return 'es'
+      if (lower === 'en' || lower.startsWith('en-')) return 'en'
+    }
+  }
+  const cookieLocale = req.cookies.get(LOCALE_KEY)?.value?.toLowerCase()
+  if (cookieLocale === 'es' || cookieLocale?.startsWith('es-')) return 'es'
+  if (cookieLocale === 'en' || cookieLocale?.startsWith('en-')) return 'en'
+
+  const accept = req.headers.get('accept-language')?.toLowerCase() ?? ''
+  if (accept.startsWith('es')) return 'es'
+  return 'en'
+}
 
 export async function POST(req: NextRequest) {
   const clientKey = getRateLimitClientKey({
@@ -119,6 +152,40 @@ export async function POST(req: NextRequest) {
     } catch (updateErr) {
       logError('firestore_mark_failed_failed', updateErr)
     }
+  }
+
+  // 3) Best-effort human auto-reply to the sender. Never blocks or fails the
+  //    contact submission if the mailer is unconfigured or transiently unavailable.
+  try {
+    const autoReplyFrom = getNewsletterFrom() || getContactFrom()
+    if (autoReplyFrom) {
+      const locale = resolveContactLocale(raw, req)
+      const autoReply = buildContactAutoReply({
+        name:    parsed.data.name,
+        message: parsed.data.message,
+        locale,
+        siteUrl: getSiteUrl(),
+      })
+      await sendTransactionalEmail({
+        from:    autoReplyFrom,
+        to:      parsed.data.email,
+        replyTo: getPublicContactEmail(),
+        subject: autoReply.subject,
+        html:    autoReply.html,
+        text:    autoReply.text,
+        headers: {
+          'Auto-Submitted':  'auto-replied',
+          'X-Entity-Ref-ID': `contact-autoreply:${contactId}`,
+        },
+      })
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('[api/contact] auto-reply skipped: no sender address configured')
+    }
+  } catch (autoReplyErr) {
+    const msg = autoReplyErr instanceof Error ? autoReplyErr.message : String(autoReplyErr)
+    // eslint-disable-next-line no-console
+    console.warn(`[api/contact] auto-reply failed: ${msg}`)
   }
 
   return NextResponse.json(

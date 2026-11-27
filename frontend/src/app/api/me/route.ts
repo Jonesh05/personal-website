@@ -38,8 +38,14 @@ export async function GET(request: NextRequest) {
   }
 
   const [likedPostIds, savedPosts] = await Promise.all([
-    listLikedPostIds(visitorId).catch(() => []),
-    listSavedPosts(visitorId).catch(() => []),
+    listLikedPostIds(visitorId).catch((err) => {
+      console.warn('[api/me] listLikedPostIds failed:', err)
+      return []
+    }),
+    listSavedPosts(visitorId).catch((err) => {
+      console.warn('[api/me] listSavedPosts failed:', err)
+      return []
+    }),
   ])
 
   return NextResponse.json(

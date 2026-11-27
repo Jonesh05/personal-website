@@ -72,10 +72,10 @@
   --gradient-surface:     linear-gradient(180deg, var(--color-surface) 0%, var(--color-void) 100%);
 
   /* Typography  */
-  --font-sans:    Inter, system-ui, sans-serif;
-  --font-display: 'Syne', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
-  --font-body:    'DM Sans', sans-serif;
+  --font-sans:    var(--font-inter), Inter, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
+  --font-mono:    var(--font-ibm-plex-mono), 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-body:    var(--font-inter), Inter, system-ui, sans-serif;
 
   /*  Spacing */
   --radius-card: 12px;
@@ -203,6 +203,23 @@ body {
 .plasma-blob-a { animation: plasma-float-a 18s ease-in-out infinite; }
 .plasma-blob-b { animation: plasma-float-b 22s ease-in-out infinite; }
 .plasma-blob-c { animation: plasma-float-c 15s ease-in-out infinite; }
+
+/* Lightweight CSS Hero particles (replaces GSAP tweens) */
+@keyframes hero-particle-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%       { transform: translate3d(var(--dx, 12px), var(--dy, -18px), 0); }
+}
+
+.hero-particle {
+  animation: hero-particle-float var(--dur, 4.5s) ease-in-out var(--delay, 0s) infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-particle {
+    animation: none;
+  }
+}
 
 /* Cursor blink  */
 @keyframes blink {

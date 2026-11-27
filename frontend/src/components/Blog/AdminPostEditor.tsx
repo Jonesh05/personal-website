@@ -7,6 +7,7 @@ import { toast } from "@/lib/toast"
 import { validatePost } from "@/utils/validation"
 import type { Post } from "@personal-website/shared/types/post.types"
 import { NEWSLETTER_TAGS } from "@personal-website/shared/schemas/newsletter.schema"
+import type { BroadcastAudienceMode } from "@/domain/newsletter/broadcast"
 import {
   createPostAction,
   updatePostAction,
@@ -34,7 +35,10 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
     published: false,
     featuredImage: "",
   })
-  const [notifySubscribers, setNotifySubscribers] = useState<boolean>(!post)
+  const [notifySubscribers, setNotifySubscribers] = useState<boolean>(
+    !post || !post.published,
+  )
+  const [audienceMode, setAudienceMode] = useState<BroadcastAudienceMode>("all")
   const [tagInput, setTagInput] = useState("")
   const [saving, setSaving] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
@@ -51,7 +55,7 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
         published: post.published,
         featuredImage: post.featuredImage || "",
       })
-      setNotifySubscribers(false)
+      setNotifySubscribers(!post.published)
     } else {
       setFormData({
         title: "",
@@ -63,6 +67,7 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
       })
       setNotifySubscribers(true)
     }
+    setAudienceMode("all")
     setErrors({})
   }, [post])
 
@@ -157,6 +162,7 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
     fd.set("featured", "false")
     fd.set("featuredImage", formData.featuredImage)
     fd.set("notifySubscribers", String(publish && notifySubscribers))
+    fd.set("audienceMode", audienceMode)
 
     startTransition(async () => {
       try {
@@ -166,14 +172,32 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
             : await createPostAction(fd)
 
         if (result.success) {
-          const broadcastMsg =
-            result.broadcast && result.broadcast.sentCount > 0
-              ? ` • Enviado a ${result.broadcast.sentCount} suscriptores`
-              : ""
-          toast.success(
-            (post ? "Post actualizado correctamente" : "Post publicado correctamente") +
-              broadcastMsg,
-          )
+          const baseSuccess = post
+            ? "Post actualizado correctamente"
+            : "Post publicado correctamente"
+          const b = result.broadcast
+
+          if (publish && notifySubscribers && b) {
+            if (b.status === "sent") {
+              toast.success(
+                `${baseSuccess} • Enviado a ${b.sentCount} suscriptores`,
+              )
+            } else if (b.status === "partial") {
+              toast.success(baseSuccess)
+              const detail = b.errors[0] ? ` (${b.errors[0]})` : ""
+              toast.error(
+                `Newsletter parcial: ${b.sentCount} enviados, ${b.failedCount} fallidos${detail}`,
+              )
+            } else {
+              toast.success(baseSuccess)
+              const reason =
+                b.skippedReason || b.errors.join("; ") || `status=${b.status}`
+              toast.error(`Newsletter no enviado (${b.status}): ${reason}`)
+            }
+          } else {
+            toast.success(baseSuccess)
+          }
+
           if (onSaveAction) {
             await onSaveAction(formData as Partial<Post>)
           } else {
@@ -351,10 +375,10 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
                   htmlFor="notify-subscribers"
                   className="text-sm font-bold text-white cursor-pointer"
                 >
-                  Enviar a suscriptores del segmento
+                  Enviar newsletter al publicar
                 </label>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Al publicar, dispara automáticamente el envío por lotes (Resend + React Email) a los usuarios activos de los tags seleccionados.
+                  Al publicar, dispara automáticamente el envío por lotes (Resend / SMTP + React Email) a la audiencia seleccionada.
                 </p>
               </div>
               <input
@@ -366,6 +390,36 @@ export const AdminPostEditor: React.FC<AdminPostEditorProps> = ({
                 className="mt-1 h-4 w-4 rounded border-slate-600 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
               />
             </div>
+
+            {notifySubscribers && (
+              <div className="mt-4 pt-3 border-t border-slate-800">
+                <label
+                  htmlFor="audience-mode"
+                  className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5"
+                  style={{ fontFamily: "var(--font-mono)" }}
+                >
+                  Audiencia del envío
+                </label>
+                <select
+                  id="audience-mode"
+                  value={audienceMode}
+                  onChange={e =>
+                    setAudienceMode(
+                      e.target.value === "matching-tags"
+                        ? "matching-tags"
+                        : "all",
+                    )
+                  }
+                  disabled={saving || isPending}
+                  className="block w-full px-3 py-2 border border-slate-700 rounded-xl bg-slate-900/90 text-slate-100 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                >
+                  <option value="all">Todos los suscriptores activos</option>
+                  <option value="matching-tags">
+                    Solo suscriptores con tags coincidentes
+                  </option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Azure OpenAI Editorial Assistant */}

@@ -7,7 +7,7 @@ import { PrivacyBodyES } from './content.es'
 export const metadata: Metadata = {
   title: 'Privacy Policy · Jhonny Pimiento',
   description:
-    'How your data is collected, used, and protected when you visit jhonnypimiento.com.',
+    'How your data is collected, used, and protected when you visit jonesh.me.',
   alternates: { canonical: '/privacy' },
 }
 

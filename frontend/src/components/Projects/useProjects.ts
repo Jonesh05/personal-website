@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ProjectsData, Project } from './Projects.types';
 import type { ProjectImage } from '@/lib/cdn/image';
 
@@ -65,7 +65,6 @@ const PROJECTS_DATA: ProjectsData = {
       accentColor: 'purple',
       featured:    true,
       year:        2024,
-      demoUrl:     'https://nft-refi-demo.com',
       githubUrl:   'https://github.com/Jonesh05/CarbonMint-web3',
     },
     {
@@ -83,7 +82,6 @@ const PROJECTS_DATA: ProjectsData = {
       accentColor: 'green',
       featured:    false,
       year:        2025,
-      githubUrl:   'https://github.com/usuario/quantum-research',
     },
     {
       id: '4',
@@ -100,7 +98,6 @@ const PROJECTS_DATA: ProjectsData = {
       accentColor: 'purple',
       featured:    true,
       year:        2025,
-      demoUrl:     'https://supply-chain-demo.com',
     },
     {
       id: '5',
@@ -117,7 +114,6 @@ const PROJECTS_DATA: ProjectsData = {
       accentColor: 'green',
       featured:    false,
       year:        2025,
-      liveUrl:     'https://design-system-demo.com',
     },
     {
       id: '6',
@@ -134,26 +130,20 @@ const PROJECTS_DATA: ProjectsData = {
       accentColor: 'purple',
       featured:    false,
       year:        2025,
-      githubUrl:   'https://github.com/usuario/ai-trading-bot',
     },
   ],
 };
 
 export const useProjects = () => {
-  const [data, setData]                     = useState<ProjectsData | null>(null);
-  const [loading, setLoading]               = useState(true);
+  const [data]                                  = useState<ProjectsData>(PROJECTS_DATA);
+  const loading                                 = false;
   const [selectedCategory, setSelectedCategory] = useState('all');
-
-  useEffect(() => {
-    setData(PROJECTS_DATA);
-    setLoading(false);
-  }, []);
 
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
   }, []);
 
-  const filteredProjects  = data ? filterProjectsByCategory(data.projects, selectedCategory) : [];
+  const filteredProjects  = filterProjectsByCategory(data.projects, selectedCategory);
   const featuredProjects  = getFeaturedProjects(filteredProjects);
 
   return {

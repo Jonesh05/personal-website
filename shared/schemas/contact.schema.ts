@@ -21,7 +21,7 @@ export const ContactFormSchema = z.object({
   source: z.string().max(64).default('contact-page'),
 
   // anti spam honeypot
-  website: z.string().max(0).optional(),
+  website: z.string().max(200).optional(),
 
   // rate limit helper
   createdAt: z

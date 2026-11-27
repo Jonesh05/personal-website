@@ -20,6 +20,12 @@ import type { Transporter } from 'nodemailer'
 import type { ContactNotification, Mailer, TransactionalEmail } from './types'
 import { MailerError } from './types'
 import { getContactFrom } from '@/lib/siteConfig'
+import {
+  buildContactAdminHtml,
+  buildContactAdminSubject,
+  buildContactAdminText,
+  sanitizeEmailHeaderValue,
+} from './contactFormatter'
 
 const DRIVER = 'smtp'
 
@@ -87,41 +93,6 @@ function getTransport(cfg: SmtpTransportConfig): Transporter {
   return cachedTransport
 }
 
-function escapeHtml(raw: string): string {
-  return raw
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-function buildSubject(name: string): string {
-  const clean = name.trim().slice(0, 60) || 'a visitor'
-  return `[contact] new message from ${clean}`
-}
-
-function buildHtml(msg: ContactNotification): string {
-  const body = escapeHtml(msg.message).replace(/\n/g, '<br/>')
-  return [
-    '<div style="font-family:system-ui,Segoe UI,Roboto,sans-serif;line-height:1.5">',
-    `<p><strong>From:</strong> ${escapeHtml(msg.name)} &lt;${escapeHtml(msg.email)}&gt;</p>`,
-    `<p><strong>Message ID:</strong> <code>${escapeHtml(msg.id)}</code></p>`,
-    '<hr/>',
-    `<p>${body}</p>`,
-    '</div>',
-  ].join('')
-}
-
-function buildText(msg: ContactNotification): string {
-  return [
-    `From: ${msg.name} <${msg.email}>`,
-    `Message ID: ${msg.id}`,
-    '---',
-    msg.message,
-  ].join('\n')
-}
-
 function mapSmtpError(err: unknown): MailerError {
   // nodemailer surfaces ECONN* / EAUTH / EENVELOPE etc.; bucket them
   // into the two outcomes callers care about (network vs provider).
@@ -149,10 +120,10 @@ export const smtpMailer: Mailer = {
       await transport.sendMail({
         from:    cfg.from,
         to:      cfg.to,
-        replyTo: msg.email,
-        subject: buildSubject(msg.name),
-        text:    buildText(msg),
-        html:    buildHtml(msg),
+        replyTo: sanitizeEmailHeaderValue(msg.email),
+        subject: buildContactAdminSubject(msg.name),
+        text:    buildContactAdminText(msg),
+        html:    buildContactAdminHtml(msg),
       })
     } catch (err) {
       throw mapSmtpError(err)
@@ -177,6 +148,9 @@ export const smtpMailer: Mailer = {
         subject: msg.subject,
         text:    msg.text,
         html:    msg.html,
+        ...(msg.headers && Object.keys(msg.headers).length > 0
+          ? { headers: msg.headers }
+          : {}),
       })
     } catch (err) {
       throw mapSmtpError(err)

@@ -37,13 +37,15 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const existing = await getPostById(id)
-    if (!existing) {
+    if (!existing || !existing.published) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
     }
 
     const result = await toggleLike(id, visitorId)
     // Fire-and-forget mirror so visitors/{id}/likes stays in sync for hydration
-    mirrorLike(id, visitorId, result.liked).catch(() => {})
+    mirrorLike(id, visitorId, result.liked).catch((err) => {
+      console.warn('[api/posts/[id]/like] mirrorLike failed:', err)
+    })
 
     return NextResponse.json(
       { success: true, ...result },

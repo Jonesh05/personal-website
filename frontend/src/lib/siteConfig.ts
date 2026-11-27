@@ -27,6 +27,8 @@ export function getPublicContactEmail(): string {
   return raw || DEFAULT_PUBLIC_CONTACT_EMAIL
 }
 
+let warnedOnboardingFallback = false
+
 /**
  * Sender header ("From") for newsletter confirmation / dispatch emails.
  * Falls back to `CONTACT_NOTIFICATION_FROM`, or Resend's built-in sandbox
@@ -39,6 +41,13 @@ export function getNewsletterFrom(): string {
     process.env.CONTACT_NOTIFICATION_FROM?.trim()
   if (configured) return configured
   if (process.env.RESEND_API_KEY?.trim()) {
+    if (process.env.NODE_ENV === 'production' && !warnedOnboardingFallback) {
+      warnedOnboardingFallback = true
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[siteConfig] NEWSLETTER_FROM and CONTACT_NOTIFICATION_FROM are unset in production; falling back to onboarding@resend.dev (Resend sandbox only delivers to the account owner). Set NEWSLETTER_FROM to a verified domain sender.',
+      )
+    }
     return 'jonesh.me <onboarding@resend.dev>'
   }
   return ''

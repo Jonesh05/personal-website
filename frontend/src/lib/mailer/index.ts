@@ -20,6 +20,11 @@ import { resendMailer } from './resend'
 
 export type { ContactNotification, Mailer, TransactionalEmail } from './types'
 export { MailerError } from './types'
+export {
+  buildContactAutoReply,
+  sanitizeEmailHeaderValue,
+  type ContactAutoReplyLocale,
+} from './contactFormatter'
 
 type DriverName = 'smtp' | 'resend'
 

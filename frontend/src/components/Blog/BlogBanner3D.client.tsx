@@ -39,9 +39,10 @@ precision highp float;
 varying vec2 v_uv;
 uniform vec2  u_res;
 uniform float u_time;
-uniform vec2  u_rot;      // yaw, pitch from drag + scroll impulse + idle spin
+uniform vec2  u_rot;      // yaw, pitch from hover + drag + scroll impulse + idle spin
 uniform vec2  u_pointer;  // normalized pointer [-1, 1] for key-light shift
 uniform float u_pulse;    // 0..1 click / scroll energy shimmer
+uniform float u_spin;     // 0..1 smoothed spin energy for subtle breathing scale
 uniform float u_dark;     // 1.0 dark mode, 0.0 light mode
 
 mat2 rot2D(float a) {
@@ -68,13 +69,17 @@ float sdOctahedron(vec3 p, float s) {
 // mat 2.0 = brushed titanium gyroscope rings
 // mat 3.0 = glowing orbital security shards
 vec2 mapScene(vec3 p) {
+  // Subtle dynamic scale swell when spinning or pulsing (stays 100% inside bounds)
+  float scale = 1.0 + u_spin * 0.11 + u_pulse * 0.04;
+  p /= scale;
+
   p.xz *= rot2D(u_rot.x);
   p.yz *= rot2D(u_rot.y);
 
   // 1. Faceted + harmonic crystal core
   vec3 pc = p;
-  pc.xy *= rot2D(u_time * 0.28);
-  pc.xz *= rot2D(u_time * 0.21);
+  pc.xy *= rot2D(u_time * 0.30);
+  pc.xz *= rot2D(u_time * 0.23);
 
   float pulseWave = u_pulse * 0.065 * sin(length(pc) * 12.0 - u_time * 9.0);
   float harmonic = 0.028 * sin(pc.x * 4.2 + u_time * 1.0)
@@ -89,14 +94,14 @@ vec2 mapScene(vec3 p) {
 
   // 2. Outer Gyroscopic Ring A
   vec3 r1 = p;
-  r1.xy *= rot2D(0.58 + u_time * 0.34);
+  r1.xy *= rot2D(0.58 + u_time * 0.36);
   r1.yz *= rot2D(0.45);
   float ringA = sdTorus(r1, vec2(1.16, 0.052));
   if (ringA < res.x) res = vec2(ringA, 2.0);
 
   // 3. Inner Gyroscopic Ring B (counter-rotating)
   vec3 r2 = p;
-  r2.yz *= rot2D(-0.72 - u_time * 0.42);
+  r2.yz *= rot2D(-0.72 - u_time * 0.44);
   r2.xz *= rot2D(0.65);
   float ringB = sdTorus(r2, vec2(0.96, 0.042));
   if (ringB < res.x) res = vec2(ringB, 2.0);
@@ -104,14 +109,14 @@ vec2 mapScene(vec3 p) {
   // 4. Three orbiting security crystal satellites
   for (int i = 0; i < 3; i++) {
     float fi = float(i);
-    float ang = u_time * (0.65 + fi * 0.14) + fi * 2.094395;
+    float ang = u_time * (0.68 + fi * 0.14) + fi * 2.094395;
     float tilt = 0.48 * sin(ang * 1.3 + fi);
     vec3 orbPos = vec3(cos(ang) * 1.36, tilt, sin(ang) * 1.36);
-    float orb = length(p - orbPos) - (0.082 + u_pulse * 0.02);
+    float orb = length(p - orbPos) - (0.084 + u_pulse * 0.02);
     if (orb < res.x) res = vec2(orb, 3.0);
   }
 
-  return res;
+  return vec2(res.x * scale, res.y);
 }
 
 vec3 calcNormal(vec3 p) {
@@ -136,10 +141,11 @@ float calcAO(vec3 pos, vec3 nor) {
 }
 
 vec3 iridescence(float t, float darkMode) {
-  vec3 a = mix(vec3(0.46, 0.56, 0.80), vec3(0.18, 0.24, 0.44), darkMode);
-  vec3 b = mix(vec3(0.28, 0.26, 0.36), vec3(0.26, 0.30, 0.42), darkMode);
-  vec3 c = vec3(0.85, 0.90, 1.0);
-  vec3 d = vec3(0.12, 0.38, 0.68);
+  // Richer, more luminous plasma prism spectrum (indigo -> violet -> cyan -> emerald)
+  vec3 a = mix(vec3(0.48, 0.58, 0.84), vec3(0.30, 0.42, 0.64), darkMode);
+  vec3 b = mix(vec3(0.32, 0.30, 0.40), vec3(0.38, 0.40, 0.48), darkMode);
+  vec3 c = vec3(0.95, 1.0, 0.92);
+  vec3 d = vec3(0.08, 0.34, 0.62);
   return a + b * cos(6.28318 * (c * t + d));
 }
 
@@ -147,9 +153,9 @@ vec4 traceSample(vec2 fragCoord) {
   vec2 uv = (fragCoord - 0.5 * u_res) / min(u_res.x, u_res.y);
   vec2 normUv = fragCoord / u_res;
 
-  // Camera distanced cleanly so all rings & orbiting satellites stay 100%
+  // Camera distanced cleanly so all rings, satellites, and spin-swell stay 100%
   // inside the canvas bounds with generous breathing room (zero clipping)
-  vec3 ro = vec3(0.0, 0.0, 4.38);
+  vec3 ro = vec3(0.0, 0.0, 4.58);
   vec3 rd = normalize(vec3(uv, -1.78));
 
   float radialDist = length((normUv - 0.5) * 2.0);
@@ -195,59 +201,60 @@ vec4 traceSample(vec2 fragCoord) {
     vec3 halfRim = normalize(rimLight + viewDir);
     float rimSpec = pow(max(dot(nor, halfRim), 0.0), 22.0);
 
-    vec3 irid = iridescence(fresnel * 0.9 + pos.y * 0.28 + u_time * 0.08 + u_pulse * 0.35, u_dark);
+    vec3 irid = iridescence(fresnel * 1.05 + pos.y * 0.30 + u_time * 0.22 + u_spin * 0.25 + u_pulse * 0.40, u_dark);
 
     if (matId < 1.5) {
       vec3 baseTone = mix(
-        vec3(0.76, 0.82, 0.96),
-        vec3(0.09, 0.12, 0.22),
+        vec3(0.78, 0.84, 0.98),
+        vec3(0.14, 0.19, 0.34),
         u_dark
       );
-      vec3 shadowTint = mix(vec3(0.45, 0.48, 0.72), vec3(0.03, 0.05, 0.11), u_dark);
+      vec3 shadowTint = mix(vec3(0.45, 0.48, 0.72), vec3(0.05, 0.08, 0.18), u_dark);
 
       col = mix(shadowTint, baseTone, diff * 0.75 + topDiff * 0.25);
-      col = mix(col, irid, 0.38 + fresnel * 0.55);
-      col += vec3(0.95, 0.98, 1.0) * spec * mix(0.95, 1.35, u_dark);
-      col += vec3(0.35, 0.88, 1.0) * rimSpec * 0.55;
-      col += vec3(0.45, 0.95, 0.85) * u_pulse * (0.35 + fresnel * 0.65);
-      col *= (0.45 + 0.55 * ao);
+      col = mix(col, irid, 0.52 + fresnel * 0.45);
+      col += vec3(0.96, 0.99, 1.0) * spec * mix(1.05, 1.65, u_dark);
+      col += vec3(0.32, 0.96, 0.86) * rimSpec * (0.72 + u_spin * 0.35);
+      col += irid * fresnel * (0.35 + u_spin * 0.30);
+      col += vec3(0.45, 0.98, 0.85) * u_pulse * (0.45 + fresnel * 0.70);
+      col *= (0.52 + 0.48 * ao);
     } else if (matId < 2.5) {
       vec3 metalBase = mix(
-        vec3(0.62, 0.68, 0.82),
-        vec3(0.28, 0.33, 0.48),
+        vec3(0.64, 0.70, 0.86),
+        vec3(0.34, 0.40, 0.56),
         u_dark
       );
-      col = metalBase * (0.35 + diff * 0.65) * ao;
-      col += irid * fresnel * 0.65;
-      col += vec3(1.0) * spec * 1.4;
-      col += vec3(0.55, 0.45, 1.0) * rimSpec * 0.45;
+      col = metalBase * (0.42 + diff * 0.65) * ao;
+      col += irid * fresnel * (0.85 + u_spin * 0.30);
+      col += vec3(1.0) * spec * 1.65;
+      col += vec3(0.45, 0.88, 1.0) * rimSpec * 0.60;
     } else {
       vec3 orbColor = mix(
-        vec3(0.24, 0.52, 0.98),
-        vec3(0.22, 0.94, 0.78),
+        vec3(0.24, 0.58, 0.98),
+        vec3(0.18, 0.98, 0.78),
         u_dark
       );
-      col = orbColor * (0.65 + diff * 0.45) + vec3(1.0) * spec * 1.1;
-      col += irid * fresnel * 0.5;
+      col = orbColor * (0.75 + diff * 0.45) + vec3(1.0) * spec * 1.35;
+      col += irid * fresnel * 0.65;
     }
 
     alpha = 1.0;
   } else {
-    float proximityGlow = exp(-minDist * 8.5) * edgeMask;
+    float proximityGlow = exp(-minDist * 7.8) * edgeMask;
     vec3 auraCol = mix(
       vec3(0.42, 0.56, 0.96),
-      vec3(0.34, 0.62, 0.98),
+      vec3(0.48, 0.38, 0.98),
       u_dark
     );
     vec3 secondaryAura = mix(
-      vec3(0.64, 0.48, 0.96),
-      vec3(0.16, 0.85, 0.72),
+      vec3(0.24, 0.82, 0.78),
+      vec3(0.10, 0.95, 0.74),
       u_dark
     );
-    vec3 glowTint = mix(auraCol, secondaryAura, smoothstep(-0.4, 0.4, uv.x));
-    float strength = (proximityGlow * 0.34 + bgGlow * 0.13) * (1.0 + u_pulse * 0.75);
+    vec3 glowTint = mix(auraCol, secondaryAura, smoothstep(-0.4, 0.4, uv.x + sin(u_time * 0.45) * 0.25));
+    float strength = (proximityGlow * 0.42 + bgGlow * 0.16) * (1.0 + u_pulse * 0.75 + u_spin * 0.35);
     col = glowTint;
-    alpha = clamp(strength * mix(0.40, 0.66, u_dark) * edgeMask, 0.0, 0.70);
+    alpha = clamp(strength * mix(0.42, 0.74, u_dark) * edgeMask, 0.0, 0.76);
   }
 
   col = pow(max(col, 0.0), vec3(0.92));
@@ -330,6 +337,7 @@ export function BlogBanner3D() {
     const uRot = gl.getUniformLocation(program, 'u_rot');
     const uPointer = gl.getUniformLocation(program, 'u_pointer');
     const uPulse = gl.getUniformLocation(program, 'u_pulse');
+    const uSpin = gl.getUniformLocation(program, 'u_spin');
     const uDark = gl.getUniformLocation(program, 'u_dark');
 
     gl.useProgram(program);
@@ -353,6 +361,11 @@ export function BlogBanner3D() {
     let lastY = 0;
     let lastScrollY = window.scrollY;
     let pulse = 0;
+    let spinEnergy = 0;
+
+    // Smooth hover-follow orientation (moves naturally with cursor without clicking)
+    let hoverYaw = 0;
+    let hoverPitch = 0;
 
     const targetPointer = { x: 0, y: 0 };
     const pointer = { x: 0, y: 0 };
@@ -363,7 +376,8 @@ export function BlogBanner3D() {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isMobile = window.innerWidth < 768;
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5);
       const w = Math.max(1, Math.floor(rect.width * dpr));
       const h = Math.max(1, Math.floor(rect.height * dpr));
       if (canvas.width !== w || canvas.height !== h) {
@@ -378,9 +392,10 @@ export function BlogBanner3D() {
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, time);
-      gl.uniform2f(uRot, yaw, pitch);
+      gl.uniform2f(uRot, yaw + hoverYaw, Math.max(-1.1, Math.min(1.1, pitch + hoverPitch)));
       gl.uniform2f(uPointer, pointer.x, pointer.y);
       gl.uniform1f(uPulse, pulse);
+      gl.uniform1f(uSpin, spinEnergy);
       gl.uniform1f(uDark, darkVal);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
@@ -391,16 +406,29 @@ export function BlogBanner3D() {
         return;
       }
       time += 0.014;
-      pointer.x += (targetPointer.x - pointer.x) * 0.08;
-      pointer.y += (targetPointer.y - pointer.y) * 0.08;
+      pointer.x += (targetPointer.x - pointer.x) * 0.09;
+      pointer.y += (targetPointer.y - pointer.y) * 0.09;
+
+      // Natural hover-follow orbit without requiring a mouse press
+      const targetHoverYaw = pointer.x * 0.58;
+      const targetHoverPitch = pointer.y * 0.34;
+      const prevHoverYaw = hoverYaw;
+      const prevHoverPitch = hoverPitch;
+      hoverYaw += (targetHoverYaw - hoverYaw) * 0.07;
+      hoverPitch += (targetHoverPitch - hoverPitch) * 0.07;
+
+      const hoverDelta = Math.hypot(hoverYaw - prevHoverYaw, hoverPitch - prevHoverPitch);
 
       if (!isDragging) {
-        // Subtle cursor-following yaw/pitch lean + momentum from drag/scroll
         yaw += 0.0045 + velYaw;
         pitch = Math.max(-1.05, Math.min(1.05, pitch + velPitch));
         velYaw *= 0.92;
         velPitch *= 0.92;
       }
+
+      // Compute smooth spin energy so the sculpture subtly swells as it turns
+      const rawSpin = Math.min(1.0, (Math.hypot(velYaw, velPitch) * 18.0) + hoverDelta * 14.0);
+      spinEnergy += (rawSpin - spinEnergy) * 0.12;
 
       if (pulse > 0.001) {
         pulse *= 0.92;
@@ -499,7 +527,21 @@ export function BlogBanner3D() {
     );
     intersectionObserver.observe(canvas);
 
+    const onWindowPointerMove = (e: PointerEvent) => {
+      if (!isVisible || isDragging) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      // Respond smoothly even when moving cursor across the header area
+      const cx = rect.left + rect.width * 0.5;
+      const cy = rect.top + rect.height * 0.5;
+      const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width * 0.95)));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height * 0.95)));
+      targetPointer.x = nx;
+      targetPointer.y = ny;
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('pointermove', onWindowPointerMove, { passive: true });
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove, { passive: true });
     canvas.addEventListener('pointerup', onPointerUp);
@@ -516,6 +558,7 @@ export function BlogBanner3D() {
       themeObserver.disconnect();
       intersectionObserver.disconnect();
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('pointermove', onWindowPointerMove);
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);

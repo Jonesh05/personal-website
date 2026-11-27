@@ -1,33 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "@/i18n";
 import { useTheme } from "@/components/providers/ThemeProvider";
-import {
-  House,
-  Buildings,
-  Suitcase,
-  Article,
-  EnvelopeSimple,
-  Globe,
-  Moon,
-  Sun,
-} from "@phosphor-icons/react";
+import { Moon, Sun } from "@phosphor-icons/react";
 
 /* Types */
 type NavKey = "home" | "projects" | "timeline" | "blog" | "contact";
 interface NavLinkItem { key: NavKey; name: string; href: string; }
 interface SocialLinkItem { name: string; href: string; iconPath: string; }
-
-/* Icon map */
-const NAV_ICONS: Record<NavKey, React.ComponentType<any>> = {
-  home: House,
-  projects: Buildings,
-  timeline: Suitcase,
-  blog: Article,
-  contact: EnvelopeSimple,
-};
 
 const IconBtn: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement> & { label: string }
@@ -44,21 +26,27 @@ const IconBtn: React.FC<
 
 /* Hook para detectar scroll */
 const useScrollDirection = () => {
-  const [scrollDirection, setScrollDirection] = useState<string | null>(null);
-  const [lastScrollY, setLastScrollY] = useState<number>(0);
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down" | null>(null);
+  const lastScrollYRef = useRef<number>(0);
+  const directionRef = useRef<"up" | "down" | null>(null);
 
   useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
+
     const updateScrollDirection = () => {
-      const scrollY = window.pageYOffset;
-      const direction = scrollY > lastScrollY ? "down" : "up";
-      if (direction !== scrollDirection && (scrollY - lastScrollY > 10 || scrollY - lastScrollY < -10)) {
+      const scrollY = window.scrollY;
+      const delta = scrollY - lastScrollYRef.current;
+      const direction: "up" | "down" = delta > 0 ? "down" : "up";
+      if (direction !== directionRef.current && Math.abs(delta) > 10) {
+        directionRef.current = direction;
         setScrollDirection(direction);
       }
-      setLastScrollY(scrollY > 0 ? scrollY : 0);
+      lastScrollYRef.current = scrollY > 0 ? scrollY : 0;
     };
-    window.addEventListener("scroll", updateScrollDirection);
+
+    window.addEventListener("scroll", updateScrollDirection, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollDirection);
-  }, [scrollDirection, lastScrollY]);
+  }, []);
 
   return scrollDirection;
 };
@@ -94,7 +82,7 @@ const Navbar: React.FC = () => {
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 max-w-7xl mx-auto px-4 
-      font-manrope transition-transform duration-300 ${
+      transition-transform duration-300 ${
       scrollDirection === "down" ? "-translate-y-full" : "translate-y-0"
     }`}>
       <nav className="mt-6 relative">
@@ -108,7 +96,7 @@ const Navbar: React.FC = () => {
             <Link href="/" aria-label="Jonesh Logo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/logo.svg"
+                src="/images/logo.svg?v=2"
                 alt="Jonesh Logo"
                 width={260}
                 height={50}
@@ -227,7 +215,9 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile menu */}
-        <div 
+        <div
+          aria-hidden={!mobileOpen}
+          hidden={!mobileOpen}
           className={`lg:hidden absolute top-full left-4 right-4 mt-4 
             transition-all duration-300 ease-out transform-gpu ${
             mobileOpen 

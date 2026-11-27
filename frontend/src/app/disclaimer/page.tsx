@@ -7,7 +7,7 @@ import { DisclaimerBodyES } from './content.es'
 export const metadata: Metadata = {
   title: 'Disclaimer · Jhonny Pimiento',
   description:
-    'Disclaimer for the articles and code published on jhonnypimiento.com.',
+    'Disclaimer for the articles and code published on jonesh.me.',
   alternates: { canonical: '/disclaimer' },
 }
 

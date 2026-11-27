@@ -156,9 +156,9 @@ const About: React.FC = () => {
                   <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
                 </div>
-                <div className="flex items-center space-x-2 text-gray-400">
+                <div className="flex items-center space-x-2 text-zinc-200">
                   <TerminalIcon className="w-4 h-4" />
-                  <span className="text-sm text-slate-800 dark:text-zinc-50 font-mono">{t('terminal_heading_title')}</span>
+                  <span className="text-sm text-zinc-200 font-mono">{t('terminal_heading_title')}</span>
                 </div>
               </div>
 

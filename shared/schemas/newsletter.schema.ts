@@ -49,7 +49,7 @@ export const NewsletterSubscribeSchema = z.object({
   source: NewsletterSourceSchema.default('blog-sidebar'),
 
   // Anti-spam honeypot. Bots tend to fill every input; real users never see it.
-  website: z.string().max(0).optional(),
+  website: z.string().max(200).optional(),
 })
 
 export type NewsletterSubscribeInput = z.infer<typeof NewsletterSubscribeSchema>

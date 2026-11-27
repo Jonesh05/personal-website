@@ -19,15 +19,38 @@ import {
   rateLimitHeaders,
 } from '@/lib/rateLimit'
 import { getVisitorId } from '@/lib/visitor'
-import { upsertSubscriber } from '@/lib/firestore/subscribers'
+import {
+  upsertSubscriber,
+  type SubscriberLocale,
+} from '@/lib/firestore/subscribers'
 import { MailerError, getMailer, sendTransactionalEmail } from '@/lib/mailer'
-import { getNewsletterFrom, getSiteUrl } from '@/lib/siteConfig'
+import {
+  getNewsletterFrom,
+  getPublicContactEmail,
+  getSiteUrl,
+} from '@/lib/siteConfig'
+import {
+  buildOneClickUnsubscribeUrl,
+  buildPreferencesUrl,
+  buildUnsubscribeUrl,
+} from '@/domain/newsletter/broadcast'
+import { LOCALE_KEY } from '@/i18n/constants'
 import NewsletterTemplate from '@/emails/NewsletterTemplate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const RATE_LIMIT = { limit: 5, windowMs: 10 * 60_000 }
+
+function resolveRequestLocale(req: NextRequest): SubscriberLocale {
+  const cookieVal = req.cookies.get(LOCALE_KEY)?.value?.toLowerCase()
+  if (cookieVal === 'es' || cookieVal?.startsWith('es-')) return 'es'
+  if (cookieVal === 'en' || cookieVal?.startsWith('en-')) return 'en'
+
+  const accept = req.headers.get('accept-language')?.toLowerCase() ?? ''
+  if (accept.startsWith('es')) return 'es'
+  return 'en'
+}
 
 export async function POST(req: NextRequest) {
   // 1) Rate limit check before parsing body or touching Firestore
@@ -75,11 +98,12 @@ export async function POST(req: NextRequest) {
   }
 
   const { email, tags, source } = parsed.data
+  const locale = resolveRequestLocale(req)
 
   // 4) Idempotent Firestore upsert (1 read + 1 write)
   let result: Awaited<ReturnType<typeof upsertSubscriber>>
   try {
-    result = await upsertSubscriber({ email, tags, source })
+    result = await upsertSubscriber({ email, tags, source, locale })
   } catch (err) {
     logError('firestore_subscriber_upsert_failed', err)
     return NextResponse.json(
@@ -98,9 +122,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const dispatched = await sendWelcomeDispatch({
-      email:      subscriber.email,
-      magicToken: subscriber.magicToken,
-      tags:       subscriber.tags,
+      subscriberId: subscriber.id,
+      email:        subscriber.email,
+      magicToken:   subscriber.magicToken,
+      locale:       subscriber.locale,
       isNew,
     })
     emailStatus = dispatched ? 'sent' : 'not_configured'
@@ -131,9 +156,10 @@ export async function POST(req: NextRequest) {
 }
 
 async function sendWelcomeDispatch(params: {
+  subscriberId: string
   email: string
   magicToken: string
-  tags: string[]
+  locale: SubscriberLocale
   isNew: boolean
 }): Promise<boolean> {
   const from = getNewsletterFrom()
@@ -147,44 +173,115 @@ async function sendWelcomeDispatch(params: {
   }
 
   const baseUrl = getSiteUrl()
+  const blogUrl = `${baseUrl}/blog`
+  const preferencesUrl = buildPreferencesUrl(baseUrl, params.magicToken)
+  const footerUnsubscribeUrl = buildUnsubscribeUrl(baseUrl, params.magicToken)
+  const oneClickUnsubscribeUrl = buildOneClickUnsubscribeUrl(
+    baseUrl,
+    params.magicToken,
+  )
+  const isEs = params.locale === 'es'
+
+  const subject = params.isNew
+    ? isEs
+      ? 'Bienvenido a mis notas en jonesh.me'
+      : 'Welcome to my notes on jonesh.me'
+    : isEs
+      ? 'Preferencias actualizadas — jonesh.me'
+      : 'Reading preferences updated — jonesh.me'
+
+  const headline = params.isNew
+    ? isEs
+      ? 'Qué gusto tenerte por aquí'
+      : 'Glad to have you here'
+    : isEs
+      ? 'Tus preferencias están actualizadas'
+      : 'Your reading preferences are updated'
+
+  const previewText = params.isNew
+    ? isEs
+      ? 'Suscripción confirmada — notas de ingeniería directo de Jhonny Pimiento.'
+      : 'Subscription confirmed — engineering notes directly from Jhonny Pimiento.'
+    : isEs
+      ? 'Guardé tus temas de lectura en jonesh.me.'
+      : 'Saved your reading topics on jonesh.me.'
+
+  const introParagraph = params.isNew
+    ? isEs
+      ? 'Hola, soy Jhonny. Gracias por suscribirte a mis notas en jonesh.me — tu suscripción ya está activa.'
+      : "Hi, I'm Jhonny. Thanks for subscribing to my notes on jonesh.me — you're all set."
+    : isEs
+      ? 'Hola, soy Jhonny. Quería confirmarte que tus preferencias de lectura en jonesh.me ya quedaron guardadas.'
+      : "Hi, I'm Jhonny. Just confirming that your reading preferences on jonesh.me have been updated."
+
+  const extraParagraphs = params.isNew
+    ? isEs
+      ? [
+          'Escribo sobre Web3, IA, ciberseguridad y arquitectura de sistemas — solo cuando tengo algo práctico que compartir, sin ruido ni correos semanales de relleno.',
+          'Si quieres saludar o contarme en qué estás trabajando, responde directamente a este correo. Leo y respondo cada mensaje personalmente.',
+        ]
+      : [
+          'I write about Web3, AI, cybersecurity, and systems architecture — only when I have something practical worth sharing, with zero filler or spam.',
+          "If you'd like to say hello or share what you're building, just hit reply to this email. I read and answer every note personally.",
+        ]
+    : isEs
+      ? [
+          'Puedes ajustar tus temas o darte de baja en cualquier momento desde los enlaces de abajo, o responderme directamente si hay algún tema que te gustaría ver.',
+        ]
+      : [
+          'You can adjust your topics or unsubscribe anytime using the links below, or just reply to this email if there is a topic you want me to cover.',
+        ]
+
+  const ctaLabel = isEs ? 'Explorar el blog →' : 'Browse the blog →'
+  const signOffGreeting = isEs ? 'Un saludo,' : 'Best,'
+
   const html = await render(
     NewsletterTemplate({
       subscriberEmail: params.email,
       magicToken:      params.magicToken,
+      locale:          params.locale,
       editionNumber:   0,
-      previewText:     params.isNew
-        ? 'Subscription confirmed — jonesh.me'
-        : 'Reading preferences updated — jonesh.me',
-      headline: params.isNew
-        ? 'Welcome to jonesh.me'
-        : 'Reading preferences updated',
-      introParagraph: params.isNew
-        ? 'Your subscription is active. Whenever a new technical article is published on jonesh.me, you will receive a concise summary and direct link right here.'
-        : 'Your reading preferences have been saved. You can adjust your topics or unsubscribe anytime from the link below.',
-      ctaLabel: 'Read Latest Articles →',
-      ctaUrl:   `${baseUrl}/blog`,
+      previewText,
+      headline,
+      introParagraph,
+      paragraphs:      extraParagraphs,
+      ctaLabel,
+      ctaUrl:          blogUrl,
+      signOffGreeting,
       baseUrl,
     }),
   )
 
   const text = [
-    params.isNew
-      ? 'Welcome to jonesh.me — Subscription Confirmed'
-      : 'Reading preferences updated — jonesh.me',
+    headline,
     '',
-    `Read the blog: ${baseUrl}/blog`,
-    `Manage preferences: ${baseUrl}/preferences?token=${encodeURIComponent(params.magicToken)}`,
+    introParagraph,
+    '',
+    ...extraParagraphs.flatMap((p) => [p, '']),
+    `${ctaLabel} ${blogUrl}`,
+    '',
+    signOffGreeting,
+    'Jhonny Pimiento',
+    baseUrl,
+    '',
+    '---',
+    `${isEs ? 'Gestionar preferencias' : 'Manage preferences'}: ${preferencesUrl}`,
+    `${isEs ? 'Cancelar suscripción' : 'Unsubscribe'}: ${footerUnsubscribeUrl}`,
   ].join('\n')
 
   const driver = getMailer().driver
   await sendTransactionalEmail({
     from,
     to:      params.email,
-    subject: params.isNew
-      ? 'Welcome to jonesh.me — Subscription Confirmed'
-      : 'jonesh.me — Reading Preferences Updated',
+    replyTo: getPublicContactEmail(),
+    subject,
     html,
     text,
+    headers: {
+      'List-Unsubscribe':      `<${oneClickUnsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      'X-Entity-Ref-ID':       `welcome:${params.subscriberId.slice(0, 12)}`,
+    },
   })
   // eslint-disable-next-line no-console
   console.info(`[api/subscribe] confirmation email accepted by driver=${driver}`)

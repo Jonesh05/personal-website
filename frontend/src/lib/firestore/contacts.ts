@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { FieldValue } from 'firebase-admin/firestore'
 import { adminDb } from '@/lib/firebase/admin'
 import type { ContactFormInput } from '@personal-website/shared/schemas/contact.schema'

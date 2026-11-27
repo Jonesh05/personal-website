@@ -2,9 +2,11 @@ import Link from 'next/link'
 import type { Post } from '@/lib/firestore/posts'
 import { BlogCoverImage } from './BlogCoverImage.client'
 import { estimateReadingTime } from '@/utils/readingTime'
+import { normalizePostTitle } from '@/utils/postSearch'
 
 interface PostCardProps {
   post: Post
+  headingLevel?: 'h2' | 'h3'
 }
 
 function formatShortDate(isoDate?: string): string {
@@ -18,11 +20,13 @@ function formatShortDate(isoDate?: string): string {
   })
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, headingLevel = 'h2' }: PostCardProps) {
   const { title, slug, excerpt, featuredImage, tags, authorName, createdAt, content } = post
+  const displayTitle = normalizePostTitle(title)
   const primaryTag = tags?.[0]
   const readMinutes = estimateReadingTime(content ?? '')
   const dateLabel = formatShortDate(createdAt)
+  const HeadingTag = headingLevel
 
   return (
     <Link
@@ -72,12 +76,12 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
 
           {/* Headline */}
-          <h3
-            className="mb-2.5 line-clamp-2 text-lg font-bold leading-snug tracking-tight text-slate-900 transition-colors duration-200 group-hover:text-purple-700 dark:text-slate-100 dark:group-hover:text-purple-300"
+          <HeadingTag
+            className="mb-2.5 line-clamp-2 text-[19px] font-bold leading-snug tracking-[-0.015em] text-slate-900 transition-colors duration-200 group-hover:text-cyan-700 dark:text-slate-100 dark:group-hover:text-emerald-300"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            {title}
-          </h3>
+            {displayTitle}
+          </HeadingTag>
 
           {/* Excerpt */}
           {excerpt && (

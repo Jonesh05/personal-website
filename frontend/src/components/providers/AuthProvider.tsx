@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 
 interface AuthProviderProps {
@@ -8,18 +9,17 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const pathname       = usePathname()
   const checkSession   = useAuthStore(state => state.checkSession)
   const initializedRef = useRef(false)
 
   useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true
-      checkSession()          // returns Promise<void>  no cleanup needed
-    }
-    return () => {
-      initializedRef.current = false
-    }
-  }, [checkSession])
+    const requiresAuthCheck = pathname?.startsWith('/blog') ?? false
+    if (!requiresAuthCheck || initializedRef.current) return
+
+    initializedRef.current = true
+    void checkSession()
+  }, [pathname, checkSession])
 
   return <>{children}</>
 }

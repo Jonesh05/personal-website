@@ -100,7 +100,8 @@ export function BlogPostContent({ post }: Props) {
     <>
       <ReadingProgress />
 
-      <article className="min-h-screen bg-white text-slate-900 dark:bg-[#060911] dark:text-gray-100 pt-[118px]">
+      <main id="main-content" className="min-h-screen bg-white text-slate-900 dark:bg-[#060911] dark:text-gray-100 pt-[118px]">
+        <article>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
           {/* Top breadcrumb */}
@@ -252,9 +253,9 @@ export function BlogPostContent({ post }: Props) {
                 sm:p-8 shadow-sm">
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                       {t('enjoyedPrompt')}
-                    </h3>
+                    </h2>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                       {post.views != null && (
                         <>
@@ -315,7 +316,8 @@ export function BlogPostContent({ post }: Props) {
             </div>
           </div>
         </div>
-      </article>
+        </article>
+      </main>
     </>
   )
 }

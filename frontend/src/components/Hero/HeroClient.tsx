@@ -11,11 +11,11 @@
 import { useState, useEffect, useRef } from 'react'
 
 const ROLES = [
-    'Web3 & Blockchain Developer',
-    'AWS Cloud Architect',
-    'Full Stack Engineer',
-    'Cybersecurity Student',
-    'DeFi Protocol Builder',
+    'Senior Software & Web3 Engineer',
+    'Distributed Systems Architect',
+    'Smart Contract & DeFi Engineer',
+    'AWS Cloud & Security Architect',
+    'Full-Stack & AI Systems Builder',
 ]
 
 export function HeroClient() {

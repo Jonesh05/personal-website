@@ -16,6 +16,7 @@ export interface TransactionalEmail {
   text?:    string
   from?:    string
   replyTo?: string
+  headers?: Record<string, string>
 }
 
 export interface Mailer {
