@@ -1,27 +1,17 @@
 'use client'
 
-import { useCallback, useState } from 'react'
-import { toast } from '@/lib/toast'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from '@/i18n'
 
 /**
- * CopyEmailCard, single source of truth for the "contact by email" UX.
+ * CopyEmailCard — single source of truth for the "contact by email" UX.
  *
- * The component exposes two actions on the same address:
- *   • Primary,  copies the email to the clipboard AND opens the user's mail
- *                client (mailto:). One click delivers both expected outcomes.
- *   • Secondary, a focused "copy only" button for users who prefer to paste
- *                the address elsewhere (Slack, CRM, etc.).
+ * Actions:
+ *   • Tap address chip: copies email to clipboard with crisp inline feedback.
+ *   • Primary CTA: copies email AND opens the user's mail client (`mailto:`).
  *
- * Visual style: vibrant gradient plasma ring around a frosted-glass card,
- * matching the hero/contact ambient treatment. Typography uses the global
- * display/mono font tokens for consistency with the rest of the site.
- *
- * Accessibility:
- *   • Buttons are real <button>/<a> elements with descriptive aria-labels.
- *   • Copy feedback is mirrored in an `aria-live="polite"` region so screen
- *     readers announce the state change.
- *   • Focus rings follow the site convention (ring-2 ring-offset).
+ * Zero localStorage and zero intrusive floating toasts — feedback stays inline
+ * inside the card and is announced via `aria-live="polite"`.
  */
 
 interface CopyEmailCardProps {
@@ -29,6 +19,8 @@ interface CopyEmailCardProps {
   subject?: string
   body?: string
 }
+
+type CopyState = 'idle' | 'copied' | 'copied_opening' | 'error'
 
 function CopyIcon({ className }: { className?: string }) {
   return (
@@ -61,7 +53,18 @@ function SendIcon({ className }: { className?: string }) {
 
 export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
   const t = useTranslations('Contact')
-  const [copied, setCopied] = useState(false)
+  const [copyState, setCopyState] = useState<CopyState>('idle')
+  const timerRef = useRef<number | null>(null)
+
+  const copied = copyState === 'copied' || copyState === 'copied_opening'
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
 
   const mailtoHref = (() => {
     const params = new URLSearchParams()
@@ -77,7 +80,6 @@ export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
         await navigator.clipboard.writeText(email)
         return true
       }
-      // Legacy fallback for non-secure contexts.
       const ta = document.createElement('textarea')
       ta.value = email
       ta.setAttribute('readonly', '')
@@ -93,38 +95,44 @@ export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
     }
   }, [email])
 
-  const flashCopied = useCallback(() => {
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
+  const scheduleReset = useCallback((next: CopyState) => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current)
+    }
+    setCopyState(next)
+    timerRef.current = window.setTimeout(() => {
+      setCopyState('idle')
+      timerRef.current = null
+    }, 2400)
   }, [])
 
   const handleCopyOnly = useCallback(async () => {
     const ok = await copyToClipboard()
-    if (ok) {
-      flashCopied()
-      toast.success(t('emailCopied'))
-    } else {
-      toast.error(t('emailCopyError'))
-    }
-  }, [copyToClipboard, flashCopied, t])
+    scheduleReset(ok ? 'copied' : 'error')
+  }, [copyToClipboard, scheduleReset])
 
   const handleCopyAndSend = useCallback(
     async (event: React.MouseEvent<HTMLAnchorElement>) => {
-      // We keep the <a href="mailto:"> so that middle-click, cmd-click,
-      // and right-click "Copy link address" behave correctly. We intercept
-      // the normal left-click to also copy, then let the browser open mailto.
       if (event.defaultPrevented || event.button !== 0) return
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
 
       const ok = await copyToClipboard()
       if (ok) {
-        flashCopied()
-        toast.success(t('emailCopiedAndOpening'))
+        scheduleReset('copied_opening')
       }
-      // Let the default navigation (mailto:) proceed.
+      // Allow native mailto: navigation to proceed.
     },
-    [copyToClipboard, flashCopied, t]
+    [copyToClipboard, scheduleReset]
   )
+
+  const inlineMessage =
+    copyState === 'copied'
+      ? t('emailCopied')
+      : copyState === 'copied_opening'
+        ? t('emailCopiedAndOpening')
+        : copyState === 'error'
+          ? t('emailCopyError')
+          : null
 
   return (
     <div
@@ -172,43 +180,68 @@ export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
           </div>
 
           {/* Email + copy chip */}
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={handleCopyOnly}
-              aria-label={copied ? t('emailCopied') : `${t('copyEmailAria')} ${email}`}
-              className="group/email inline-flex items-center gap-2 rounded-xl
-                border border-slate-200 bg-slate-50 px-3 py-2
-                text-[15px] sm:text-base font-medium transition-colors
-                hover:border-slate-300 hover:bg-slate-100
-                dark:border-white/10 dark:bg-white/[0.04]
-                dark:hover:border-white/25 dark:hover:bg-white/[0.08]
-                focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-purple-400/70 focus-visible:ring-offset-2
-                focus-visible:ring-offset-transparent"
-              style={{
-                color: 'var(--color-text)',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              <span className="select-all truncate max-w-[65vw] sm:max-w-none">
-                {email}
-              </span>
-              <span
-                className="inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={handleCopyOnly}
+                aria-label={copied ? t('emailCopied') : `${t('copyEmailAria')} ${email}`}
+                className="group/email inline-flex items-center gap-2 rounded-xl cursor-pointer
+                  border border-slate-200 bg-slate-50 px-3 py-2
+                  text-[15px] sm:text-base font-medium transition-colors
+                  hover:border-slate-300 hover:bg-slate-100
+                  dark:border-white/10 dark:bg-white/[0.04]
+                  dark:hover:border-white/25 dark:hover:bg-white/[0.08]
+                  focus-visible:outline-none focus-visible:ring-2
+                  focus-visible:ring-purple-400/70 focus-visible:ring-offset-2
+                  focus-visible:ring-offset-transparent"
                 style={{
-                  background: copied
-                    ? 'rgba(16, 185, 129, 0.18)'
-                    : 'rgba(124, 58, 237, 0.18)',
-                  color: copied
-                    ? 'var(--color-green-neon)'
-                    : 'var(--color-purple-neon)',
+                  color: 'var(--color-text)',
+                  fontFamily: 'var(--font-mono)',
                 }}
-                aria-hidden="true"
               >
-                {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
-              </span>
-            </button>
+                <span className="select-all truncate max-w-[65vw] sm:max-w-none">
+                  {email}
+                </span>
+                <span
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+                  style={{
+                    background: copied
+                      ? 'rgba(16, 185, 129, 0.18)'
+                      : 'rgba(124, 58, 237, 0.18)',
+                    color: copied
+                      ? 'var(--color-green-neon)'
+                      : 'var(--color-purple-neon)',
+                  }}
+                  aria-hidden="true"
+                >
+                  {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
+                </span>
+              </button>
+            </div>
+
+            {/* Crisp inline feedback (replaces floating toast) */}
+            <div
+              role="status"
+              aria-live="polite"
+              className="min-h-[1.25rem] flex items-center"
+            >
+              {inlineMessage && (
+                <span
+                  className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity"
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    color:
+                      copyState === 'error'
+                        ? '#f87171'
+                        : 'var(--color-green-neon)',
+                  }}
+                >
+                  {copied && <CheckIcon className="h-3.5 w-3.5 shrink-0" />}
+                  <span>{inlineMessage}</span>
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Helper copy */}
@@ -239,11 +272,6 @@ export function CopyEmailCard({ email, subject, body }: CopyEmailCardProps) {
             <SendIcon className="h-4 w-4" />
             <span>{t('copyAndSend')}</span>
           </a>
-
-          {/* Screen-reader live region */}
-          <span className="sr-only" role="status" aria-live="polite">
-            {copied ? t('emailCopied') : ''}
-          </span>
         </div>
       </div>
     </div>

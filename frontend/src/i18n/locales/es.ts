@@ -138,6 +138,7 @@ const es: Translations = {
     newsletterSubscribe: 'Suscribirse',
     newsletterSubmitting: 'Suscribiendo…',
     newsletterSuccess: '¡Listo! Revisa tu bandeja para confirmar.',
+    newsletterSavedNoMail: '¡Suscripción guardada! Tus preferencias quedaron registradas.',
     newsletterError: 'No se pudo suscribir. Inténtalo de nuevo en un momento.',
     newsletterInvalidEmail: 'Por favor ingresa un correo válido.',
     newsletterNoSpam: 'Sin spam. Solo contenido de calidad.',

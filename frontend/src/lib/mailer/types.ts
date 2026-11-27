@@ -9,6 +9,15 @@ export interface ContactNotification {
   message: string
 }
 
+export interface TransactionalEmail {
+  to:       string
+  subject:  string
+  html:     string
+  text?:    string
+  from?:    string
+  replyTo?: string
+}
+
 export interface Mailer {
   /** Stable transport tag used for log lines and Firestore breadcrumbs. */
   readonly driver: string
@@ -18,6 +27,11 @@ export interface Mailer {
    * mark the Firestore record `failed` and return a stable user response.
    */
   sendContactNotification(msg: ContactNotification): Promise<void>
+  /**
+   * Deliver a generic transactional email (e.g. newsletter confirmation).
+   * Transport-agnostic so SMTP and Resend remain interchangeable via env.
+   */
+  sendEmail(msg: TransactionalEmail): Promise<void>
 }
 
 export class MailerError extends Error {

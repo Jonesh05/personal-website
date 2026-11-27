@@ -1,9 +1,9 @@
 // frontend/src/components/Blog/RelatedPosts.tsx
 import Link from 'next/link'
-import Image from 'next/image'
 import type { Post } from '@personal-website/shared'
 import { getRelatedPosts } from '@/lib/firestore/posts'
 import { LOCALE_TO_HREFLANG } from '@/i18n/routing'
+import BlogCoverImage from './BlogCoverImage.client'
 
 
 interface RelatedPostsProps {
@@ -42,17 +42,14 @@ function RelatedPostCard({ post, dateLocale }: RelatedPostCardProps) {
             className="group block bg-white dark:bg-gray-800 rounded-lg shadow-sm
         hover:shadow-md transition-shadow overflow-hidden"
         >
-            {post.featuredImage && (
-                <div className="relative h-32 overflow-hidden">
-                    <Image
-                        src={post.featuredImage}
-                        alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                </div>
-            )}
+            <div className="relative overflow-hidden border-b border-slate-200/70 dark:border-slate-800/80">
+                <BlogCoverImage
+                    src={post.featuredImage}
+                    alt={post.title}
+                    categoryTag={post.tags?.[0]}
+                    aspectClassName="aspect-[16/9]"
+                />
+            </div>
 
             <div className="p-4">
                 <h3 className="font-semibold text-gray-900 dark:text-white

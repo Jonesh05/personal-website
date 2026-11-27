@@ -1,8 +1,20 @@
 'use client'
 
 import { create } from 'zustand'
-import { auth } from '@/lib/firebase/client'
-import { User, signInWithPopup, GoogleAuthProvider, signOut as firebaseSignOut } from 'firebase/auth'
+// PERF: type-only import — erased at compile time, does NOT pull the Firebase
+// SDK into the initial bundle. Runtime Firebase code is loaded via dynamic
+// import() inside signInWithGoogle/signOut only.
+import type { User } from 'firebase/auth'
+
+// Loads the Firebase Auth SDK + initialized Auth instance on demand.
+async function loadFirebaseAuth() {
+  const [{ getFirebaseAuth }, firebaseAuth] = await Promise.all([
+    import('@/lib/firebase/client'),
+    import('firebase/auth'),
+  ])
+  const auth = await getFirebaseAuth()
+  return { auth, firebaseAuth }
+}
 
 // 1. Definimos el estado (Variables)
 interface AuthState {
@@ -51,6 +63,9 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
   signInWithGoogle: async () => {
     set({ loading: true, error: null })
     try {
+      const { auth, firebaseAuth } = await loadFirebaseAuth()
+      const { GoogleAuthProvider, signInWithPopup } = firebaseAuth
+
       // Admin identity is enforced server-side in /api/auth/login against the
       // ADMIN_EMAILS env allow-list. No account hint is set here leaking a
       // specific email into the client bundle is avoided on purpose.
@@ -85,9 +100,24 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
         error: null,
       })
     } catch (err) {
-      await firebaseSignOut(auth).catch(() => {})
+      const rawMessage = err instanceof Error ? err.message : 'Login failed'
+      // Ignore user-cancelled popup closures gently
+      const friendlyError = rawMessage.includes('auth/popup-closed-by-user')
+        ? 'Sign-in popup was closed before completing.'
+        : rawMessage.includes('auth/popup-blocked')
+        ? 'Sign-in popup was blocked by the browser. Please allow popups for this site.'
+        : rawMessage
+
+      // Best-effort Firebase sign-out so a half-completed popup flow doesn't
+      // leave a lingering client-side session.
+      try {
+        const { auth, firebaseAuth } = await loadFirebaseAuth()
+        await firebaseAuth.signOut(auth)
+      } catch {
+        // ignore — SDK may not even have loaded
+      }
       set({
-        error: err instanceof Error ? err.message : 'Login failed',
+        error: friendlyError,
         loading: false,
         isAdmin: false,
         initialized: true,
@@ -102,7 +132,8 @@ export const useAuthStore = create<AuthState & AuthActions>()((set) => ({
     set({ loading: true })
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
-      await firebaseSignOut(auth)
+      const { auth, firebaseAuth } = await loadFirebaseAuth()
+      await firebaseAuth.signOut(auth)
       set({ 
         isAdmin: false, 
         initialized: true, 

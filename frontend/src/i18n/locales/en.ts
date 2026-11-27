@@ -144,6 +144,7 @@ const en = {
     newsletterSubscribe: 'Subscribe',
     newsletterSubmitting: 'Subscribing…',
     newsletterSuccess: 'You\'re in, check your inbox to confirm.',
+    newsletterSavedNoMail: 'You\'re subscribed! Your preferences have been saved.',
     newsletterError: 'Subscription failed. Please try again in a moment.',
     newsletterInvalidEmail: 'Please enter a valid email.',
     newsletterNoSpam: 'No spam. Quality content only.',

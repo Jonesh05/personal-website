@@ -30,9 +30,9 @@ function isAdminEmail(email: string | undefined | null): boolean {
 export async function createSessionCookie(idToken: string): Promise<string> {
   const decoded = await adminAuth.verifyIdToken(idToken)
 
-  if (!isAdminEmail(decoded.email)) {
+  if (decoded.email_verified !== true || !isAdminEmail(decoded.email)) {
     // Log without echoing the attempted email back to the client.
-    console.warn('[auth/session] rejected non-admin login attempt')
+    console.warn('[auth/session] rejected non-admin or unverified login attempt')
     throw new Error('Unauthorized')
   }
 
@@ -51,7 +51,7 @@ export async function verifySessionCookie() {
 
   try {
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true)
-    if (!isAdminEmail(decoded.email)) return null
+    if (decoded.email_verified !== true || !isAdminEmail(decoded.email)) return null
     return decoded
   } catch {
     return null

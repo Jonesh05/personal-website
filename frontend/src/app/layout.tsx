@@ -7,12 +7,22 @@ import { AuthProvider }   from '@/components/providers/AuthProvider';
 import { ThemeProvider }  from '@/components/providers/ThemeProvider';
 import { LocaleProvider } from '@/i18n/LocaleContext';
 import { getServerLocale } from '@/i18n/server';
+import { ToastProvider }   from '@/components/providers/ToastProvider';
+import { getSiteUrl }      from '@/lib/siteConfig';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title:       'Jhonny Pimiento - Web3 & Blockchain Developer',
-  description: 'Portfolio of Jhonny Pimiento, Colombian entrepreneur specializing in Web3, blockchain, and full-stack development.',
+  metadataBase: new URL(getSiteUrl()),
+  title:        'Jhonny Pimiento - Web3 & Blockchain Developer',
+  description:  'Portfolio of Jhonny Pimiento, Colombian entrepreneur specializing in Web3, blockchain, and full-stack development.',
+  alternates: {
+    types: {
+      'application/rss+xml': [
+        { url: '/feed.xml', title: 'Jhonny Pimiento — Blog RSS Feed' },
+      ],
+    },
+  },
 };
 
 export default async function RootLayout({
@@ -37,6 +47,7 @@ export default async function RootLayout({
             <AuthProvider>
               <Navbar />
               {children}
+              <ToastProvider />
             </AuthProvider>
             <Footer />
           </LocaleProvider>

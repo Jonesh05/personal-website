@@ -1,15 +1,8 @@
 // frontend/src/lib/firestore/newsletter_events.ts
 // Append-only event log for the newsletter funnel. Used for internal
-// analytics ("how many subscribe attempts last week", "listmonk failure
-// rate", etc.) without storing any extra PII beyond the emailHash we
-// already keep on `newsletter_leads`.
-//
-// Design choices:
-//   - One document per event (immutable). No updates, no upserts.
-//   - The lead document id (sha256(email)) is denormalised on every event
-//     so we can filter by lead without joining.
-//   - Raw email is intentionally NOT stored on events; analytics only need
-//     the hash.
+// analytics ("how many subscribe attempts last week", "preference changes",
+// etc.) without storing any extra PII beyond the emailHash we already keep
+// on `newsletter_leads`.
 
 import 'server-only'
 import { FieldValue } from 'firebase-admin/firestore'
@@ -19,15 +12,17 @@ import type { NewsletterSource } from '@personal-website/shared/schemas/newslett
 const COLLECTION = 'newsletter_events'
 
 export type NewsletterEventType =
-  | 'subscribe_requested'   // request hit /api/newsletter/subscribe and passed validation
-  | 'listmonk_accepted'     // listmonk acknowledged the subscriber (still not opt-in confirmed)
-  | 'listmonk_failed'       // provider call errored after persistence
+  | 'subscribe_requested'   // request hit /api/subscribe and passed validation
+  | 'subscriber_synced'     // PostgreSQL (Prisma) upserted subscriber & tags
+  | 'subscriber_failed'     // PostgreSQL or Resend welcome email errored
+  | 'preferences_updated'   // user updated email or tags via magicToken
+  | 'subscriber_unsubscribed' // user opted out via Preference Center
 
 export interface NewsletterEventInput {
   emailHash: string
   type:      NewsletterEventType
   source:    NewsletterSource
-  /** Free-form provider metadata. Keep small; no PII. */
+  /** Free-form metadata. Keep small; no PII. */
   meta?:     Record<string, string | number | boolean | null>
 }
 

@@ -1,13 +1,33 @@
 'use client';
 
-import { useEffect, useRef, useMemo } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { HeroClient } from './HeroClient'
 import { useTranslations } from '@/i18n';
 
-gsap.registerPlugin(ScrollTrigger);
+const COLORS = [
+  { bg: 'rgba(191, 94, 255, 0.9)',  shadow: '0 0 8px 2px rgba(191, 94, 255, 0.7)'  },
+  { bg: 'rgba(0, 255, 178, 0.9)',   shadow: '0 0 8px 2px rgba(0, 255, 178, 0.7)'   },
+  { bg: 'rgba(255, 255, 255, 0.7)', shadow: '0 0 5px 1px rgba(255, 255, 255, 0.4)' },
+] as const
+
+interface ParticleData {
+  id:    number
+  size:  number
+  left:  number
+  top:   number
+  color: typeof COLORS[number]
+}
+
+function generateParticles(count: number): ParticleData[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id:    i,
+    size:  2 + Math.random() * 4,
+    left:  Math.random() * 100,
+    top:   Math.random() * 100,
+    color: COLORS[i % COLORS.length],
+  }))
+}
 
 const Hero = () => {
   const t = useTranslations('Hero');
@@ -17,81 +37,121 @@ const Hero = () => {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  
-  const particleData = useMemo(() => {
-    const COLORS = [
-      { bg: 'rgba(191, 94, 255, 0.9)',  shadow: '0 0 8px 2px rgba(191, 94, 255, 0.7)'  },
-      { bg: 'rgba(0, 255, 178, 0.9)',   shadow: '0 0 8px 2px rgba(0, 255, 178, 0.7)'   },
-      { bg: 'rgba(255, 255, 255, 0.7)', shadow: '0 0 5px 1px rgba(255, 255, 255, 0.4)' },
-    ];
-    return Array.from({ length: 55 }, (_, i) => ({
-      id:     i,
-      size:   2 + Math.random() * 4,
-      left:   Math.random() * 100,
-      top:    Math.random() * 100,
-      color:  COLORS[i % COLORS.length],
-    }));
 
-  }, []);
+  /**
+   * Particles are generated purely client-side after mount.
+   * Server always renders an empty array → no hydration mismatch.
+   * Desktop: 55 particles (full experience).
+   * Mobile: 18 particles (same visual, same animation, lighter budget).
+   */
+  const [particleData, setParticleData] = useState<ParticleData[]>([])
 
+  // Generate particles after mount — client-only, no SSR/hydration mismatch.
+  // No reduced-motion guard here: particles are a design feature the user
+  // wants visible. The GSAP animation guard below handles the motion pref.
   useEffect(() => {
-    const container = containerRef.current;
-    const title     = titleRef.current;
-    const subtitle  = subtitleRef.current;
-    const buttons   = buttonsRef.current;
-    if (!container || !title || !subtitle || !buttons) return;
+    const isMobile = window.innerWidth < 768
+    setParticleData(generateParticles(isMobile ? 18 : 55))
+  }, [])
 
-    // Estados iniciales
-    gsap.set([title, subtitle, buttons], { opacity: 0, y: 100, scale: 0.8 });
+  // Entrance timeline + scroll parallax. GSAP is dynamically imported so it
+  // stays out of the initial bundle and loads only after hydration.
+  useEffect(() => {
+    let cancelled = false
+    let cleanup = () => {}
 
-    // Timeline de entrada
-    const tl = gsap.timeline();
-    tl.to(title,    { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out' })
-      .to(subtitle, { opacity: 1, y: 0, scale: 1, duration: 1,   ease: 'power3.out' }, '-=0.8')
-      .to(buttons,  { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' }, '-=0.6');
+    void (async () => {
+      const { gsap } = await import('gsap')
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      if (cancelled) return
 
-    // ScrollTrigger parallax
-    ScrollTrigger.create({
-      trigger: container,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: 1,
-      onUpdate: (self) => {
-        const p = self.progress;
-        gsap.to(title,    { y: p * -100, scale: 1 - p * 0.3, opacity: 1 - p * 0.5, duration: 0.3 });
-        gsap.to(subtitle, { y: p * -80,  opacity: 1 - p * 0.7, duration: 0.3 });
-        gsap.to(buttons,  { y: p * -60,  opacity: 1 - p * 0.8, duration: 0.3 });
-        gsap.to(container, { backgroundPosition: `50% ${50 + p * 30}%`, duration: 0.3 });
-      },
-    });
+      gsap.registerPlugin(ScrollTrigger)
+
+      const container = containerRef.current;
+      const title     = titleRef.current;
+      const subtitle  = subtitleRef.current;
+      const buttons   = buttonsRef.current;
+      if (!container || !title || !subtitle || !buttons) return;
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (prefersReduced) {
+        gsap.set([title, subtitle, buttons], { opacity: 1, y: 0, scale: 1 })
+        return
+      }
+
+      // Estados iniciales
+      gsap.set([title, subtitle, buttons], { opacity: 0, y: 100, scale: 0.8 });
+
+      // Timeline de entrada
+      const tl = gsap.timeline();
+      tl.to(title,    { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out' })
+        .to(subtitle, { opacity: 1, y: 0, scale: 1, duration: 1,   ease: 'power3.out' }, '-=0.8')
+        .to(buttons,  { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' }, '-=0.6');
+
+      // ScrollTrigger parallax
+      ScrollTrigger.create({
+        trigger: container,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (self) => {
+          const p = self.progress;
+          gsap.to(title,    { y: p * -100, scale: 1 - p * 0.3, opacity: 1 - p * 0.5, duration: 0.3 });
+          gsap.to(subtitle, { y: p * -80,  opacity: 1 - p * 0.7, duration: 0.3 });
+          gsap.to(buttons,  { y: p * -60,  opacity: 1 - p * 0.8, duration: 0.3 });
+          gsap.to(container, { backgroundPosition: `50% ${50 + p * 30}%`, duration: 0.3 });
+        },
+      });
+
+      cleanup = () => {
+        tl.kill();
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+      }
+    })()
 
     return () => {
-      tl.kill();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      cancelled = true
+      cleanup()
     };
   }, []);
 
   useEffect(() => {
     const container = particlesRef.current;
-    if (!container) return;
+    if (!container || particleData.length === 0) return;
 
     const els = container.querySelectorAll<HTMLElement>('[data-particle]');
     if (els.length === 0) return;
 
-    const tweens = Array.from(els).map((el, i) =>
-      gsap.to(el, {
-        y:        -30 + Math.random() * 60,
-        x:        -20 + Math.random() * 40,
-        duration: 3 + Math.random() * 2,
-        repeat:   -1,
-        yoyo:     true,
-        ease:     'sine.inOut',
-        delay:    i * 0.08,
-      })
-    );
+    let cancelled = false
+    let cleanup = () => {}
 
-    return () => tweens.forEach((t) => t.kill());
-  }, [particleData]); // particleData 
+    void (async () => {
+      const { gsap } = await import('gsap')
+      if (cancelled) return
+
+      const isMobile = window.innerWidth < 768
+
+      const tweens = Array.from(els).map((el, i) =>
+        gsap.to(el, {
+          // Mobile: tighter movement so it stays light on the GPU
+          y:        (isMobile ? -15 : -30) + Math.random() * (isMobile ? 30 : 60),
+          x:        (isMobile ? -10 : -20) + Math.random() * (isMobile ? 20 : 40),
+          duration: (isMobile ? 4 : 3) + Math.random() * 2,
+          repeat:   -1,
+          yoyo:     true,
+          ease:     'sine.inOut',
+          delay:    i * 0.08,
+        })
+      );
+
+      cleanup = () => tweens.forEach((t) => t.kill())
+    })()
+
+    return () => {
+      cancelled = true
+      cleanup()
+    };
+  }, [particleData]);
 
   return (
     <section

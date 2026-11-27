@@ -8,25 +8,28 @@
 // MAILER_DRIVER=smtp     (default)  uses nodemailer against any SMTP relay
 // MAILER_DRIVER=resend              uses the Resend HTTP API
 //
-// Newsletter delivery (campaigns, double opt-in, unsubscribes) is owned by
-// listmonk and goes through its own SMTP config  see infra/listmonk.
-// This module is only for our small transactional surface (contact-form
-// notifications today; admin alerts tomorrow).
+// Newsletter delivery (campaigns, segmentation, preference center) is owned by
+// our Prisma + Resend Execution Layer (`infra/mailer-worker` and `/api/subscribe`).
+// This module is for our contact-form notification channel.
 
 import 'server-only'
-import type { ContactNotification, Mailer } from './types'
+import type { ContactNotification, Mailer, TransactionalEmail } from './types'
 import { MailerError } from './types'
 import { smtpMailer } from './smtp'
 import { resendMailer } from './resend'
 
-export type { ContactNotification, Mailer } from './types'
+export type { ContactNotification, Mailer, TransactionalEmail } from './types'
 export { MailerError } from './types'
 
 type DriverName = 'smtp' | 'resend'
 
 function pickDriver(): DriverName {
-  const raw = (process.env.MAILER_DRIVER ?? 'smtp').toLowerCase()
-  if (raw === 'resend') return 'resend'
+  const explicit = process.env.MAILER_DRIVER?.trim().toLowerCase()
+  if (explicit === 'resend') return 'resend'
+  if (explicit === 'smtp') return 'smtp'
+  // Auto-detect when MAILER_DRIVER is unset: prefer explicit SMTP relay, else Resend.
+  if (process.env.SMTP_HOST?.trim()) return 'smtp'
+  if (process.env.RESEND_API_KEY?.trim()) return 'resend'
   return 'smtp'
 }
 
@@ -46,4 +49,11 @@ export function getMailer(): Mailer {
  */
 export async function sendContactNotification(msg: ContactNotification): Promise<void> {
   await getMailer().sendContactNotification(msg)
+}
+
+/**
+ * Transport-agnostic transactional email helper (uses SMTP or Resend via `getMailer()`).
+ */
+export async function sendTransactionalEmail(msg: TransactionalEmail): Promise<void> {
+  await getMailer().sendEmail(msg)
 }

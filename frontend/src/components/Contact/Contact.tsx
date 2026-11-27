@@ -1,12 +1,13 @@
 import ContactForm from './ContactForm.client';
 import { CopyEmailCard } from './CopyEmailCard.client';
 import { getServerTranslations } from '@/i18n/server';
+import { getPublicContactEmail } from '@/lib/siteConfig';
 
-const EMAIL = 'jopimiento@gmail.com';
 const EMAIL_SUBJECT = "Let's connect";
 
 export default async function Contact() {
   const { t } = await getServerTranslations('Contact');
+  const email = getPublicContactEmail();
 
   return (
     <section
@@ -72,7 +73,7 @@ export default async function Contact() {
           {/* Left column email-first contact card */}
           <aside className="lg:col-span-2" aria-label={t('emailLabel')}>
             <CopyEmailCard
-              email={EMAIL}
+              email={email}
               subject={EMAIL_SUBJECT}
             />
           </aside>

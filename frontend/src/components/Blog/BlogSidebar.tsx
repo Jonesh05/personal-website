@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { getPopularTags, getFeaturedPosts } from '@/lib/firestore/posts'
 import { getServerTranslations } from '@/i18n/server'
 import { formatDateByLocale } from '@/utils/formatDate'
 import NewsletterForm from './NewsletterForm.client'
+import BlogCoverImage from './BlogCoverImage.client'
 
 interface BlogPostSidebarProps {
   postId: string
@@ -175,13 +175,12 @@ async function FeaturedPosts() {
             className="flex space-x-3 group"
           >
             {post.featuredImage && (
-              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <Image
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-slate-200/70 dark:ring-slate-800">
+                <BlogCoverImage
                   src={post.featuredImage}
                   alt={post.title}
-                  width={64}
-                  height={64}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  categoryTag={post.tags?.[0]}
+                  aspectClassName="aspect-square h-full"
                 />
               </div>
             )}

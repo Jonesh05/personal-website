@@ -1,10 +1,13 @@
 // frontend/src/lib/firebase/client.ts
 // Client-side Firebase SDK | AUTH ONLY
 // No Firestore client imports allowed, all Firestore access via Admin SDK on server
+//
+// PERF: firebase/app and firebase/auth are loaded via dynamic import() so the
+// ~110-150KB gzipped SDK stays out of the initial-render bundle. It is only
+// fetched when an admin actually triggers sign-in/sign-out.
 'use client'
 
-import { initializeApp, getApps, getApp } from 'firebase/app'
-import { getAuth, connectAuthEmulator } from 'firebase/auth'
+import type { Auth } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,14 +18,44 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
-const auth = getAuth(app)
+let authPromise: Promise<Auth> | null = null
 
-// Connect to Auth emulator in development
-if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
-  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
-  console.log('🔐 Firebase Auth connected to emulator')
+/**
+ * Lazily loads the Firebase SDK and initializes Auth exactly once.
+ * Safe to call concurrently — all callers share the same promise.
+ */
+export function getFirebaseAuth(): Promise<Auth> {
+  if (!authPromise) {
+    authPromise = (async () => {
+      if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+        authPromise = null
+        throw new Error(
+          'Missing Firebase client configuration (NEXT_PUBLIC_FIREBASE_API_KEY / AUTH_DOMAIN / PROJECT_ID).',
+        )
+      }
+
+      const [{ initializeApp, getApps, getApp }, { getAuth, connectAuthEmulator }] =
+        await Promise.all([import('firebase/app'), import('firebase/auth')])
+
+      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+      const auth = getAuth(app)
+
+      // Connect to Auth emulator in development
+      if (
+        typeof window !== 'undefined' &&
+        process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true'
+      ) {
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true })
+        console.log('🔐 Firebase Auth connected to emulator')
+      }
+
+      return auth
+    })().catch((err) => {
+      authPromise = null
+      throw err
+    })
+  }
+  return authPromise
 }
 
-export { app, auth }
 // NO Firestore exports, all Firestore access is via Admin SDK on server

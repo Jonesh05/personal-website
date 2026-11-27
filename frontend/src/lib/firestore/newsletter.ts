@@ -1,10 +1,8 @@
 // frontend/src/lib/firestore/newsletter.ts
-// Server-only repository for newsletter-lead tracking. listmonk is the source
-// of truth for subscribers; this collection is our internal funnel log so we
-// can see raw submissions even when the provider is down.
-//
-// `emailHash` (sha256) is used as the document id for natural dedupe and to
-// avoid leaking raw emails via document listings.
+// Server-only repository for newsletter-lead audit tracking. PostgreSQL (Prisma)
+// is the primary source of truth for subscribers and segmentation; this
+// collection is our internal funnel audit log so we capture raw submissions
+// with SHA-256 deduplication.
 
 import 'server-only'
 import { createHash } from 'crypto'
@@ -22,6 +20,7 @@ export function hashEmail(email: string): string {
 export interface CreateLeadInput {
   email:  string
   source: NewsletterSource
+  tags?:  string[]
 }
 
 /**
@@ -41,6 +40,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
         emailHash,
         email:     input.email,
         source:    input.source,
+        tags:      input.tags ?? ['web3'],
         status:    'pending' satisfies NewsletterLeadStatus,
         createdAt: now,
         updatedAt: now,

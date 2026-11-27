@@ -1,25 +1,28 @@
-import type { NewsletterSource } from '../schemas/newsletter.schema'
+import type { NewsletterSource, SubscriberStatus } from '../schemas/newsletter.schema'
 
-// Lead lifecycle. listmonk owns the true subscriber state (confirmation,
-// unsubscribe, bounce). Our Firestore row is an internal funnel signal only:
+// Lead lifecycle. PostgreSQL (Prisma) owns the true subscriber state
+// (pending, active, unsubscribed, tags, magicToken). Our Firestore row is an
+// internal funnel audit signal:
 //
-//   pending request persisted. This covers both "not yet sent to listmonk"
-//             and "sent to listmonk, awaiting the user's opt-in click", we
-//             intentionally do NOT promote to `confirmed` based on listmonk's
-//             synchronous ACK, because that ACK is not a user confirmation.
-//   failed   provider delivery failed after persistence. Internal-only.
-export type NewsletterLeadStatus = 'pending' | 'failed'
+//   pending  request persisted in Firestore audit log.
+//   synced   successfully upserted into PostgreSQL via Prisma.
+//   failed   database/provider delivery failed after Firestore persistence.
+export type NewsletterLeadStatus = 'pending' | 'synced' | 'failed'
 
-// Keep this record intentionally lean. listmonk is the source of truth for
-// subscriber data; Firestore is the raw submission log. Do not accrete
-// profile fields here if it's not needed for funnel analytics, it belongs
-// in listmonk (or nowhere).
 export interface NewsletterLead {
   emailHash: string
   email: string
   source: NewsletterSource
+  tags: string[]
   status: NewsletterLeadStatus
   createdAt: string
+  updatedAt: string
+}
+
+export interface SubscriberPreferencesDTO {
+  email: string
+  status: SubscriberStatus
+  tags: string[]
   updatedAt: string
 }
 

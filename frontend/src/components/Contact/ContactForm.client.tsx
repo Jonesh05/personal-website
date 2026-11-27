@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useId } from 'react';
+import { useTranslations } from '@/i18n';
 
 interface FieldProps {
   id: string;
@@ -9,6 +10,7 @@ interface FieldProps {
   required?: boolean;
   children: React.ReactNode;
 }
+
 function Field({ id, label, error, required, children }: FieldProps) {
   const errorId = `${id}-error`;
   return (
@@ -67,11 +69,10 @@ function useInputStyle(focused: boolean, hasError: boolean): React.CSSProperties
   return inputBase;
 }
 
-
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
-
 export default function ContactForm() {
+  const t = useTranslations('Contact');
   const uid = useId();
   const nameId    = `${uid}-name`;
   const emailId   = `${uid}-email`;
@@ -81,6 +82,7 @@ export default function ContactForm() {
   const [name,    setName]    = useState('');
   const [email,   setEmail]   = useState('');
   const [message, setMessage] = useState('');
+  const [website, setWebsite] = useState('');
   const [status,  setStatus]  = useState<Status>('idle');
   const [errors,  setErrors]  = useState<Record<string, string>>({});
 
@@ -88,15 +90,14 @@ export default function ContactForm() {
   const [emailFocus,   setEmailFocus]   = useState(false);
   const [messageFocus, setMessageFocus] = useState(false);
 
-
   function validate(): boolean {
     const next: Record<string, string> = {};
-    if (!name.trim())                        next.name    = 'Name is required.';
-    if (!email.trim())                       next.email   = 'Email is required.';
+    if (!name.trim())                        next.name    = t('err_name');
+    if (!email.trim())                       next.email   = t('err_email_req');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-                                             next.email   = 'Please enter a valid email.';
-    if (!message.trim())                     next.message = 'Message is required.';
-    else if (message.trim().length < 10)     next.message = 'Message must be at least 10 characters.';
+                                             next.email   = t('err_email_fmt');
+    if (!message.trim())                     next.message = t('err_msg_req');
+    else if (message.trim().length < 10)     next.message = t('err_msg_short');
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -111,7 +112,12 @@ export default function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          ...(website ? { website } : {}),
+        }),
       });
 
       const body = (await res.json().catch(() => ({}))) as {
@@ -135,6 +141,7 @@ export default function ContactForm() {
       setName('');
       setEmail('');
       setMessage('');
+      setWebsite('');
       setErrors({});
     } catch {
       setStatus('error');
@@ -145,14 +152,13 @@ export default function ContactForm() {
 
   return (
     <div
-      className="rounded-2xl p-7"
+      className="relative rounded-2xl p-7"
       style={{
         background: 'var(--color-surface-2)',
         border: '1px solid rgba(16, 185, 129, 0.25)',
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      
       <div
         className="absolute top-0 inset-x-0 h-px rounded-t-2xl"
         style={{
@@ -161,7 +167,6 @@ export default function ContactForm() {
         aria-hidden="true"
       />
 
-      
       {status === 'success' ? (
         <div
           role="status"
@@ -181,12 +186,13 @@ export default function ContactForm() {
             </svg>
           </span>
           <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--color-text)' }}>
-            Message sent!
+            {t('form_success_h')}
           </p>
           <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', fontSize: '14px' }}>
-            Thanks for reaching out. I&apos;ll get back to you soon.
+            {t('form_success_p')}
           </p>
           <button
+            type="button"
             onClick={() => setStatus('idle')}
             className="mt-2 px-5 py-2 rounded-full text-sm transition-all duration-200 bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 dark:bg-white/[0.05] dark:border-white/10 dark:text-[color:var(--color-text-muted)] dark:hover:bg-white/10"
             style={{
@@ -194,18 +200,18 @@ export default function ContactForm() {
               cursor: 'pointer',
             }}
           >
-            Send another
+            {t('form_again')}
           </button>
         </div>
       ) : (
         <form
           onSubmit={handleSubmit}
           noValidate
-          aria-label="Contact form"
+          aria-label={t('section_label')}
         >
           <div className="flex flex-col gap-5">
             {/* Name */}
-            <Field id={nameId} label="Your name" error={errors.name} required>
+            <Field id={nameId} label={t('form_name')} error={errors.name} required>
               <input
                 id={nameId}
                 type="text"
@@ -218,13 +224,13 @@ export default function ContactForm() {
                 aria-required="true"
                 aria-invalid={!!errors.name}
                 aria-describedby={errors.name ? `${nameId}-error` : undefined}
-                placeholder="Your name"
+                placeholder={t('placeholder_name')}
                 style={useInputStyle(nameFocus, !!errors.name)}
               />
             </Field>
 
             {/* Email */}
-            <Field id={emailId} label="Email address" error={errors.email} required>
+            <Field id={emailId} label={t('form_email')} error={errors.email} required>
               <input
                 id={emailId}
                 type="email"
@@ -237,13 +243,13 @@ export default function ContactForm() {
                 aria-required="true"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? `${emailId}-error` : undefined}
-                placeholder="you@example.com"
+                placeholder={t('placeholder_email')}
                 style={useInputStyle(emailFocus, !!errors.email)}
               />
             </Field>
 
-            
-            <Field id={messageId} label="Message" error={errors.message} required>
+            {/* Message */}
+            <Field id={messageId} label={t('form_message')} error={errors.message} required>
               <textarea
                 id={messageId}
                 value={message}
@@ -255,7 +261,7 @@ export default function ContactForm() {
                 aria-required="true"
                 aria-invalid={!!errors.message}
                 aria-describedby={errors.message ? `${messageId}-error` : undefined}
-                placeholder="Tell me about your project or idea…"
+                placeholder={t('placeholder_message')}
                 style={{ ...useInputStyle(messageFocus, !!errors.message), resize: 'vertical' }}
               />
               {/* Character hint */}
@@ -267,6 +273,25 @@ export default function ContactForm() {
                 {message.length} / 10 min
               </p>
             </Field>
+
+            {/* Anti-spam honeypot */}
+            <input
+              type="text"
+              name="website"
+              value={website}
+              onChange={e => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: '-10000px',
+                top: 'auto',
+                width: 1,
+                height: 1,
+                overflow: 'hidden',
+              }}
+            />
 
             {/* Error banner */}
             {status === 'error' && (
@@ -285,7 +310,7 @@ export default function ContactForm() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
-                Something went wrong. Please try again.
+                {t('form_error')}
               </div>
             )}
 
@@ -320,11 +345,11 @@ export default function ContactForm() {
                     <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeOpacity="0.25"/>
                     <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
-                  Sending…
+                  {t('form_sending')}
                 </>
               ) : (
                 <>
-                  Send Message
+                  {t('form_send')}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                     aria-hidden="true"

@@ -2,8 +2,6 @@
 
 import { useState }  from 'react'
 import { useRouter } from 'next/navigation'
-import { auth }      from '@/lib/firebase/client'
-import { signOut }   from 'firebase/auth'
 
 export function SignOutButton() {
   const router      = useRouter()
@@ -12,7 +10,17 @@ export function SignOutButton() {
   async function handleSignOut() {
     setBusy(true)
     await fetch('/api/auth/logout', { method: 'POST' })
-    await signOut(auth).catch(() => {})
+    // PERF: Firebase SDK is loaded on demand here so it stays out of the
+    // initial-render bundle.
+    try {
+      const [{ getFirebaseAuth }, { signOut }] = await Promise.all([
+        import('@/lib/firebase/client'),
+        import('firebase/auth'),
+      ])
+      await signOut(await getFirebaseAuth())
+    } catch {
+      // ignore — server session is already cleared
+    }
     router.replace('/blog')
     router.refresh()
   }

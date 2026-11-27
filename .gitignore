@@ -182,3 +182,4 @@ node_modules
 
 backups/
 *.sql.gz
+.tlbx

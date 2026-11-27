@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ProjectsData, Project } from './Projects.types';
+import type { ProjectImage } from '@/lib/cdn/image';
 
 const filterProjectsByCategory = (projects: Project[], category: string): Project[] => {
   if (category === 'all') return projects;
@@ -17,35 +18,46 @@ const getFeaturedProjects = (projects: Project[]): Project[] => {
   layer only for display labels (see
  *     `ProjectsPresentational`).
  */
+// ─── Image descriptors ────────────────────────────────────────────────────────
+// Use { provider: 'og' } until a real asset is uploaded to your CDN.
+// To swap to Cloudinary: { provider: 'cloudinary', publicId: 'projects/slug' }
+// To swap to Cloudflare: { provider: 'cloudflare', imageId: 'abc123' }
+// The resolver (resolveProjectImage) handles all URL construction automatically.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const img = (p: ProjectImage): ProjectImage => p
+
 const PROJECTS_DATA: ProjectsData = {
   categories: ['all', 'web', 'blockchain', 'AI/ML'],
   projects: [
     {
       id: '1',
-      title: 'Utilscore E-commerce',
+      title: 'Lanark Agentic E-commerce',
       description: {
-        en: 'A full e-commerce platform built with Vite + React + TypeScript. Ships with cart, checkout, product management and an admin dashboard.',
-        es: 'Plataforma de comercio electrónico completa construida con Vite + React + TypeScript. Incluye carrito, checkout, gestión de productos y panel administrativo.',
+        en: 'LANARK is an Execution Agentic Marketplace built on CELO. It integrates artificial intelligence, on-chain payments, stablecoins, and automation so that a user can discover products, negotiate, buy, and execute the entire transaction from a single experience.',
+        es: 'LANARK es un Execution Agentic Marketplace construido sobre CELO. Integra inteligencia artificial, pagos on-chain, stablecoins y automatización para que un usuario pueda descubrir productos, negociar, comprar y ejecutar toda la transacción desde una única experiencia.',
       },
-      image: 'https://picsum.photos/400/250?grayscale',
-      technologies: ['React', 'TypeScript', 'Vite', 'Tailwind', 'Zustand'],
-      tags:        ['React', 'TypeScript', 'Vite', 'Tailwind', 'Zustand'],
+      image: img({ provider: 'og' }),
+      technologies: ['React', 'TypeScript', 'Wagmi', 'Reown', 'Vercel AI SDK', 'SUPABASE', 'Azure Services'],
+      tags:        ['React', 'TypeScript', 'Wagmi', 'Reown', 'Vercel AI SDK', 'SUPABASE', 'Azure Services'],
       category:    'web',
       status:      'completed',
       accentColor: 'green',
       featured:    true,
-      year:        2024,
-      liveUrl:     'https://ecommerce-demo.com',
-      githubUrl:   'https://github.com/usuario/ecommerce',
+      year:        2026,
+      demoUrl:     'https://lanark-marketplace-agentic.vercel.app',
+      liveUrl:     'lanark-marketplace-agentic.vercel.app',
+      githubUrl:   'https://github.com/Jonesh05/lanark-marketplace-agentic/',
     },
     {
       id: '2',
-      title: 'NFT ReFi Platform',
+      title: 'Carbon Mint',
       description: {
         en: 'Regenerative-finance platform that uses NFTs to fund environmental projects. Smart contracts, minting and an integrated marketplace.',
         es: 'Plataforma de finanzas regenerativas que usa NFTs para proyectos ambientales. Smart contracts, minteo y marketplace integrado.',
       },
-      image: '/images/NFT-card.webp',
+      // Swap to { provider: 'cloudinary', publicId: 'projects/nft-refi' } once uploaded
+      image: img({ provider: 'og' }),
       technologies: ['Solidity', 'Hardhat', 'RainbowKit', 'Next.js', 'IPFS'],
       tags:         ['Solidity', 'Hardhat', 'RainbowKit', 'Next.js', 'IPFS'],
       category:    'blockchain',
@@ -54,7 +66,7 @@ const PROJECTS_DATA: ProjectsData = {
       featured:    true,
       year:        2024,
       demoUrl:     'https://nft-refi-demo.com',
-      githubUrl:   'https://github.com/usuario/nft-refi',
+      githubUrl:   'https://github.com/Jonesh05/CarbonMint-web3',
     },
     {
       id: '3',
@@ -63,31 +75,31 @@ const PROJECTS_DATA: ProjectsData = {
         en: 'Research and prototypes in Qiskit for quantum algorithms applied to portfolio optimization and ML workloads.',
         es: 'Investigación y prototipos con Qiskit para algoritmos cuánticos aplicados a optimización de portafolios y cargas de ML.',
       },
-      image: 'https://picsum.photos/400/250?grayscale',
+      image: img({ provider: 'og' }),
       technologies: ['Qiskit', 'Python', 'Jupyter', 'NumPy', 'Matplotlib'],
       tags:         ['Qiskit', 'Python', 'Jupyter', 'NumPy', 'Matplotlib'],
       category:    'AI/ML',
       status:      'in-progress',
       accentColor: 'green',
       featured:    false,
-      year:        2024,
+      year:        2025,
       githubUrl:   'https://github.com/usuario/quantum-research',
     },
     {
       id: '4',
       title: 'Hackathon Clerk',
       description: {
-        en: 'Winning hackathon entry: a supply-chain traceability system built on smart contracts and decentralized oracles.',
-        es: 'Proyecto ganador de hackathon: un sistema de trazabilidad de cadena de suministro basado en smart contracts y oráculos descentralizados.',
+        en: 'Hackathon entry: a supply-chain traceability system built on smart contracts and decentralized oracles.',
+        es: 'Hackathon: un sistema de trazabilidad de cadena de suministro basado en smart contracts y oráculos descentralizados.',
       },
-      image: 'https://picsum.photos/400/250?grayscale',
+      image: img({ provider: 'og' }),
       technologies: ['Solidity', 'Chainlink', 'React', 'Web3.js', 'Node.js'],
       tags:         ['Solidity', 'Chainlink', 'React', 'Web3.js', 'Node.js'],
       category:    'blockchain',
       status:      'completed',
       accentColor: 'purple',
       featured:    true,
-      year:        2023,
+      year:        2025,
       demoUrl:     'https://supply-chain-demo.com',
     },
     {
@@ -97,14 +109,14 @@ const PROJECTS_DATA: ProjectsData = {
         en: 'A complete design system with reusable components, design tokens and interactive documentation tailored for product teams.',
         es: 'Sistema de diseño completo con componentes reutilizables, tokens de diseño y documentación interactiva orientada a equipos de producto.',
       },
-      image: 'https://picsum.photos/400/250?grayscale',
+      image: img({ provider: 'og' }),
       technologies: ['React', 'Storybook', 'Figma', 'Styled Components'],
       tags:         ['React', 'Storybook', 'Figma', 'Styled Components'],
       category:    'web',
       status:      'completed',
       accentColor: 'green',
       featured:    false,
-      year:        2023,
+      year:        2025,
       liveUrl:     'https://design-system-demo.com',
     },
     {
@@ -114,14 +126,14 @@ const PROJECTS_DATA: ProjectsData = {
         en: 'Automated trading bot that combines ML-driven technical analysis with strategy execution across crypto exchanges.',
         es: 'Bot de trading automatizado que combina análisis técnico dirigido por ML con ejecución de estrategias en exchanges cripto.',
       },
-      image: 'https://picsum.photos/400/250?grayscale',
+      image: img({ provider: 'og' }),
       technologies: ['Python', 'TensorFlow', 'Pandas', 'Binance API'],
       tags:         ['Python', 'TensorFlow', 'Pandas', 'Binance API'],
       category:    'AI/ML',
       status:      'in-progress',
       accentColor: 'purple',
       featured:    false,
-      year:        2024,
+      year:        2025,
       githubUrl:   'https://github.com/usuario/ai-trading-bot',
     },
   ],
@@ -133,12 +145,8 @@ export const useProjects = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
-    const load = async () => {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setData(PROJECTS_DATA);
-      setLoading(false);
-    };
-    load();
+    setData(PROJECTS_DATA);
+    setLoading(false);
   }, []);
 
   const handleCategoryChange = useCallback((category: string) => {

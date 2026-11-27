@@ -2,7 +2,8 @@
 
 import { FC, useEffect, useRef, useState } from 'react';
 import { Project, ProjectsData } from './Projects.types';
-import gsap from 'gsap';
+import { resolveProjectImage } from '@/lib/cdn/image';
+import { ProjectCardVisual } from './ProjectCardVisual';
 import { useTranslations, useLocale } from '@/i18n';
 import type { Locale } from '@/i18n/constants';
 
@@ -74,53 +75,38 @@ const ProjectCard: FC<{
         aria-hidden="true"
       />
 
-      {/* Image */}
-      <img
-        src={project.image}
-        alt={project.title}
-        className="w-full h-40 object-cover"
-        style={{ borderBottom: `1px solid ${accent.border}` }}
-      />
-
-      {/* Body */}
-      <div className="flex flex-col flex-1 p-6">
-        {/* Meta row */}
-        <div className="flex items-center gap-2 flex-wrap mb-3">
-          <span
-            className="text-xs px-2 py-0.5 rounded-full font-bold uppercase"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              background: 'rgba(255,255,255,0.06)',
-              color: 'var(--color-text-muted)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            {project.category}
-          </span>
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-              project.status === 'completed'
-                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                : project.status === 'in-progress'
-                ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
-                : 'bg-slate-500/15 text-slate-400 border border-slate-500/30'
-            }`}
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {project.status === 'completed'
+      {/* Visual Header — Zero-HTTP inline SVG blueprint when provider === 'og', or CDN asset */}
+      {project.image.provider === 'og' ? (
+        <ProjectCardVisual
+          project={project}
+          hovered={hovered}
+          statusLabel={
+            project.status === 'completed'
               ? labels.statusDone
               : project.status === 'in-progress'
               ? labels.statusWip
-              : project.status}
-          </span>
-          <span
-            className="ml-auto text-xs"
-            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-faint)' }}
-          >
-            {project.year}
-          </span>
-        </div>
+              : project.status
+          }
+          featuredLabel={labels.featured}
+        />
+      ) : (
+        <img
+          src={resolveProjectImage(project.image, {
+            title:        project.title,
+            category:     project.category,
+            accentColor:  project.accentColor,
+            technologies: project.technologies,
+          })}
+          alt={project.title}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-44 object-cover"
+          style={{ borderBottom: `1px solid ${accent.border}` }}
+        />
+      )}
 
+      {/* Body */}
+      <div className="flex flex-col flex-1 p-6">
         {/* Title */}
         <h3
           className="text-xl font-bold mb-2 leading-tight transition-colors duration-200"
@@ -142,7 +128,7 @@ const ProjectCard: FC<{
         </p>
 
         {/* Tech tags */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
+        <div className="flex flex-wrap gap-1.5 mb-5">
           {project.technologies.map(tech => (
             <span
               key={tech}
@@ -197,7 +183,7 @@ const ProjectCard: FC<{
           )}
           {project.liveUrl && (
             <a
-              href={project.liveUrl}
+              href={project.liveUrl.startsWith('http') ? project.liveUrl : `https://${project.liveUrl}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs transition-all duration-200 ml-auto"
@@ -220,8 +206,8 @@ const ProjectCard: FC<{
         </div>
       </div>
 
-      {/* Featured badge */}
-      {project.featured && (
+      {/* Featured badge fallback when using non-OG raster image */}
+      {project.image.provider !== 'og' && project.featured && (
         <span
           className="absolute top-3 right-3 text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold"
           style={{
@@ -260,11 +246,22 @@ export const ProjectsPresentational: FC<Props> = ({
 
   useEffect(() => {
     if (cardsRef.current.length === 0) return;
-    gsap.fromTo(
-      cardsRef.current,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, stagger: 0.08, duration: 0.6, ease: 'power3.out' }
-    );
+    let cancelled = false;
+
+    // GSAP is loaded on demand so it stays out of the initial JS chunk.
+    (async () => {
+      const { default: gsap } = await import('gsap');
+      if (cancelled || !gsap || cardsRef.current.length === 0) return;
+      gsap.fromTo(
+        cardsRef.current,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, stagger: 0.08, duration: 0.6, ease: 'power3.out' }
+      );
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [projects]);
 
   return (
@@ -301,8 +298,11 @@ export const ProjectsPresentational: FC<Props> = ({
           </p>
         </header>
         
-        {/* Filter tabs */}
+        {/* Category filter — plain toggle buttons (no tabpanels exist, so
+            tab/tablist semantics would be invalid here) */}
         <div
+          role="group"
+          aria-label={t('section_label')}
           className="flex justify-center gap-1 p-1.5 mb-12 rounded-full mx-auto w-fit"
           style={{
             background: 'var(--color-surface-2)',
@@ -314,10 +314,10 @@ export const ProjectsPresentational: FC<Props> = ({
             return (
               <button
                 key={cat}
-                role="tab"
-                aria-selected={isActive}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => onCategoryChange(cat)}
-                className="px-4 py-1.5 rounded-full text-sm transition-all duration-200"
+                className="px-4 py-1.5 rounded-full text-sm transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize:   '13px',

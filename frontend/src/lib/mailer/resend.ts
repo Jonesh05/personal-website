@@ -10,8 +10,9 @@
 // CONTACT_NOTIFICATION_FROM   verified "From" address in Resend
 
 import 'server-only'
-import type { ContactNotification, Mailer } from './types'
+import type { ContactNotification, Mailer, TransactionalEmail } from './types'
 import { MailerError } from './types'
+import { getContactFrom } from '@/lib/siteConfig'
 
 const DRIVER = 'resend'
 
@@ -21,12 +22,23 @@ interface ResendConfig {
   from:   string
 }
 
+function readApiKey(): string {
+  const apiKey = process.env.RESEND_API_KEY?.trim() ?? ''
+  if (!apiKey) {
+    throw new MailerError('resend mailer is not configured (missing RESEND_API_KEY)', {
+      code: 'config',
+      driver: DRIVER,
+    })
+  }
+  return apiKey
+}
+
 function readConfig(): ResendConfig {
-  const apiKey = process.env.RESEND_API_KEY ?? ''
-  const to     = process.env.CONTACT_NOTIFICATION_TO ?? ''
-  const from   = process.env.CONTACT_NOTIFICATION_FROM ?? ''
-  if (!apiKey || !to || !from) {
-    throw new MailerError('resend mailer is not configured', { code: 'config', driver: DRIVER })
+  const apiKey = readApiKey()
+  const to     = process.env.CONTACT_NOTIFICATION_TO?.trim() ?? ''
+  const from   = getContactFrom()
+  if (!to || !from) {
+    throw new MailerError('resend contact mailer is not configured', { code: 'config', driver: DRIVER })
   }
   return { apiKey, to, from }
 }
@@ -66,24 +78,30 @@ function buildText(msg: ContactNotification): string {
   ].join('\n')
 }
 
-async function send(msg: ContactNotification): Promise<void> {
-  const cfg = readConfig()
-
+async function postToResend(payload: {
+  apiKey:   string
+  from:     string
+  to:       string
+  replyTo?: string
+  subject:  string
+  html:     string
+  text?:    string
+}): Promise<void> {
   let res: Response
   try {
     res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${cfg.apiKey}`,
+        'Authorization': `Bearer ${payload.apiKey}`,
         'Content-Type':  'application/json',
       },
       body: JSON.stringify({
-        from:     cfg.from,
-        to:       [cfg.to],
-        reply_to: msg.email,
-        subject:  buildSubject(msg.name),
-        html:     buildHtml(msg),
-        text:     buildText(msg),
+        from:     payload.from,
+        to:       [payload.to],
+        ...(payload.replyTo ? { reply_to: payload.replyTo } : {}),
+        subject:  payload.subject,
+        html:     payload.html,
+        ...(payload.text ? { text: payload.text } : {}),
       }),
       cache: 'no-store',
     })
@@ -93,7 +111,14 @@ async function send(msg: ContactNotification): Promise<void> {
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new MailerError(`resend responded ${res.status}`, {
+    let detail = ''
+    try {
+      const parsed = JSON.parse(text) as { message?: string; name?: string }
+      if (parsed.message) detail = ` — ${parsed.message}`
+    } catch {
+      if (text) detail = ` — ${text.slice(0, 160)}`
+    }
+    throw new MailerError(`resend responded ${res.status}${detail}`, {
       code: 'provider',
       driver: DRIVER,
       cause: text,
@@ -101,9 +126,43 @@ async function send(msg: ContactNotification): Promise<void> {
   }
 }
 
+async function send(msg: ContactNotification): Promise<void> {
+  const cfg = readConfig()
+  await postToResend({
+    apiKey:  cfg.apiKey,
+    from:    cfg.from,
+    to:      cfg.to,
+    replyTo: msg.email,
+    subject: buildSubject(msg.name),
+    html:    buildHtml(msg),
+    text:    buildText(msg),
+  })
+}
+
+async function sendEmail(msg: TransactionalEmail): Promise<void> {
+  const apiKey = readApiKey()
+  const from = msg.from?.trim() || getContactFrom()
+  if (!from) {
+    throw new MailerError('resend transactional email missing From address', {
+      code: 'config',
+      driver: DRIVER,
+    })
+  }
+  await postToResend({
+    apiKey,
+    from,
+    to:      msg.to,
+    replyTo: msg.replyTo,
+    subject: msg.subject,
+    html:    msg.html,
+    text:    msg.text,
+  })
+}
+
 export const resendMailer: Mailer = {
   driver: DRIVER,
   sendContactNotification: send,
+  sendEmail,
 }
 
 /**
